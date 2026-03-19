@@ -1,0 +1,27 @@
+[
+  {
+    "idi": 72509,
+    "codigo": 29983,
+    "nome_fantasia": "Distribuidora de Bebidas Cruzeiro",
+    "razao_nome": "Distribuidora de Bebidas Cruzeiro",
+    "cnpj_cpf": "01295096000125",
+    "ie_rg": null,
+    "endereco": null,
+    "numero": null,
+    "complemento": null,
+    "bairro": null,
+    "cidade": null,
+    "codigo_cidade": null,
+    "cep": null,
+    "estado": null,
+    "fone_fax": null,
+    "email": null,
+    "info_adicionais": null,
+    "data_inc": "2023-08-30 20:05:24",
+    "usuario_inc": null,
+    "data_alt": "2023-08-30 20:05:24",
+    "usuario_alt": null,
+    "data_del": null,
+    "usuario_del": 0
+  }
+]

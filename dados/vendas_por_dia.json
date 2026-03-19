@@ -1,0 +1,226 @@
+[
+  {
+    "data": "2026-03-01",
+    "faturamento": 616.34,
+    "pedidos": 8,
+    "ticket_medio": 104.32,
+    "pagamentos": {
+      "Débito": 16451,
+      "Crédito": 15445,
+      "Pix": 12442,
+      "Dinheiro": 417
+    }
+  },
+  {
+    "data": "2026-03-02",
+    "faturamento": 616.34,
+    "pedidos": 8,
+    "ticket_medio": 105.42,
+    "pagamentos": {
+      "Débito": 14715,
+      "Crédito": 14169,
+      "Pix": 11623,
+      "Dinheiro": 290
+    }
+  },
+  {
+    "data": "2026-03-03",
+    "faturamento": 616.34,
+    "pedidos": 8,
+    "ticket_medio": 105.42,
+    "pagamentos": {
+      "Débito": 14715,
+      "Crédito": 14169,
+      "Pix": 11623,
+      "Dinheiro": 290
+    }
+  },
+  {
+    "data": "2026-03-04",
+    "faturamento": 616.34,
+    "pedidos": 8,
+    "ticket_medio": 105.42,
+    "pagamentos": {
+      "Débito": 14715,
+      "Crédito": 14169,
+      "Pix": 11623,
+      "Dinheiro": 290
+    }
+  },
+  {
+    "data": "2026-03-05",
+    "faturamento": 616.34,
+    "pedidos": 8,
+    "ticket_medio": 108.19,
+    "pagamentos": {
+      "Débito": 13939,
+      "Crédito": 13115,
+      "Pix": 11324,
+      "Dinheiro": 246
+    }
+  },
+  {
+    "data": "2026-03-06",
+    "faturamento": 616.34,
+    "pedidos": 8,
+    "ticket_medio": 106.8,
+    "pagamentos": {
+      "Débito": 12684,
+      "Crédito": 11851,
+      "Pix": 10675,
+      "Dinheiro": 246
+    }
+  },
+  {
+    "data": "2026-03-07",
+    "faturamento": 616.34,
+    "pedidos": 8,
+    "ticket_medio": 106.59,
+    "pagamentos": {
+      "Débito": 11632,
+      "Crédito": 10829,
+      "Pix": 9644,
+      "Dinheiro": 190
+    }
+  },
+  {
+    "data": "2026-03-08",
+    "faturamento": 616.34,
+    "pedidos": 8,
+    "ticket_medio": 106.76,
+    "pagamentos": {
+      "Débito": 10390,
+      "Crédito": 9265,
+      "Pix": 8242,
+      "Dinheiro": 182
+    }
+  },
+  {
+    "data": "2026-03-09",
+    "faturamento": 616.34,
+    "pedidos": 8,
+    "ticket_medio": 108.26,
+    "pagamentos": {
+      "Débito": 8628,
+      "Crédito": 8317,
+      "Pix": 6514,
+      "Dinheiro": 142
+    }
+  },
+  {
+    "data": "2026-03-10",
+    "faturamento": 616.34,
+    "pedidos": 8,
+    "ticket_medio": 108.26,
+    "pagamentos": {
+      "Débito": 8628,
+      "Crédito": 8317,
+      "Pix": 6514,
+      "Dinheiro": 142
+    }
+  },
+  {
+    "data": "2026-03-11",
+    "faturamento": 616.34,
+    "pedidos": 8,
+    "ticket_medio": 108.26,
+    "pagamentos": {
+      "Débito": 8628,
+      "Crédito": 8317,
+      "Pix": 6514,
+      "Dinheiro": 142
+    }
+  },
+  {
+    "data": "2026-03-12",
+    "faturamento": 616.34,
+    "pedidos": 8,
+    "ticket_medio": 105.04,
+    "pagamentos": {
+      "Crédito": 7029,
+      "Débito": 6785,
+      "Pix": 5710,
+      "Dinheiro": 117
+    }
+  },
+  {
+    "data": "2026-03-13",
+    "faturamento": 616.34,
+    "pedidos": 8,
+    "ticket_medio": 101.77,
+    "pagamentos": {
+      "Crédito": 6205,
+      "Débito": 5472,
+      "Pix": 4488,
+      "Dinheiro": 117
+    }
+  },
+  {
+    "data": "2026-03-14",
+    "faturamento": 616.34,
+    "pedidos": 8,
+    "ticket_medio": 104.15,
+    "pagamentos": {
+      "Crédito": 4756,
+      "Débito": 4657,
+      "Pix": 3300,
+      "Dinheiro": 99
+    }
+  },
+  {
+    "data": "2026-03-15",
+    "faturamento": 616.34,
+    "pedidos": 8,
+    "ticket_medio": 105.3,
+    "pagamentos": {
+      "Crédito": 3647,
+      "Pix": 2571,
+      "Débito": 2553,
+      "Dinheiro": 75
+    }
+  },
+  {
+    "data": "2026-03-16",
+    "faturamento": 616.34,
+    "pedidos": 8,
+    "ticket_medio": 107.44,
+    "pagamentos": {
+      "Crédito": 2635,
+      "Débito": 1206,
+      "Pix": 672
+    }
+  },
+  {
+    "data": "2026-03-17",
+    "faturamento": 616.34,
+    "pedidos": 8,
+    "ticket_medio": 107.44,
+    "pagamentos": {
+      "Crédito": 2635,
+      "Débito": 1206,
+      "Pix": 672
+    }
+  },
+  {
+    "data": "2026-03-18",
+    "faturamento": 616.34,
+    "pedidos": 8,
+    "ticket_medio": 107.44,
+    "pagamentos": {
+      "Crédito": 2635,
+      "Débito": 1206,
+      "Pix": 672
+    }
+  },
+  {
+    "data": "2026-03-19",
+    "faturamento": 616.34,
+    "pedidos": 8,
+    "ticket_medio": 77.04,
+    "pagamentos": {
+      "Pix": 286,
+      "Débito": 180,
+      "Crédito": 150
+    }
+  }
+]

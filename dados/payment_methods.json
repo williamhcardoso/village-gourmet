@@ -1,0 +1,47 @@
+[
+  {
+    "idi": 72509,
+    "id": 218438,
+    "name": "Dinheiro",
+    "desc": null,
+    "status": 1,
+    "created_at": "2023-05-16 22:02:57",
+    "updated_at": "2023-05-16 22:02:57"
+  },
+  {
+    "idi": 72509,
+    "id": 218439,
+    "name": "Boleto Bancário",
+    "desc": null,
+    "status": 1,
+    "created_at": "2023-05-16 22:02:57",
+    "updated_at": "2023-05-16 22:02:57"
+  },
+  {
+    "idi": 72509,
+    "id": 218440,
+    "name": "Transferência",
+    "desc": null,
+    "status": 1,
+    "created_at": "2023-05-16 22:02:57",
+    "updated_at": "2023-05-16 22:02:57"
+  },
+  {
+    "idi": 72509,
+    "id": 218441,
+    "name": "Depósito",
+    "desc": null,
+    "status": 1,
+    "created_at": "2023-05-16 22:02:57",
+    "updated_at": "2023-05-16 22:02:57"
+  },
+  {
+    "idi": 72509,
+    "id": 218442,
+    "name": "Cartão de Débito",
+    "desc": null,
+    "status": 1,
+    "created_at": "2023-05-16 22:02:57",
+    "updated_at": "2023-05-16 22:02:57"
+  }
+]

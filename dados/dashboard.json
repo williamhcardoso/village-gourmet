@@ -1,0 +1,2622 @@
+{
+  "vendas_mes": 44755.40000000004,
+  "vendas_dia": 616.3399999999999,
+  "ticket_medio": 104.3249417249418,
+  "vendas_count": 8,
+  "vendas_count_month": 429,
+  "media_diaria": 0,
+  "start": "2026-03-01",
+  "end": "2026-03-20",
+  "top_chart_data": [
+    95564,
+    78627,
+    91889,
+    92302,
+    96665,
+    99914,
+    96156,
+    93835,
+    122312,
+    74204,
+    44755,
+    0
+  ],
+  "top_chart_labels": [
+    "mai",
+    "jun",
+    "jul",
+    "ago",
+    "set",
+    "out",
+    "nov",
+    "dez",
+    "jan",
+    "fev",
+    "mar",
+    "abr"
+  ],
+  "chart_semana_data": [
+    12770,
+    0,
+    0,
+    10028,
+    7143,
+    6633,
+    8182
+  ],
+  "chart_semana_labels": [
+    "domingo",
+    "segunda-feira",
+    "terça-feira",
+    "quarta-feira",
+    "quinta-feira",
+    "sexta-feira",
+    "sábado"
+  ],
+  "chart_horario_labels": [
+    "00:00",
+    "01:00",
+    "02:00",
+    "03:00",
+    "04:00",
+    "05:00",
+    "06:00",
+    "07:00",
+    "08:00",
+    "09:00",
+    "10:00",
+    "11:00",
+    "12:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+    "18:00",
+    "19:00",
+    "20:00",
+    "21:00",
+    "22:00",
+    "23:00"
+  ],
+  "chart_horario_data": [
+    4297,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    66,
+    2311,
+    6574,
+    11105,
+    11666,
+    8736
+  ],
+  "chart_pagamento_labels": [
+    "Débito",
+    "Crédito",
+    "Pix",
+    "Dinheiro"
+  ],
+  "chart_pagamento_data": [
+    16451,
+    15445,
+    12442,
+    417
+  ],
+  "chart_produto_labels": [
+    "Batata Supreme (creme de queijo)",
+    "Red Bull Sugarfree- lata 250ml",
+    "Adicional de Baicon",
+    "Pepsi Lata Black",
+    "Limao (und)",
+    "Soda Italiana maracuja vermelho",
+    "Guaraná Antarctica Lata 350 ml",
+    "Adicional de OVO",
+    "Village Isa",
+    "Pina Colada",
+    "H2O Limoneto",
+    "Tonica  Antartica lata",
+    "Guarana Antartica 1 litro ",
+    "Budweiser long neck",
+    "Guarnição mandioca",
+    "CDB - VILLAGE",
+    "Drink Negroni",
+    "Dose Vodka Smirnoff",
+    "Red Bull -  energético Lata - 250ml",
+    "Dose Uísque - Red Label",
+    "Trident",
+    "Campari Orange",
+    "Bolinho Artesanal Village",
+    "Guaraná Zero Lata 350 ml",
+    "Soda Italiana Frutas vermelhas",
+    "Adicional Hanburguer extra",
+    "Cozumel",
+    "Adicional de batata (100 gramas)",
+    "Coca-Cola Zero Lata 310 ml",
+    "Cupim Mexicano (mandioca frita)",
+    "H2O Limão",
+    "Caipirinha",
+    "Polenta",
+    "Village Piscininha de Cheddar",
+    "1\\2 Porção de Cupim do patrao",
+    "Copo Especial - Limão e Gelo",
+    "Guarnição de vinagrete",
+    "Chopp Brahma copo de 300 ml",
+    "Prato Executivo cupim- 150 gramas",
+    "Porção de mandioca frita 500 gramas",
+    "Petit Gateau",
+    "Batata recheada no pote (carne)",
+    "Necta Dourado",
+    "Soda Italiana de Maça verde",
+    "Preparo do Cozumel",
+    "1\\2 Porção de Alcatra- 250 gramas",
+    "Stella Artois Long Neck",
+    "Coca-Cola 1 Litro retornavel",
+    "Coxinha supreme",
+    "Guarnição Arroz",
+    "Coronita",
+    "Budweiser Long Neck Zero",
+    "Executivo Frango à Parmegiana",
+    "Água Mineral sem Gás",
+    "Caipirinha de Maracujá",
+    "Combo Australiano",
+    "Combo Village",
+    "Frango Oriental",
+    "Black burguer",
+    "Batata Mistura perfeita( carne desfiada e creme de queijo)",
+    "Corona extra long neck 330 ML",
+    "Suco de Laranja",
+    "Burguer Doce Pecado",
+    "Panqueca MAria Bonita ao molho branco",
+    "Coca-Cola Lata 310 ml",
+    "Village Burguer Crispy",
+    "Suco de Maracujá",
+    "Spaten 600 ml",
+    "Village Nordestino",
+    "Village Burguer Cheese",
+    "Água Mineral com gás",
+    "Village Burguer Páprica",
+    "Village Burguer Australiano",
+    "Golden Burguer",
+    "Stella Artois 600ml",
+    "Stella Pure Gold sem Gluten",
+    "Torre Chopp 2,5 Litros",
+    "Batata Mista ",
+    "Burguer Chicken Pepper",
+    "Brahma Chopp 600 ml",
+    "Batata dos Deuses (cheddar e bacon)",
+    "Cupim do patrao",
+    "Batata Frita",
+    "Porção Filé de Peixe 400g",
+    "Village Burguer Australiano Duplo",
+    "Corona 600",
+    "Village Salada Burguer",
+    "Frango Crocante",
+    "Panqueca Maria Bonita ao molho vermelho",
+    "Village Hambúrguer  Duplo",
+    "Alcatra Embrasada 500 gramas",
+    "Village Burguer",
+    "Bolinho Lampião (carne desfiada)",
+    "Filé Mignon à Parmegiana",
+    "Original 600ml",
+    "Antárctica Pilsen 600 ml",
+    "Chopp Brahma caneca de 350 ml",
+    "Fraldinha  Nobre"
+  ],
+  "chart_produto_desc": [
+    {
+      "label": "Batata Supreme (creme de queijo)",
+      "percent": 0
+    },
+    {
+      "label": "Red Bull Sugarfree- lata 250ml",
+      "percent": 0
+    },
+    {
+      "label": "Adicional de Baicon",
+      "percent": 0
+    },
+    {
+      "label": "Pepsi Lata Black",
+      "percent": 0
+    },
+    {
+      "label": "Limao (und)",
+      "percent": 0
+    },
+    {
+      "label": "Soda Italiana maracuja vermelho",
+      "percent": 0
+    },
+    {
+      "label": "Guaraná Antarctica Lata 350 ml",
+      "percent": 0
+    },
+    {
+      "label": "Adicional de OVO",
+      "percent": 0
+    },
+    {
+      "label": "Village Isa",
+      "percent": 0
+    },
+    {
+      "label": "Pina Colada",
+      "percent": 0
+    },
+    {
+      "label": "H2O Limoneto",
+      "percent": 0
+    },
+    {
+      "label": "Tonica  Antartica lata",
+      "percent": 0
+    },
+    {
+      "label": "Guarana Antartica 1 litro ",
+      "percent": 0
+    },
+    {
+      "label": "Budweiser long neck",
+      "percent": 0
+    },
+    {
+      "label": "Guarnição mandioca",
+      "percent": 0
+    },
+    {
+      "label": "CDB - VILLAGE",
+      "percent": 0
+    },
+    {
+      "label": "Drink Negroni",
+      "percent": 0
+    },
+    {
+      "label": "Dose Vodka Smirnoff",
+      "percent": 0
+    },
+    {
+      "label": "Red Bull -  energético Lata - 250ml",
+      "percent": 0
+    },
+    {
+      "label": "Dose Uísque - Red Label",
+      "percent": 0
+    },
+    {
+      "label": "Trident",
+      "percent": 0
+    },
+    {
+      "label": "Campari Orange",
+      "percent": 0
+    },
+    {
+      "label": "Bolinho Artesanal Village",
+      "percent": 0
+    },
+    {
+      "label": "Guaraná Zero Lata 350 ml",
+      "percent": 0
+    },
+    {
+      "label": "Soda Italiana Frutas vermelhas",
+      "percent": 0
+    },
+    {
+      "label": "Adicional Hanburguer extra",
+      "percent": 0
+    },
+    {
+      "label": "Cozumel",
+      "percent": 0
+    },
+    {
+      "label": "Adicional de batata (100 gramas)",
+      "percent": 0
+    },
+    {
+      "label": "Coca-Cola Zero Lata 310 ml",
+      "percent": 0
+    },
+    {
+      "label": "Cupim Mexicano (mandioca frita)",
+      "percent": 0
+    },
+    {
+      "label": "H2O Limão",
+      "percent": 0
+    },
+    {
+      "label": "Caipirinha",
+      "percent": 0
+    },
+    {
+      "label": "Polenta",
+      "percent": 0
+    },
+    {
+      "label": "Village Piscininha de Cheddar",
+      "percent": 0
+    },
+    {
+      "label": "1\\2 Porção de Cupim do patrao",
+      "percent": 0
+    },
+    {
+      "label": "Copo Especial - Limão e Gelo",
+      "percent": 0
+    },
+    {
+      "label": "Guarnição de vinagrete",
+      "percent": 0
+    },
+    {
+      "label": "Chopp Brahma copo de 300 ml",
+      "percent": 0
+    },
+    {
+      "label": "Prato Executivo cupim- 150 gramas",
+      "percent": 0
+    },
+    {
+      "label": "Porção de mandioca frita 500 gramas",
+      "percent": 0
+    },
+    {
+      "label": "Petit Gateau",
+      "percent": 0
+    },
+    {
+      "label": "Batata recheada no pote (carne)",
+      "percent": 0
+    },
+    {
+      "label": "Necta Dourado",
+      "percent": 0
+    },
+    {
+      "label": "Soda Italiana de Maça verde",
+      "percent": 0
+    },
+    {
+      "label": "Preparo do Cozumel",
+      "percent": 0
+    },
+    {
+      "label": "1\\2 Porção de Alcatra- 250 gramas",
+      "percent": 0
+    },
+    {
+      "label": "Stella Artois Long Neck",
+      "percent": 0
+    },
+    {
+      "label": "Coca-Cola 1 Litro retornavel",
+      "percent": 0
+    },
+    {
+      "label": "Coxinha supreme",
+      "percent": 0
+    },
+    {
+      "label": "Guarnição Arroz",
+      "percent": 0
+    },
+    {
+      "label": "Coronita",
+      "percent": 1
+    },
+    {
+      "label": "Budweiser Long Neck Zero",
+      "percent": 1
+    },
+    {
+      "label": "Executivo Frango à Parmegiana",
+      "percent": 1
+    },
+    {
+      "label": "Água Mineral sem Gás",
+      "percent": 1
+    },
+    {
+      "label": "Caipirinha de Maracujá",
+      "percent": 1
+    },
+    {
+      "label": "Combo Australiano",
+      "percent": 1
+    },
+    {
+      "label": "Combo Village",
+      "percent": 1
+    },
+    {
+      "label": "Frango Oriental",
+      "percent": 1
+    },
+    {
+      "label": "Black burguer",
+      "percent": 1
+    },
+    {
+      "label": "Batata Mistura perfeita( carne desfiada e creme de queijo)",
+      "percent": 1
+    },
+    {
+      "label": "Corona extra long neck 330 ML",
+      "percent": 1
+    },
+    {
+      "label": "Suco de Laranja",
+      "percent": 1
+    },
+    {
+      "label": "Burguer Doce Pecado",
+      "percent": 1
+    },
+    {
+      "label": "Panqueca MAria Bonita ao molho branco",
+      "percent": 1
+    },
+    {
+      "label": "Coca-Cola Lata 310 ml",
+      "percent": 1
+    },
+    {
+      "label": "Village Burguer Crispy",
+      "percent": 1
+    },
+    {
+      "label": "Suco de Maracujá",
+      "percent": 1
+    },
+    {
+      "label": "Spaten 600 ml",
+      "percent": 1
+    },
+    {
+      "label": "Village Nordestino",
+      "percent": 1
+    },
+    {
+      "label": "Village Burguer Cheese",
+      "percent": 1
+    },
+    {
+      "label": "Água Mineral com gás",
+      "percent": 1
+    },
+    {
+      "label": "Village Burguer Páprica",
+      "percent": 1
+    },
+    {
+      "label": "Village Burguer Australiano",
+      "percent": 1
+    },
+    {
+      "label": "Golden Burguer",
+      "percent": 1
+    },
+    {
+      "label": "Stella Artois 600ml",
+      "percent": 1
+    },
+    {
+      "label": "Stella Pure Gold sem Gluten",
+      "percent": 1
+    },
+    {
+      "label": "Torre Chopp 2,5 Litros",
+      "percent": 1
+    },
+    {
+      "label": "Batata Mista ",
+      "percent": 1
+    },
+    {
+      "label": "Burguer Chicken Pepper",
+      "percent": 1
+    },
+    {
+      "label": "Brahma Chopp 600 ml",
+      "percent": 2
+    },
+    {
+      "label": "Batata dos Deuses (cheddar e bacon)",
+      "percent": 2
+    },
+    {
+      "label": "Cupim do patrao",
+      "percent": 2
+    },
+    {
+      "label": "Batata Frita",
+      "percent": 2
+    },
+    {
+      "label": "Porção Filé de Peixe 400g",
+      "percent": 2
+    },
+    {
+      "label": "Village Burguer Australiano Duplo",
+      "percent": 2
+    },
+    {
+      "label": "Corona 600",
+      "percent": 2
+    },
+    {
+      "label": "Village Salada Burguer",
+      "percent": 3
+    },
+    {
+      "label": "Frango Crocante",
+      "percent": 3
+    },
+    {
+      "label": "Panqueca Maria Bonita ao molho vermelho",
+      "percent": 3
+    },
+    {
+      "label": "Village Hambúrguer  Duplo",
+      "percent": 3
+    },
+    {
+      "label": "Alcatra Embrasada 500 gramas",
+      "percent": 3
+    },
+    {
+      "label": "Village Burguer",
+      "percent": 3
+    },
+    {
+      "label": "Bolinho Lampião (carne desfiada)",
+      "percent": 3
+    },
+    {
+      "label": "Filé Mignon à Parmegiana",
+      "percent": 4
+    },
+    {
+      "label": "Original 600ml",
+      "percent": 4
+    },
+    {
+      "label": "Antárctica Pilsen 600 ml",
+      "percent": 6
+    },
+    {
+      "label": "Chopp Brahma caneca de 350 ml",
+      "percent": 7
+    },
+    {
+      "label": "Fraldinha  Nobre",
+      "percent": 7
+    }
+  ],
+  "chart_produto_data": [
+    0,
+    12,
+    15,
+    18,
+    22,
+    26,
+    30,
+    31,
+    40,
+    41,
+    45,
+    49,
+    50,
+    50,
+    56,
+    58,
+    58,
+    60,
+    60,
+    60,
+    67,
+    69,
+    70,
+    78,
+    79,
+    90,
+    91,
+    93,
+    94,
+    94,
+    98,
+    98,
+    100,
+    100,
+    102,
+    107,
+    108,
+    110,
+    115,
+    117,
+    128,
+    128,
+    131,
+    132,
+    139,
+    146,
+    194,
+    197,
+    203,
+    210,
+    224,
+    230,
+    239,
+    239,
+    243,
+    260,
+    260,
+    260,
+    272,
+    299,
+    314,
+    335,
+    335,
+    351,
+    390,
+    424,
+    459,
+    481,
+    485,
+    492,
+    502,
+    514,
+    542,
+    564,
+    565,
+    590,
+    623,
+    652,
+    670,
+    768,
+    846,
+    899,
+    979,
+    1037,
+    1040,
+    1043,
+    1267,
+    1272,
+    1326,
+    1337,
+    1364,
+    1450,
+    1495,
+    1699,
+    1860,
+    2673,
+    3121,
+    3139
+  ],
+  "chart_venda_dia_mes_data": [
+    3959,
+    2172,
+    3168,
+    3161,
+    4217,
+    4478,
+    3960,
+    3359,
+    3472,
+    3966,
+    4333,
+    3896,
+    616
+  ],
+  "chart_venda_dia_mes_labels": [
+    "01/03",
+    "04/03",
+    "05/03",
+    "06/03",
+    "07/03",
+    "08/03",
+    "11/03",
+    "12/03",
+    "13/03",
+    "14/03",
+    "15/03",
+    "18/03",
+    "19/03"
+  ],
+  "chart_payments_data": [
+    {
+      "idi": 72509,
+      "id": 43524269,
+      "name": "Retirada - Horta",
+      "value": 65,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-01-22T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43524270,
+      "name": "Retirada - Gelo",
+      "value": 20,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-01-22T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43598244,
+      "name": "Retirada - Gelo",
+      "value": 20,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-01-24T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43635045,
+      "name": "Retirada - Gelo",
+      "value": 20,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-01-25T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43749353,
+      "name": "Retirada - Horta",
+      "value": 60,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-01-29T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43785281,
+      "name": "Retirada - Gelo",
+      "value": 20,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-01-30T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43823608,
+      "name": "Retirada - Gelo",
+      "value": 30,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-01-31T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43977885,
+      "name": "Retirada - Horta",
+      "value": 48,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-02-04T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44116583,
+      "name": "Retirada - Gelo",
+      "value": 20,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-02-08T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44211402,
+      "name": "Retirada - Horta",
+      "value": 30,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-02-12T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44243452,
+      "name": "Retirada - Gelo",
+      "value": 20,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-02-13T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44243453,
+      "name": "Retirada - 2 abridor ",
+      "value": 9,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-02-13T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44277440,
+      "name": "Retirada - Temperos Pro Saude",
+      "value": 30,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-02-14T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44339545,
+      "name": "Retirada - Gelo",
+      "value": 20,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-02-15T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44426998,
+      "name": "Retirada - Gelo",
+      "value": 20,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-02-18T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44497237,
+      "name": "Retirada - Gelo",
+      "value": 20,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-02-21T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44556948,
+      "name": "Retirada - gelo",
+      "value": 20,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-02-22T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44646186,
+      "name": "Retirada - horta (couve, cebolinha)",
+      "value": 30,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-02-26T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44677415,
+      "name": "Retirada - pepino em conserva",
+      "value": 18,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-02-27T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44712433,
+      "name": "Retirada - Bobina",
+      "value": 20.25,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-02-28T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44747236,
+      "name": "Retirada - Gelo",
+      "value": 24,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-03-01T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44903669,
+      "name": "Retirada - Horta",
+      "value": 30,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-03-06T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45001445,
+      "name": "Retirada - Gelo",
+      "value": 20,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-03-08T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45094912,
+      "name": "Retirada - Horta",
+      "value": 36,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-03-11T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45128173,
+      "name": "Retirada - 2 caixa de grampo",
+      "value": 13.8,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-03-13T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45229529,
+      "name": "Retirada - Gelo",
+      "value": 20,
+      "type": "e",
+      "identificador": null,
+      "due_date": "2026-03-15T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43505362,
+      "name": "Vendas em Pix",
+      "value": 10,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-21T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43524271,
+      "name": "Vendas em Pix",
+      "value": 644.9,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-22T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43524272,
+      "name": "Vendas em Crédito",
+      "value": 1885.56,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-22T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43524273,
+      "name": "Vendas em Débito",
+      "value": 1547.12,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-22T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43524274,
+      "name": "Vendas em Dinheiro",
+      "value": 58,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-22T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43558817,
+      "name": "Vendas em Crédito",
+      "value": 2861.39,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-23T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43558818,
+      "name": "Vendas em Débito",
+      "value": 790.9,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-23T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43558819,
+      "name": "Vendas em Pix",
+      "value": 1272.01,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-23T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43558820,
+      "name": "Vendas em Dinheiro",
+      "value": 104.3,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-23T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43598245,
+      "name": "Vendas em Débito",
+      "value": 1249.96,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-24T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43598246,
+      "name": "Vendas em Dinheiro",
+      "value": 60.49,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-24T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43598247,
+      "name": "Vendas em Crédito",
+      "value": 3199.38,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-24T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43598248,
+      "name": "Vendas em Pix",
+      "value": 1572.1,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-24T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43635046,
+      "name": "Vendas em Débito",
+      "value": 2222.6,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-25T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43635047,
+      "name": "Vendas em Crédito",
+      "value": 1699.2,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-25T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43635048,
+      "name": "Vendas em Pix",
+      "value": 1421.69,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-25T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43635049,
+      "name": "Vendas em Dinheiro",
+      "value": 153.9,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-25T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43656575,
+      "name": "Vendas em Débito",
+      "value": 1095.68,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-25T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43656576,
+      "name": "Vendas em Crédito",
+      "value": 1813.43,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-25T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43656577,
+      "name": "Vendas em Pix",
+      "value": 1060.65,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-25T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43656578,
+      "name": "Vendas em Dinheiro",
+      "value": 54,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-25T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43749354,
+      "name": "Vendas em Crédito",
+      "value": 1400.19,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-29T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43749355,
+      "name": "Vendas em Débito",
+      "value": 757.6,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-29T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43749356,
+      "name": "Vendas em Pix",
+      "value": 732.3,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-29T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43785282,
+      "name": "Vendas em Débito",
+      "value": 677.54,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-30T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43785283,
+      "name": "Vendas em Crédito",
+      "value": 1659.68,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-30T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43785284,
+      "name": "Vendas em Pix",
+      "value": 913.95,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-30T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43785285,
+      "name": "Vendas em Dinheiro",
+      "value": 672.55,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-30T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43823609,
+      "name": "Vendas em Débito",
+      "value": 2000.53,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-31T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43823610,
+      "name": "Vendas em Dinheiro",
+      "value": 299.71,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-31T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43823611,
+      "name": "Vendas em Pix",
+      "value": 1597.65,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-31T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43823612,
+      "name": "Vendas em Crédito",
+      "value": 1503.58,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-01-31T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43859790,
+      "name": "Vendas em Débito",
+      "value": 2091.03,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-01T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43859791,
+      "name": "Vendas em Dinheiro",
+      "value": 207.98,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-01T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43859792,
+      "name": "Vendas em Pix",
+      "value": 2101.37,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-01T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43859793,
+      "name": "Vendas em Crédito",
+      "value": 2348.71,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-01T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43888565,
+      "name": "Vendas em Pix",
+      "value": 542.62,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-02T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43888566,
+      "name": "Vendas em Débito",
+      "value": 533.21,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-02T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43888567,
+      "name": "Vendas em Crédito",
+      "value": 1108.93,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-02T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43888568,
+      "name": "Vendas em Dinheiro",
+      "value": 97.9,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-02T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43977886,
+      "name": "Vendas em Débito",
+      "value": 540.79,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-04T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43977887,
+      "name": "Vendas em Crédito",
+      "value": 390.14,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-04T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43977888,
+      "name": "Vendas em Pix",
+      "value": 890.7,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-04T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 43977889,
+      "name": "Vendas em Dinheiro",
+      "value": 159.89,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-04T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44011222,
+      "name": "Vendas em Débito",
+      "value": 378.4,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-05T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44011223,
+      "name": "Vendas em Crédito",
+      "value": 1373.6,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-05T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44011224,
+      "name": "Vendas em Pix",
+      "value": 721.26,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-05T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44011225,
+      "name": "Vendas em Dinheiro",
+      "value": 128.24,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-05T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44047414,
+      "name": "Vendas em Dinheiro",
+      "value": 39.9,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-07T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44047415,
+      "name": "Vendas em Débito",
+      "value": 956.51,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-07T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44047416,
+      "name": "Vendas em Crédito",
+      "value": 1098.7,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-07T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44047417,
+      "name": "Vendas em Pix",
+      "value": 1613.63,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-07T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44086574,
+      "name": "Vendas em Dinheiro",
+      "value": 98,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-08T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44086575,
+      "name": "Vendas em Débito",
+      "value": 3236.74,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-08T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44086576,
+      "name": "Vendas em Pix",
+      "value": 1500.53,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-08T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44086577,
+      "name": "Vendas em Crédito",
+      "value": 1389.42,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-08T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44116584,
+      "name": "Vendas em Pix",
+      "value": 1134.52,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-08T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44116585,
+      "name": "Vendas em Dinheiro",
+      "value": 86.95,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-08T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44116586,
+      "name": "Vendas em Débito",
+      "value": 772.24,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-08T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44116587,
+      "name": "Vendas em Crédito",
+      "value": 1077.5,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-08T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44211403,
+      "name": "Vendas em Pix",
+      "value": 1315.6,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-12T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44211404,
+      "name": "Vendas em Crédito",
+      "value": 3857.02,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-12T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44211405,
+      "name": "Vendas em Dinheiro",
+      "value": 65,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-12T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44211406,
+      "name": "Vendas em Débito",
+      "value": 1697.06,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-12T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44243454,
+      "name": "Vendas em Crédito",
+      "value": 1447.25,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-13T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44243455,
+      "name": "Vendas em Débito",
+      "value": 1603.43,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-13T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44243456,
+      "name": "Vendas em Pix",
+      "value": 860.71,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-13T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44243457,
+      "name": "Vendas em Dinheiro",
+      "value": 46.5,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-13T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44277441,
+      "name": "Vendas em Débito",
+      "value": 1139.47,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-14T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44277442,
+      "name": "Vendas em Pix",
+      "value": 695.17,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-14T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44277443,
+      "name": "Vendas em Crédito",
+      "value": 1404.48,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-14T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44277444,
+      "name": "Vendas em Dinheiro",
+      "value": 126.3,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-14T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44315604,
+      "name": "Vendas em Crédito",
+      "value": 1303.99,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-15T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44315605,
+      "name": "Vendas em Pix",
+      "value": 1353.07,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-15T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44315606,
+      "name": "Vendas em Débito",
+      "value": 1654.23,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-15T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44315607,
+      "name": "Vendas em Dinheiro",
+      "value": 44.04,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-15T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44339546,
+      "name": "Vendas em Crédito",
+      "value": 985.76,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-15T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44339547,
+      "name": "Vendas em Pix",
+      "value": 543.5,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-15T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44339548,
+      "name": "Vendas em Débito",
+      "value": 143.7,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-15T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44339549,
+      "name": "Vendas em Dinheiro",
+      "value": 76.9,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-15T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44426999,
+      "name": "Vendas em Dinheiro",
+      "value": 79,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-18T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44427000,
+      "name": "Vendas em Débito",
+      "value": 836.3,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-18T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44427001,
+      "name": "Vendas em Crédito",
+      "value": 1405.14,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-18T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44427002,
+      "name": "Vendas em Pix",
+      "value": 422.08,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-18T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44457509,
+      "name": "Vendas em Crédito",
+      "value": 2573.9,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-19T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44457510,
+      "name": "Vendas em Pix",
+      "value": 404.16,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-19T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44457511,
+      "name": "Vendas em Débito",
+      "value": 907.69,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-19T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44497238,
+      "name": "Vendas em Crédito",
+      "value": 1625.94,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-21T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44497239,
+      "name": "Vendas em Débito",
+      "value": 665.07,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-21T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44497240,
+      "name": "Vendas em Pix",
+      "value": 1543.15,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-21T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44497241,
+      "name": "Vendas em Dinheiro",
+      "value": 73.5,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-21T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44529861,
+      "name": "Vendas em Crédito",
+      "value": 1196.82,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-22T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44529862,
+      "name": "Vendas em Pix",
+      "value": 1037.3,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-22T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44529863,
+      "name": "Vendas em Dinheiro",
+      "value": 30,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-22T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44529864,
+      "name": "Vendas em Débito",
+      "value": 1677.75,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-22T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44556949,
+      "name": "Vendas em Débito",
+      "value": 883.48,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-22T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44556950,
+      "name": "Vendas em Pix",
+      "value": 1140.3,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-22T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44556951,
+      "name": "Vendas em Crédito",
+      "value": 722.76,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-22T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44556952,
+      "name": "Vendas em Dinheiro",
+      "value": 95.3,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-22T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44646187,
+      "name": "Vendas em Débito",
+      "value": 1594.86,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-26T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44646188,
+      "name": "Vendas em Crédito",
+      "value": 1552.87,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-26T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44646189,
+      "name": "Vendas em Pix",
+      "value": 569.35,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-26T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44646190,
+      "name": "Vendas em Dinheiro",
+      "value": 7,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-26T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44677416,
+      "name": "Vendas em Débito",
+      "value": 642.34,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-27T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44677417,
+      "name": "Vendas em Crédito",
+      "value": 1168.35,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-27T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44677418,
+      "name": "Vendas em Pix",
+      "value": 895.3,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-27T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44677419,
+      "name": "Vendas em Dinheiro",
+      "value": 0.01,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-27T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44712434,
+      "name": "Vendas em Débito",
+      "value": 1135.63,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-28T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44712435,
+      "name": "Vendas em Crédito",
+      "value": 1019.35,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-28T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44712436,
+      "name": "Vendas em Pix",
+      "value": 2106.79,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-28T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44712437,
+      "name": "Vendas em Dinheiro",
+      "value": 99.7,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-02-28T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44747237,
+      "name": "Vendas em Débito",
+      "value": 1645.9,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-01T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44747238,
+      "name": "Vendas em Dinheiro",
+      "value": 79.59,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-01T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44747239,
+      "name": "Vendas em Pix",
+      "value": 1314.97,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-01T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44747240,
+      "name": "Vendas em Crédito",
+      "value": 1150.4,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-01T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44777796,
+      "name": "Vendas em Pix",
+      "value": 819.64,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-01T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44777797,
+      "name": "Vendas em Débito",
+      "value": 1664.5,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-01T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44777798,
+      "name": "Vendas em Dinheiro",
+      "value": 127,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-01T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44777799,
+      "name": "Vendas em Crédito",
+      "value": 1276.27,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-01T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44870424,
+      "name": "Vendas em Débito",
+      "value": 1413.6,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-05T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44870425,
+      "name": "Vendas em Dinheiro",
+      "value": 44,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-05T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44870426,
+      "name": "Vendas em Pix",
+      "value": 461.01,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-05T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44870427,
+      "name": "Vendas em Crédito",
+      "value": 1053.31,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-05T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44903670,
+      "name": "Vendas em Débito",
+      "value": 616.85,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-06T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44903671,
+      "name": "Vendas em Crédito",
+      "value": 1264.55,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-06T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44903672,
+      "name": "Vendas em Pix",
+      "value": 659.21,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-06T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44934154,
+      "name": "Vendas em Dinheiro",
+      "value": 56,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-06T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44934155,
+      "name": "Vendas em Débito",
+      "value": 1052.27,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-06T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44934156,
+      "name": "Vendas em Pix",
+      "value": 858.07,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-06T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44934157,
+      "name": "Vendas em Crédito",
+      "value": 1021.5,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-06T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44974628,
+      "name": "Vendas em Débito",
+      "value": 1919,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-08T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44974629,
+      "name": "Vendas em Crédito",
+      "value": 1599.95,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-08T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44974630,
+      "name": "Vendas em Pix",
+      "value": 1432.51,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-08T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 44974631,
+      "name": "Vendas em Dinheiro",
+      "value": 28,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-08T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45001446,
+      "name": "Vendas em Débito",
+      "value": 1085.06,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-08T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45001447,
+      "name": "Vendas em Pix",
+      "value": 1697.38,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-08T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45001448,
+      "name": "Vendas em Crédito",
+      "value": 912.37,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-08T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45001449,
+      "name": "Vendas em Dinheiro",
+      "value": 19.9,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-08T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45094913,
+      "name": "Vendas em Débito",
+      "value": 1842.8,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-11T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45094914,
+      "name": "Vendas em Crédito",
+      "value": 1288.34,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-11T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45094915,
+      "name": "Vendas em Pix",
+      "value": 804.06,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-11T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45094916,
+      "name": "Vendas em Dinheiro",
+      "value": 24.53,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-11T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45128174,
+      "name": "Vendas em Pix",
+      "value": 1222.63,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-13T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45128175,
+      "name": "Vendas em Débito",
+      "value": 1312.93,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-13T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45128176,
+      "name": "Vendas em Crédito",
+      "value": 1118.11,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-13T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45162298,
+      "name": "Vendas em Débito",
+      "value": 1465.88,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-14T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45162299,
+      "name": "Vendas em Crédito",
+      "value": 1190.97,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-14T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45162300,
+      "name": "Vendas em Dinheiro",
+      "value": 18.45,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-14T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45162301,
+      "name": "Vendas em Pix",
+      "value": 1188.16,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-14T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45198613,
+      "name": "Vendas em Crédito",
+      "value": 1263.84,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-15T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45198614,
+      "name": "Vendas em Pix",
+      "value": 1122.14,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-15T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45198615,
+      "name": "Vendas em Débito",
+      "value": 1762.34,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-15T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45198616,
+      "name": "Vendas em Dinheiro",
+      "value": 24,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-15T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45229530,
+      "name": "Vendas em Débito",
+      "value": 1038.55,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-15T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45229531,
+      "name": "Vendas em Pix",
+      "value": 1505.68,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-15T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45229532,
+      "name": "Vendas em Crédito",
+      "value": 820.8,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-15T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45229533,
+      "name": "Vendas em Dinheiro",
+      "value": 74.9,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-15T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45320136,
+      "name": "Vendas em Pix",
+      "value": 671.78,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-19T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45320137,
+      "name": "Vendas em Débito",
+      "value": 1205.63,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-19T00:00:00.000Z",
+      "pay_date": null
+    },
+    {
+      "idi": 72509,
+      "id": 45320138,
+      "name": "Vendas em Crédito",
+      "value": 2634.93,
+      "type": "r",
+      "identificador": null,
+      "due_date": "2026-03-19T00:00:00.000Z",
+      "pay_date": null
+    }
+  ],
+  "timeflow": [
+    0,
+    0.006,
+    0.007,
+    0.023,
+    0.029,
+    0.041,
+    0.045,
+    0.05,
+    0.057,
+    0.065
+  ],
+  "vendas_intervalo": 44755.4,
+  "pedidos_intervalo": 429,
+  "media_pedidos": 33,
+  "ticket_medio_periodo": 104.3249417249418
+}

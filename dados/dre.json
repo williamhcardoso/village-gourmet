@@ -1,0 +1,169 @@
+{
+  "dre": [
+    {
+      "id": 78951,
+      "name": "Receita Operacional Bruta",
+      "dre_row_id": 0,
+      "order": 0,
+      "type": "add",
+      "active": 1,
+      "dreRows": [],
+      "value": 0,
+      "finance_categories": []
+    },
+    {
+      "id": 78952,
+      "name": "Deduções das Receitas",
+      "dre_row_id": 0,
+      "order": 1,
+      "type": "sub",
+      "active": 1,
+      "dreRows": [],
+      "value": 0,
+      "finance_categories": []
+    },
+    {
+      "id": 78953,
+      "name": "Receita Operacional Líquida",
+      "dre_row_id": 0,
+      "order": 2,
+      "type": "res",
+      "active": 1,
+      "dreRows": [],
+      "value": 0,
+      "finance_categories": []
+    },
+    {
+      "id": 78954,
+      "name": "Custos da Mercadoria Vendida",
+      "dre_row_id": 0,
+      "order": 3,
+      "type": "sub",
+      "active": 1,
+      "dreRows": [],
+      "value": 0,
+      "finance_categories": []
+    },
+    {
+      "id": 78955,
+      "name": "Receita Bruta / Margem de Contribuição",
+      "dre_row_id": 0,
+      "order": 4,
+      "type": "res",
+      "active": 1,
+      "dreRows": [],
+      "value": 0,
+      "finance_categories": []
+    },
+    {
+      "id": 78956,
+      "name": "Despesa Operacional",
+      "dre_row_id": 0,
+      "order": 5,
+      "type": "sub",
+      "active": 1,
+      "dreRows": [],
+      "value": 0,
+      "finance_categories": []
+    },
+    {
+      "id": 78957,
+      "name": "Receitas Financeiras",
+      "dre_row_id": 0,
+      "order": 6,
+      "type": "add",
+      "active": 1,
+      "dreRows": [],
+      "value": 0,
+      "finance_categories": []
+    },
+    {
+      "id": 78958,
+      "name": "Despesas Financeiras",
+      "dre_row_id": 0,
+      "order": 7,
+      "type": "sub",
+      "active": 1,
+      "dreRows": [],
+      "value": 0,
+      "finance_categories": []
+    },
+    {
+      "id": 78959,
+      "name": "Outras Receitas",
+      "dre_row_id": 0,
+      "order": 8,
+      "type": "add",
+      "active": 1,
+      "dreRows": [],
+      "value": 0,
+      "finance_categories": []
+    },
+    {
+      "id": 78960,
+      "name": "Outras Despesas",
+      "dre_row_id": 0,
+      "order": 9,
+      "type": "sub",
+      "active": 1,
+      "dreRows": [],
+      "value": 0,
+      "finance_categories": []
+    },
+    {
+      "id": 78961,
+      "name": "Depreciação",
+      "dre_row_id": 0,
+      "order": 10,
+      "type": "sub",
+      "active": 1,
+      "dreRows": [],
+      "value": 0,
+      "finance_categories": []
+    },
+    {
+      "id": 78962,
+      "name": "Lucro Bruto / EBIT",
+      "dre_row_id": 0,
+      "order": 11,
+      "type": "res",
+      "active": 1,
+      "dreRows": [],
+      "value": 0,
+      "finance_categories": []
+    },
+    {
+      "id": 78963,
+      "name": "Tributos",
+      "dre_row_id": 0,
+      "order": 12,
+      "type": "sub",
+      "active": 1,
+      "dreRows": [],
+      "value": 0,
+      "finance_categories": []
+    },
+    {
+      "id": 78964,
+      "name": "Distribuição de Lucros ou Dividendos",
+      "dre_row_id": 0,
+      "order": 13,
+      "type": "sub",
+      "active": 1,
+      "dreRows": [],
+      "value": 0,
+      "finance_categories": []
+    },
+    {
+      "id": 78965,
+      "name": "Lucro ou Prejuízo após os tributos",
+      "dre_row_id": 0,
+      "order": 14,
+      "type": "res",
+      "active": 1,
+      "dreRows": [],
+      "value": 0,
+      "finance_categories": []
+    }
+  ]
+}

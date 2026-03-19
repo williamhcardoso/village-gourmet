@@ -1,0 +1,17 @@
+{
+  "start": "01/03/2026",
+  "end": "31/03/2026",
+  "order_count": 55,
+  "order_total": 48730.46,
+  "order_revenue_total": 48874.259999999995,
+  "order_expense_total": 143.8,
+  "pending_revenue_total": 48874.259999999995,
+  "pending_expense_total": 143.8,
+  "pending_revenue_count": 49,
+  "pending_expense_count": 6,
+  "paid_revenue_total": 0,
+  "paid_expense_total": 0,
+  "paid_revenue_count": 0,
+  "paid_expense_count": 0,
+  "saldo": -1304309.4
+}

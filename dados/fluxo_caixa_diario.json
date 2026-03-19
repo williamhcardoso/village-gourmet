@@ -1,0 +1,3099 @@
+[
+  {
+    "data": "2026-03-01",
+    "dados": {
+      "categories": {
+        "230786": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230786,
+          "type": "r"
+        },
+        "230787": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230787,
+          "type": "e"
+        }
+      },
+      "flow": [
+        {
+          "period": "fev/26",
+          "current_month": false,
+          "total_revenue": 75093.78,
+          "total_expense": 305.25,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 74788.53,
+          "total": 1031261.69,
+          "total_prev": 956473.1599999999,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 305.25
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 75093.78
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mar/26",
+          "current_month": true,
+          "total_revenue": 48874.26,
+          "total_expense": 143.8,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 48730.46,
+          "total": 1079992.15,
+          "total_prev": 1031261.69,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 143.8
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 48874.26
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "abr/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mai/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jun/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jul/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "ago/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "set/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        }
+      ]
+    }
+  },
+  {
+    "data": "2026-03-02",
+    "dados": {
+      "categories": {
+        "230786": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230786,
+          "type": "r"
+        },
+        "230787": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230787,
+          "type": "e"
+        }
+      },
+      "flow": [
+        {
+          "period": "fev/26",
+          "current_month": false,
+          "total_revenue": 75093.78,
+          "total_expense": 305.25,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 74788.53,
+          "total": 1031261.69,
+          "total_prev": 956473.1599999999,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 305.25
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 75093.78
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mar/26",
+          "current_month": true,
+          "total_revenue": 48874.26,
+          "total_expense": 143.8,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 48730.46,
+          "total": 1079992.15,
+          "total_prev": 1031261.69,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 143.8
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 48874.26
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "abr/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mai/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jun/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jul/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "ago/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "set/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        }
+      ]
+    }
+  },
+  {
+    "data": "2026-03-03",
+    "dados": {
+      "categories": {
+        "230786": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230786,
+          "type": "r"
+        },
+        "230787": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230787,
+          "type": "e"
+        }
+      },
+      "flow": [
+        {
+          "period": "fev/26",
+          "current_month": false,
+          "total_revenue": 75093.78,
+          "total_expense": 305.25,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 74788.53,
+          "total": 1031261.69,
+          "total_prev": 956473.1599999999,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 305.25
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 75093.78
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mar/26",
+          "current_month": true,
+          "total_revenue": 48874.26,
+          "total_expense": 143.8,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 48730.46,
+          "total": 1079992.15,
+          "total_prev": 1031261.69,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 143.8
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 48874.26
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "abr/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mai/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jun/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jul/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "ago/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "set/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        }
+      ]
+    }
+  },
+  {
+    "data": "2026-03-04",
+    "dados": {
+      "categories": {
+        "230786": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230786,
+          "type": "r"
+        },
+        "230787": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230787,
+          "type": "e"
+        }
+      },
+      "flow": [
+        {
+          "period": "fev/26",
+          "current_month": false,
+          "total_revenue": 75093.78,
+          "total_expense": 305.25,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 74788.53,
+          "total": 1031261.69,
+          "total_prev": 956473.1599999999,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 305.25
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 75093.78
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mar/26",
+          "current_month": true,
+          "total_revenue": 48874.26,
+          "total_expense": 143.8,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 48730.46,
+          "total": 1079992.15,
+          "total_prev": 1031261.69,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 143.8
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 48874.26
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "abr/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mai/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jun/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jul/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "ago/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "set/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        }
+      ]
+    }
+  },
+  {
+    "data": "2026-03-05",
+    "dados": {
+      "categories": {
+        "230786": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230786,
+          "type": "r"
+        },
+        "230787": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230787,
+          "type": "e"
+        }
+      },
+      "flow": [
+        {
+          "period": "fev/26",
+          "current_month": false,
+          "total_revenue": 75093.78,
+          "total_expense": 305.25,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 74788.53,
+          "total": 1031261.69,
+          "total_prev": 956473.1599999999,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 305.25
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 75093.78
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mar/26",
+          "current_month": true,
+          "total_revenue": 48874.26,
+          "total_expense": 143.8,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 48730.46,
+          "total": 1079992.15,
+          "total_prev": 1031261.69,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 143.8
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 48874.26
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "abr/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mai/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jun/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jul/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "ago/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "set/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        }
+      ]
+    }
+  },
+  {
+    "data": "2026-03-06",
+    "dados": {
+      "categories": {
+        "230786": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230786,
+          "type": "r"
+        },
+        "230787": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230787,
+          "type": "e"
+        }
+      },
+      "flow": [
+        {
+          "period": "fev/26",
+          "current_month": false,
+          "total_revenue": 75093.78,
+          "total_expense": 305.25,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 74788.53,
+          "total": 1031261.69,
+          "total_prev": 956473.1599999999,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 305.25
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 75093.78
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mar/26",
+          "current_month": true,
+          "total_revenue": 48874.26,
+          "total_expense": 143.8,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 48730.46,
+          "total": 1079992.15,
+          "total_prev": 1031261.69,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 143.8
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 48874.26
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "abr/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mai/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jun/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jul/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "ago/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "set/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        }
+      ]
+    }
+  },
+  {
+    "data": "2026-03-07",
+    "dados": {
+      "categories": {
+        "230786": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230786,
+          "type": "r"
+        },
+        "230787": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230787,
+          "type": "e"
+        }
+      },
+      "flow": [
+        {
+          "period": "fev/26",
+          "current_month": false,
+          "total_revenue": 75093.78,
+          "total_expense": 305.25,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 74788.53,
+          "total": 1031261.69,
+          "total_prev": 956473.1599999999,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 305.25
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 75093.78
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mar/26",
+          "current_month": true,
+          "total_revenue": 48874.26,
+          "total_expense": 143.8,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 48730.46,
+          "total": 1079992.15,
+          "total_prev": 1031261.69,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 143.8
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 48874.26
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "abr/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mai/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jun/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jul/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "ago/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "set/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        }
+      ]
+    }
+  },
+  {
+    "data": "2026-03-08",
+    "dados": {
+      "categories": {
+        "230786": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230786,
+          "type": "r"
+        },
+        "230787": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230787,
+          "type": "e"
+        }
+      },
+      "flow": [
+        {
+          "period": "fev/26",
+          "current_month": false,
+          "total_revenue": 75093.78,
+          "total_expense": 305.25,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 74788.53,
+          "total": 1031261.69,
+          "total_prev": 956473.1599999999,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 305.25
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 75093.78
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mar/26",
+          "current_month": true,
+          "total_revenue": 48874.26,
+          "total_expense": 143.8,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 48730.46,
+          "total": 1079992.15,
+          "total_prev": 1031261.69,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 143.8
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 48874.26
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "abr/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mai/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jun/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jul/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "ago/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "set/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        }
+      ]
+    }
+  },
+  {
+    "data": "2026-03-09",
+    "dados": {
+      "categories": {
+        "230786": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230786,
+          "type": "r"
+        },
+        "230787": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230787,
+          "type": "e"
+        }
+      },
+      "flow": [
+        {
+          "period": "fev/26",
+          "current_month": false,
+          "total_revenue": 75093.78,
+          "total_expense": 305.25,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 74788.53,
+          "total": 1031261.69,
+          "total_prev": 956473.1599999999,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 305.25
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 75093.78
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mar/26",
+          "current_month": true,
+          "total_revenue": 48874.26,
+          "total_expense": 143.8,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 48730.46,
+          "total": 1079992.15,
+          "total_prev": 1031261.69,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 143.8
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 48874.26
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "abr/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mai/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jun/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jul/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "ago/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "set/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        }
+      ]
+    }
+  },
+  {
+    "data": "2026-03-10",
+    "dados": {
+      "categories": {
+        "230786": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230786,
+          "type": "r"
+        },
+        "230787": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230787,
+          "type": "e"
+        }
+      },
+      "flow": [
+        {
+          "period": "fev/26",
+          "current_month": false,
+          "total_revenue": 75093.78,
+          "total_expense": 305.25,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 74788.53,
+          "total": 1031261.69,
+          "total_prev": 956473.1599999999,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 305.25
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 75093.78
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mar/26",
+          "current_month": true,
+          "total_revenue": 48874.26,
+          "total_expense": 143.8,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 48730.46,
+          "total": 1079992.15,
+          "total_prev": 1031261.69,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 143.8
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 48874.26
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "abr/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mai/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jun/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jul/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "ago/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "set/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        }
+      ]
+    }
+  },
+  {
+    "data": "2026-03-11",
+    "dados": {
+      "categories": {
+        "230786": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230786,
+          "type": "r"
+        },
+        "230787": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230787,
+          "type": "e"
+        }
+      },
+      "flow": [
+        {
+          "period": "fev/26",
+          "current_month": false,
+          "total_revenue": 75093.78,
+          "total_expense": 305.25,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 74788.53,
+          "total": 1031261.69,
+          "total_prev": 956473.1599999999,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 305.25
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 75093.78
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mar/26",
+          "current_month": true,
+          "total_revenue": 48874.26,
+          "total_expense": 143.8,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 48730.46,
+          "total": 1079992.15,
+          "total_prev": 1031261.69,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 143.8
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 48874.26
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "abr/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mai/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jun/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jul/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "ago/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "set/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        }
+      ]
+    }
+  },
+  {
+    "data": "2026-03-12",
+    "dados": {
+      "categories": {
+        "230786": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230786,
+          "type": "r"
+        },
+        "230787": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230787,
+          "type": "e"
+        }
+      },
+      "flow": [
+        {
+          "period": "fev/26",
+          "current_month": false,
+          "total_revenue": 75093.78,
+          "total_expense": 305.25,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 74788.53,
+          "total": 1031261.69,
+          "total_prev": 956473.1599999999,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 305.25
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 75093.78
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mar/26",
+          "current_month": true,
+          "total_revenue": 48874.26,
+          "total_expense": 143.8,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 48730.46,
+          "total": 1079992.15,
+          "total_prev": 1031261.69,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 143.8
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 48874.26
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "abr/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mai/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jun/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jul/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "ago/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "set/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        }
+      ]
+    }
+  },
+  {
+    "data": "2026-03-13",
+    "dados": {
+      "categories": {
+        "230786": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230786,
+          "type": "r"
+        },
+        "230787": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230787,
+          "type": "e"
+        }
+      },
+      "flow": [
+        {
+          "period": "fev/26",
+          "current_month": false,
+          "total_revenue": 75093.78,
+          "total_expense": 305.25,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 74788.53,
+          "total": 1031261.69,
+          "total_prev": 956473.1599999999,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 305.25
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 75093.78
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mar/26",
+          "current_month": true,
+          "total_revenue": 48874.26,
+          "total_expense": 143.8,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 48730.46,
+          "total": 1079992.15,
+          "total_prev": 1031261.69,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 143.8
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 48874.26
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "abr/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mai/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jun/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jul/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "ago/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "set/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        }
+      ]
+    }
+  },
+  {
+    "data": "2026-03-14",
+    "dados": {
+      "categories": {
+        "230786": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230786,
+          "type": "r"
+        },
+        "230787": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230787,
+          "type": "e"
+        }
+      },
+      "flow": [
+        {
+          "period": "fev/26",
+          "current_month": false,
+          "total_revenue": 75093.78,
+          "total_expense": 305.25,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 74788.53,
+          "total": 1031261.69,
+          "total_prev": 956473.1599999999,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 305.25
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 75093.78
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mar/26",
+          "current_month": true,
+          "total_revenue": 48874.26,
+          "total_expense": 143.8,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 48730.46,
+          "total": 1079992.15,
+          "total_prev": 1031261.69,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 143.8
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 48874.26
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "abr/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mai/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jun/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jul/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "ago/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "set/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        }
+      ]
+    }
+  },
+  {
+    "data": "2026-03-15",
+    "dados": {
+      "categories": {
+        "230786": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230786,
+          "type": "r"
+        },
+        "230787": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230787,
+          "type": "e"
+        }
+      },
+      "flow": [
+        {
+          "period": "fev/26",
+          "current_month": false,
+          "total_revenue": 75093.78,
+          "total_expense": 305.25,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 74788.53,
+          "total": 1031261.69,
+          "total_prev": 956473.1599999999,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 305.25
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 75093.78
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mar/26",
+          "current_month": true,
+          "total_revenue": 48874.26,
+          "total_expense": 143.8,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 48730.46,
+          "total": 1079992.15,
+          "total_prev": 1031261.69,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 143.8
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 48874.26
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "abr/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mai/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jun/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jul/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "ago/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "set/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        }
+      ]
+    }
+  },
+  {
+    "data": "2026-03-16",
+    "dados": {
+      "categories": {
+        "230786": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230786,
+          "type": "r"
+        },
+        "230787": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230787,
+          "type": "e"
+        }
+      },
+      "flow": [
+        {
+          "period": "fev/26",
+          "current_month": false,
+          "total_revenue": 75093.78,
+          "total_expense": 305.25,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 74788.53,
+          "total": 1031261.69,
+          "total_prev": 956473.1599999999,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 305.25
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 75093.78
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mar/26",
+          "current_month": true,
+          "total_revenue": 48874.26,
+          "total_expense": 143.8,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 48730.46,
+          "total": 1079992.15,
+          "total_prev": 1031261.69,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 143.8
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 48874.26
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "abr/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mai/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jun/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jul/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "ago/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "set/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        }
+      ]
+    }
+  },
+  {
+    "data": "2026-03-17",
+    "dados": {
+      "categories": {
+        "230786": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230786,
+          "type": "r"
+        },
+        "230787": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230787,
+          "type": "e"
+        }
+      },
+      "flow": [
+        {
+          "period": "fev/26",
+          "current_month": false,
+          "total_revenue": 75093.78,
+          "total_expense": 305.25,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 74788.53,
+          "total": 1031261.69,
+          "total_prev": 956473.1599999999,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 305.25
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 75093.78
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mar/26",
+          "current_month": true,
+          "total_revenue": 48874.26,
+          "total_expense": 143.8,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 48730.46,
+          "total": 1079992.15,
+          "total_prev": 1031261.69,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 143.8
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 48874.26
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "abr/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mai/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jun/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jul/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "ago/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "set/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        }
+      ]
+    }
+  },
+  {
+    "data": "2026-03-18",
+    "dados": {
+      "categories": {
+        "230786": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230786,
+          "type": "r"
+        },
+        "230787": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230787,
+          "type": "e"
+        }
+      },
+      "flow": [
+        {
+          "period": "fev/26",
+          "current_month": false,
+          "total_revenue": 75093.78,
+          "total_expense": 305.25,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 74788.53,
+          "total": 1031261.69,
+          "total_prev": 956473.1599999999,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 305.25
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 75093.78
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mar/26",
+          "current_month": true,
+          "total_revenue": 48874.26,
+          "total_expense": 143.8,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 48730.46,
+          "total": 1079992.15,
+          "total_prev": 1031261.69,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 143.8
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 48874.26
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "abr/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mai/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jun/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jul/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "ago/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "set/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        }
+      ]
+    }
+  },
+  {
+    "data": "2026-03-19",
+    "dados": {
+      "categories": {
+        "230786": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230786,
+          "type": "r"
+        },
+        "230787": {
+          "name": "Sistema - Fechamento de Caixa",
+          "id": 230787,
+          "type": "e"
+        }
+      },
+      "flow": [
+        {
+          "period": "fev/26",
+          "current_month": false,
+          "total_revenue": 75093.78,
+          "total_expense": 305.25,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 74788.53,
+          "total": 1031261.69,
+          "total_prev": 956473.1599999999,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 305.25
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 75093.78
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mar/26",
+          "current_month": true,
+          "total_revenue": 48874.26,
+          "total_expense": 143.8,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 48730.46,
+          "total": 1079992.15,
+          "total_prev": 1031261.69,
+          "expenses": {
+            "230787": {
+              "category_id": 230787,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 143.8
+            }
+          },
+          "revenues": {
+            "230786": {
+              "category_id": 230786,
+              "name": "Sistema - Fechamento de Caixa",
+              "value": 48874.26
+            }
+          },
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "abr/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "mai/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jun/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "jul/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "ago/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        },
+        {
+          "period": "set/26",
+          "current_month": false,
+          "total_revenue": 0,
+          "total_expense": 0,
+          "total_transfer_revenue": 0,
+          "total_transfer_expense": 0,
+          "geracao": 0,
+          "total": 1079992.15,
+          "total_prev": 1079992.15,
+          "expenses": {},
+          "revenues": {},
+          "transfer_expenses": {},
+          "transfer_revenues": {}
+        }
+      ]
+    }
+  }
+]

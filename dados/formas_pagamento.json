@@ -1,0 +1,82 @@
+[
+  {
+    "account": null,
+    "account_id": null,
+    "codigo": 146271,
+    "conciliacoes": [],
+    "descricao": "Dinheiro",
+    "idi": 72509,
+    "movimenta_caixa": true,
+    "taxa": 0,
+    "tipo_nfce": 1,
+    "adquirentes": [],
+    "usuario_del": 0,
+    "data_del": null,
+    "origins": [
+      {
+        "type": "PDV",
+        "active": 1
+      }
+    ]
+  },
+  {
+    "account": null,
+    "account_id": null,
+    "codigo": 146272,
+    "conciliacoes": [],
+    "descricao": "Débito",
+    "idi": 72509,
+    "movimenta_caixa": false,
+    "taxa": 0,
+    "tipo_nfce": 4,
+    "adquirentes": [],
+    "usuario_del": 0,
+    "data_del": null,
+    "origins": [
+      {
+        "type": "PDV",
+        "active": 1
+      }
+    ]
+  },
+  {
+    "account": null,
+    "account_id": null,
+    "codigo": 146273,
+    "conciliacoes": [],
+    "descricao": "Crédito",
+    "idi": 72509,
+    "movimenta_caixa": false,
+    "taxa": 0,
+    "tipo_nfce": 3,
+    "adquirentes": [],
+    "usuario_del": 0,
+    "data_del": null,
+    "origins": [
+      {
+        "type": "PDV",
+        "active": 1
+      }
+    ]
+  },
+  {
+    "account": null,
+    "account_id": null,
+    "codigo": 146274,
+    "conciliacoes": [],
+    "descricao": "Pix",
+    "idi": 72509,
+    "movimenta_caixa": false,
+    "taxa": 0,
+    "tipo_nfce": 17,
+    "adquirentes": [],
+    "usuario_del": 0,
+    "data_del": null,
+    "origins": [
+      {
+        "type": "PDV",
+        "active": 1
+      }
+    ]
+  }
+]

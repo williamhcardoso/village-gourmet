@@ -1,0 +1,646 @@
+{
+  "categorias": [
+    {
+      "categoria_nome": "Batatas",
+      "categoria_codigo": 9629603,
+      "produtos": [
+        {
+          "codigo": null,
+          "produto": "Batata Mistura perfeita( carne desfiada e creme de queijo)",
+          "estoque_minimo": 0,
+          "estoque_atual": -16
+        },
+        {
+          "codigo": null,
+          "produto": "Batata Mista ",
+          "estoque_minimo": 0,
+          "estoque_atual": -64
+        },
+        {
+          "codigo": null,
+          "produto": "Batata recheada no pote (carne)",
+          "estoque_minimo": 0,
+          "estoque_atual": -22
+        },
+        {
+          "codigo": null,
+          "produto": "Batata Frita",
+          "estoque_minimo": 0,
+          "estoque_atual": -118
+        },
+        {
+          "codigo": null,
+          "produto": "Batata dos Deuses (cheddar e bacon)",
+          "estoque_minimo": 0,
+          "estoque_atual": -169
+        }
+      ]
+    },
+    {
+      "categoria_nome": "Bolinhos / Petiscos",
+      "categoria_codigo": 1686211,
+      "produtos": [
+        {
+          "codigo": null,
+          "produto": "Bolinho Lampião (carne desfiada)",
+          "estoque_minimo": 0,
+          "estoque_atual": -214
+        },
+        {
+          "codigo": null,
+          "produto": "Polenta",
+          "estoque_minimo": 0,
+          "estoque_atual": -27
+        },
+        {
+          "codigo": null,
+          "produto": "Bolinho Artesanal Village",
+          "estoque_minimo": 0,
+          "estoque_atual": -7
+        },
+        {
+          "codigo": null,
+          "produto": "Coxinha supreme",
+          "estoque_minimo": 0,
+          "estoque_atual": -15
+        }
+      ]
+    },
+    {
+      "categoria_nome": "Carnes / Porções",
+      "categoria_codigo": 392111,
+      "produtos": [
+        {
+          "codigo": null,
+          "produto": "Fraldinha  Nobre",
+          "estoque_minimo": 0,
+          "estoque_atual": -171
+        },
+        {
+          "codigo": null,
+          "produto": "Prato Executivo cupim- 150 gramas",
+          "estoque_minimo": 0,
+          "estoque_atual": -19
+        },
+        {
+          "codigo": null,
+          "produto": "Porção Filé de Peixe 400g",
+          "estoque_minimo": 0,
+          "estoque_atual": -69
+        },
+        {
+          "codigo": null,
+          "produto": "Cupim do patrao",
+          "estoque_minimo": 0,
+          "estoque_atual": -44
+        },
+        {
+          "codigo": null,
+          "produto": "Guarnição de vinagrete",
+          "estoque_minimo": 0,
+          "estoque_atual": -5
+        },
+        {
+          "codigo": null,
+          "produto": "Porção de mandioca frita 500 gramas",
+          "estoque_minimo": 0,
+          "estoque_atual": -8
+        },
+        {
+          "codigo": null,
+          "produto": "Cupim Mexicano (mandioca frita)",
+          "estoque_minimo": 0,
+          "estoque_atual": -22
+        },
+        {
+          "codigo": null,
+          "produto": "Guarnição mandioca",
+          "estoque_minimo": 0,
+          "estoque_atual": -14
+        },
+        {
+          "codigo": null,
+          "produto": "Filé Mignon à Parmegiana",
+          "estoque_minimo": 0,
+          "estoque_atual": -105
+        },
+        {
+          "codigo": null,
+          "produto": "Guarnição Arroz",
+          "estoque_minimo": 0,
+          "estoque_atual": -47
+        },
+        {
+          "codigo": null,
+          "produto": "Alcatra Embrasada 500 gramas",
+          "estoque_minimo": 0,
+          "estoque_atual": -56
+        },
+        {
+          "codigo": null,
+          "produto": "Frango Crocante",
+          "estoque_minimo": 0,
+          "estoque_atual": -121
+        },
+        {
+          "codigo": null,
+          "produto": "Executivo Frango à Parmegiana",
+          "estoque_minimo": 0,
+          "estoque_atual": -16
+        }
+      ]
+    },
+    {
+      "categoria_nome": "Cervejas 600 ml",
+      "categoria_codigo": 392110,
+      "produtos": [
+        {
+          "codigo": null,
+          "produto": "Cerveja Budweiser 600",
+          "estoque_minimo": 0,
+          "estoque_atual": -39
+        },
+        {
+          "codigo": null,
+          "produto": "Corona 600",
+          "estoque_minimo": 0,
+          "estoque_atual": -312
+        },
+        {
+          "codigo": null,
+          "produto": "Original 600ml",
+          "estoque_minimo": 0,
+          "estoque_atual": -697
+        },
+        {
+          "codigo": null,
+          "produto": "Spaten 600 ml",
+          "estoque_minimo": 0,
+          "estoque_atual": -331
+        },
+        {
+          "codigo": null,
+          "produto": "Brahma Chopp 600 ml",
+          "estoque_minimo": 0,
+          "estoque_atual": -424
+        },
+        {
+          "codigo": null,
+          "produto": "Antárctica Pilsen 600 ml",
+          "estoque_minimo": 0,
+          "estoque_atual": -1578
+        }
+      ]
+    },
+    {
+      "categoria_nome": "Cervejas Long Neck",
+      "categoria_codigo": 1686213,
+      "produtos": [
+        {
+          "codigo": null,
+          "produto": "Brahma Long Neck",
+          "estoque_minimo": 0,
+          "estoque_atual": 0
+        },
+        {
+          "codigo": null,
+          "produto": "Corona extra long neck 330 ML",
+          "estoque_minimo": 0,
+          "estoque_atual": -197
+        },
+        {
+          "codigo": null,
+          "produto": "Stella Pure Gold sem Gluten",
+          "estoque_minimo": 0,
+          "estoque_atual": -55
+        },
+        {
+          "codigo": null,
+          "produto": "Budweiser Long Neck Zero",
+          "estoque_minimo": 0,
+          "estoque_atual": -22
+        },
+        {
+          "codigo": null,
+          "produto": "Corona cero (zero alcool)",
+          "estoque_minimo": 0,
+          "estoque_atual": -76
+        },
+        {
+          "codigo": null,
+          "produto": "Spaten long neck",
+          "estoque_minimo": 0,
+          "estoque_atual": -15
+        },
+        {
+          "codigo": null,
+          "produto": "Michelob ultra long neck",
+          "estoque_minimo": 0,
+          "estoque_atual": -32
+        },
+        {
+          "codigo": null,
+          "produto": "Coronita",
+          "estoque_minimo": 0,
+          "estoque_atual": -95
+        },
+        {
+          "codigo": null,
+          "produto": "Stella Artois Long Neck",
+          "estoque_minimo": 0,
+          "estoque_atual": -82
+        },
+        {
+          "codigo": null,
+          "produto": "Budweiser long neck",
+          "estoque_minimo": 0,
+          "estoque_atual": -8
+        }
+      ]
+    },
+    {
+      "categoria_nome": "Chopp Brahma",
+      "categoria_codigo": 1686209,
+      "produtos": [
+        {
+          "codigo": null,
+          "produto": "Chopp Brahma caneca de 350 ml",
+          "estoque_minimo": 0,
+          "estoque_atual": -1657
+        },
+        {
+          "codigo": null,
+          "produto": "Torre Chopp 2,5 Litros",
+          "estoque_minimo": 0,
+          "estoque_atual": -23
+        },
+        {
+          "codigo": null,
+          "produto": "Dose Uísque - Red Label",
+          "estoque_minimo": 0,
+          "estoque_atual": -14
+        }
+      ]
+    },
+    {
+      "categoria_nome": "Coquetéis / Drinks / Energéticos",
+      "categoria_codigo": 486925,
+      "produtos": [
+        {
+          "codigo": null,
+          "produto": "Soda Italiana Frutas vermelhas",
+          "estoque_minimo": 0,
+          "estoque_atual": -1
+        },
+        {
+          "codigo": null,
+          "produto": "Necta Dourado",
+          "estoque_minimo": 0,
+          "estoque_atual": -24
+        },
+        {
+          "codigo": null,
+          "produto": "Red Bull Sugarfree- lata 250ml",
+          "estoque_minimo": 0,
+          "estoque_atual": -11
+        },
+        {
+          "codigo": null,
+          "produto": "Limina Aperol",
+          "estoque_minimo": 0,
+          "estoque_atual": -2
+        },
+        {
+          "codigo": null,
+          "produto": "Frozzen de Morango",
+          "estoque_minimo": 0,
+          "estoque_atual": -8
+        },
+        {
+          "codigo": null,
+          "produto": "Campari Orange",
+          "estoque_minimo": 0,
+          "estoque_atual": -119
+        },
+        {
+          "codigo": null,
+          "produto": "Preparo do Cozumel",
+          "estoque_minimo": 0,
+          "estoque_atual": -42
+        },
+        {
+          "codigo": null,
+          "produto": "Caipirinha",
+          "estoque_minimo": 0,
+          "estoque_atual": -58
+        },
+        {
+          "codigo": null,
+          "produto": "Cozumel",
+          "estoque_minimo": 0,
+          "estoque_atual": -63
+        },
+        {
+          "codigo": null,
+          "produto": "Red Bull -  energético Lata - 250ml",
+          "estoque_minimo": 0,
+          "estoque_atual": -69
+        },
+        {
+          "codigo": null,
+          "produto": "Soda Italiana morango",
+          "estoque_minimo": 0,
+          "estoque_atual": -9
+        },
+        {
+          "codigo": null,
+          "produto": "Soda Italiana de Maça verde",
+          "estoque_minimo": 0,
+          "estoque_atual": -6
+        },
+        {
+          "codigo": null,
+          "produto": "Caipirinha de Maracujá",
+          "estoque_minimo": 0,
+          "estoque_atual": -8
+        }
+      ]
+    },
+    {
+      "categoria_nome": "Destilados",
+      "categoria_codigo": 487001,
+      "produtos": [
+        {
+          "codigo": null,
+          "produto": "Dose Vodka Smirnoff",
+          "estoque_minimo": 0,
+          "estoque_atual": -5
+        }
+      ]
+    },
+    {
+      "categoria_nome": "Diversos",
+      "categoria_codigo": 401276,
+      "produtos": [
+        {
+          "codigo": null,
+          "produto": "Limao (und)",
+          "estoque_minimo": 0,
+          "estoque_atual": -98
+        },
+        {
+          "codigo": null,
+          "produto": "BUBBALOO BALA",
+          "estoque_minimo": 0,
+          "estoque_atual": 0
+        },
+        {
+          "codigo": null,
+          "produto": "Petit Gateau",
+          "estoque_minimo": 0,
+          "estoque_atual": -19
+        },
+        {
+          "codigo": null,
+          "produto": "Mentos",
+          "estoque_minimo": 0,
+          "estoque_atual": -1
+        },
+        {
+          "codigo": null,
+          "produto": "Halls",
+          "estoque_minimo": 0,
+          "estoque_atual": 0
+        },
+        {
+          "codigo": null,
+          "produto": "Trident",
+          "estoque_minimo": 0,
+          "estoque_atual": -114
+        },
+        {
+          "codigo": null,
+          "produto": "Bubbaloo",
+          "estoque_minimo": 0,
+          "estoque_atual": 0
+        }
+      ]
+    },
+    {
+      "categoria_nome": "Hambúrgueres",
+      "categoria_codigo": 1686195,
+      "produtos": [
+        {
+          "codigo": null,
+          "produto": "Golden Burguer",
+          "estoque_minimo": 0,
+          "estoque_atual": -19
+        },
+        {
+          "codigo": null,
+          "produto": "Burguer Doce Pecado",
+          "estoque_minimo": 0,
+          "estoque_atual": -9
+        },
+        {
+          "codigo": null,
+          "produto": "Village Burguer",
+          "estoque_minimo": 0,
+          "estoque_atual": -183
+        },
+        {
+          "codigo": null,
+          "produto": "Village Burguer Australiano",
+          "estoque_minimo": 0,
+          "estoque_atual": -108
+        },
+        {
+          "codigo": null,
+          "produto": "Burguer Chicken Pepper",
+          "estoque_minimo": 0,
+          "estoque_atual": -48
+        },
+        {
+          "codigo": null,
+          "produto": "Village Burguer Australiano Duplo",
+          "estoque_minimo": 0,
+          "estoque_atual": -93
+        },
+        {
+          "codigo": null,
+          "produto": "Village Hambúrguer  Duplo",
+          "estoque_minimo": 0,
+          "estoque_atual": -178
+        },
+        {
+          "codigo": null,
+          "produto": "Black burguer",
+          "estoque_minimo": 0,
+          "estoque_atual": -54
+        },
+        {
+          "codigo": null,
+          "produto": "Adicional Hanburguer extra",
+          "estoque_minimo": 0,
+          "estoque_atual": -15
+        },
+        {
+          "codigo": null,
+          "produto": "Village Burguer Cheese",
+          "estoque_minimo": 0,
+          "estoque_atual": -12
+        }
+      ]
+    },
+    {
+      "categoria_nome": "Panquecas",
+      "categoria_codigo": 11019490,
+      "produtos": [
+        {
+          "codigo": null,
+          "produto": "Panqueca Maria Bonita ao molho vermelho",
+          "estoque_minimo": 0,
+          "estoque_atual": -144
+        },
+        {
+          "codigo": null,
+          "produto": "Panqueca MAria Bonita ao molho branco",
+          "estoque_minimo": 0,
+          "estoque_atual": -35
+        }
+      ]
+    },
+    {
+      "categoria_nome": "Promoções/Combos",
+      "categoria_codigo": 486901,
+      "produtos": [
+        {
+          "codigo": null,
+          "produto": "Combo Village",
+          "estoque_minimo": 0,
+          "estoque_atual": -33
+        },
+        {
+          "codigo": null,
+          "produto": "Combo Australiano",
+          "estoque_minimo": 0,
+          "estoque_atual": -14
+        }
+      ]
+    },
+    {
+      "categoria_nome": "Refrigerantes",
+      "categoria_codigo": 1686202,
+      "produtos": [
+        {
+          "codigo": null,
+          "produto": "Coca-Cola 1 Litro retornavel",
+          "estoque_minimo": 0.055,
+          "estoque_atual": -126
+        },
+        {
+          "codigo": null,
+          "produto": "Coca-Cola Lata 310 ml",
+          "estoque_minimo": 0.048,
+          "estoque_atual": -405
+        },
+        {
+          "codigo": null,
+          "produto": "Guarana Antartica 1 litro ",
+          "estoque_minimo": 0,
+          "estoque_atual": -29
+        },
+        {
+          "codigo": null,
+          "produto": "Guaraná Zero Lata 350 ml",
+          "estoque_minimo": 0,
+          "estoque_atual": -12
+        },
+        {
+          "codigo": null,
+          "produto": "Guaraná Antarctica Lata 350 ml",
+          "estoque_minimo": 0,
+          "estoque_atual": -50
+        },
+        {
+          "codigo": null,
+          "produto": "Coca-Cola Zero Lata 310 ml",
+          "estoque_minimo": 0,
+          "estoque_atual": -63
+        }
+      ]
+    },
+    {
+      "categoria_nome": "Sucos / Águas",
+      "categoria_codigo": 1686203,
+      "produtos": [
+        {
+          "codigo": null,
+          "produto": "Tonica  Antartica lata",
+          "estoque_minimo": 0,
+          "estoque_atual": -18
+        },
+        {
+          "codigo": null,
+          "produto": "H2O Limão",
+          "estoque_minimo": 0,
+          "estoque_atual": -39
+        },
+        {
+          "codigo": null,
+          "produto": "CDB - VILLAGE",
+          "estoque_minimo": 0,
+          "estoque_atual": -79
+        },
+        {
+          "codigo": null,
+          "produto": "Suco de Laranja",
+          "estoque_minimo": 0,
+          "estoque_atual": -166
+        },
+        {
+          "codigo": null,
+          "produto": "H2O Limoneto",
+          "estoque_minimo": 0,
+          "estoque_atual": -22
+        },
+        {
+          "codigo": null,
+          "produto": "Copo Especial - Limão e Gelo",
+          "estoque_minimo": 0,
+          "estoque_atual": -412
+        },
+        {
+          "codigo": null,
+          "produto": "Suco de Maracujá",
+          "estoque_minimo": 0,
+          "estoque_atual": -128
+        },
+        {
+          "codigo": null,
+          "produto": "Água Mineral com gás",
+          "estoque_minimo": 0,
+          "estoque_atual": -315
+        },
+        {
+          "codigo": null,
+          "produto": "Água Mineral sem Gás",
+          "estoque_minimo": 0,
+          "estoque_atual": -174
+        }
+      ]
+    },
+    {
+      "categoria_nome": "Sem categoria",
+      "categoria_codigo": null,
+      "produtos": [
+        {
+          "codigo": null,
+          "produto": "Adicional de batata (100 gramas)",
+          "estoque_minimo": 0,
+          "estoque_atual": -83
+        }
+      ]
+    }
+  ]
+}

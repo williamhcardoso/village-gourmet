@@ -1,0 +1,39 @@
+{
+  "data": "19/03/2026",
+  "faturamento_bruto": 616.34,
+  "faturamento_mes": 44755.4,
+  "total_pedidos_dia": 8,
+  "total_pedidos_mes": 429,
+  "ticket_medio": 104.32,
+  "top_produtos": [
+    {
+      "nome": "Fraldinha  Nobre",
+      "quantidade": 3139
+    },
+    {
+      "nome": "Chopp Brahma caneca de 350 ml",
+      "quantidade": 3121
+    },
+    {
+      "nome": "Antárctica Pilsen 600 ml",
+      "quantidade": 2673
+    },
+    {
+      "nome": "Original 600ml",
+      "quantidade": 1860
+    },
+    {
+      "nome": "Filé Mignon à Parmegiana",
+      "quantidade": 1699
+    }
+  ],
+  "pagamentos": {
+    "Débito": 16451,
+    "Crédito": 15445,
+    "Pix": 12442,
+    "Dinheiro": 417
+  },
+  "total_despesas": 0,
+  "saldo_caixa": 0,
+  "estoque_critico": []
+}
