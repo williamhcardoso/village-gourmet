@@ -727,6 +727,121 @@ function showRefreshInfo() {
   alert('Para atualizar os dados:\\n\\n1. Execute: python coletar_endpoints.py\\n2. Execute: python gerar_dashboard.py\\n3. Recarregue esta página (F5)');
 }
 
+// ═══ SISTEMA REATIVO ═══
+let _impostosInited = false;
+
+// Constrói HTML das linhas do DRE (reutilizado em initFinanceiro e refreshFinanceiro)
+function _dreRow(label, val, indent, cls, pct, bold, final) {
+  const v = val < 0
+    ? `<span class="dre-value neg">${fmt(val)}</span>`
+    : val > 0
+      ? `<span class="dre-value ${cls||'pos'}">${fmt(val)}</span>`
+      : `<span class="dre-value" style="color:var(--text2)">${fmt(0)}</span>`;
+  const rowCls = final ? ' result-final' : bold ? ' result' : '';
+  return `<div class="dre-row${rowCls}">
+    <span class="dre-label${indent?' dre-indent':''}" ${bold||final?'style="font-weight:700"':''}>${label}</span>
+    <span class="dre-pct">${pct!==undefined?fmtPct(pct):''}</span>
+    ${v}
+  </div>`;
+}
+
+// Constrói HTML completo do DRE a partir do objeto D de calcDRE()
+function _buildDRE(D) {
+  const alerta = D.pct(D.cmv) > 40
+    ? `<div style="background:#7c2d1222;border:1px solid var(--yellow);border-radius:7px;padding:8px 12px;margin-bottom:10px;font-size:.78rem;color:var(--yellow)">
+        &#9888; CMV acima de 40% da receita — revise preços ou renegocie fornecedores</div>` : '';
+  return alerta +
+    _dreRow('(+) Receita Operacional Bruta',       D.receita,    false, 'pos',  100,                         false) +
+    _dreRow('(-) CMV — Notas de Compra',           -D.cmv,       true,  '',     D.pct(D.cmv),                false) +
+    _dreRow('(=) Lucro Bruto',                      D.lucroBruto,false, D.lucroBruto>=0?'pos':'neg', D.pct(D.lucroBruto), true) +
+    _dreRow('(-) Desp. Operacionais Yooga',        -D.despYooga, true,  '',     D.pct(D.despYooga),          false) +
+    _dreRow('(-) Despesas Fixas Cadastradas',      -D.despFixas, true,  '',     D.pct(D.despFixas),          false) +
+    _dreRow('(=) EBITDA',                           D.ebitda,    false, D.ebitda>=0?'pos':'neg', D.pct(D.ebitda), true) +
+    _dreRow('(-) Impostos (~'+D.aliqPct.toFixed(1)+'%)', -D.impostos, true, '', D.aliqPct,                  false) +
+    `<div class="dre-row result-final">
+      <span class="dre-label" style="font-weight:700">&#9783; Resultado L&iacute;quido</span>
+      <span class="dre-pct">${fmtPct(D.pct(D.resultLiq))}</span>
+      <span class="dre-value ${D.resultLiq>=0?'pos':'neg'}" style="font-size:1.05rem">${fmt(D.resultLiq)}</span>
+    </div>` +
+    `<div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border)">` +
+    _dreRow('Pendente a receber', EXTOPT.pending_revenue_total||0,  false, 'pos', undefined, false) +
+    _dreRow('Pendente a pagar',  -(EXTOPT.pending_expense_total||0),false, '',    undefined, false) +
+    `</div>`;
+}
+
+// Constrói cards de impostos (usado em calcImpostos e refreshFinanceiro)
+function _buildCardsImp(D) {
+  const regime = document.getElementById('imp-regime')?.value || 'simples_2';
+  const r = REGIMES_IMP[regime] || REGIMES_IMP['simples_2'];
+  const fat = parseFloat(document.getElementById('imp-fat')?.value||0) || D.receita;
+  const totalImp = fat * r.aliq_total / 100;
+  const pctEfet  = fat > 0 ? totalImp/fat*100 : 0;
+  const cmvImp   = (NOTAS_COMPRA||[]).reduce((s,n)=>s+(n.vNF||0),0);
+  const resultLiqImp = fat - cmvImp - D.despYooga - D.despFixas - totalImp;
+  return [
+    {label:'Total de Impostos',    value:fmt(totalImp),       sub:fmtPct(pctEfet)+' do faturamento',           cls:'red',                          icon:'&#127963;'},
+    {label:'CMV (Notas de Compra)',value:fmt(cmvImp),         sub:fmtPct(fat>0?cmvImp/fat*100:0)+' da receita',cls:'red',                          icon:'&#128666;'},
+    {label:'Despesas Fixas',       value:fmt(D.despFixas),    sub:'Cadastradas na aba Despesas Fixas',          cls:'yellow',                       icon:'&#128203;'},
+    {label:'Resultado L&iacute;quido',value:fmt(resultLiqImp),sub:'Fat - CMV - Fixas - Impostos',               cls:resultLiqImp>=0?'green':'red',  icon:'&#9878;'},
+  ].map(d=>`<div class="card ${d.cls}"><div class="card-icon">${d.icon}</div><div class="card-label">${d.label}</div><div class="card-value">${d.value}</div><div class="card-sub">${d.sub}</div></div>`).join('');
+}
+
+// Atualiza todos os displays financeiros sem redesenhar gráficos
+function refreshFinanceiro() {
+  const D = calcDRE();
+  const nPed = D.nPed;
+  const ticketMed = nPed > 0 ? D.receita/nPed : 0;
+  const cardHtml = d => `<div class="card ${d.cls}"><div class="card-icon">${d.icon}</div><div class="card-label">${d.label}</div><div class="card-value">${d.value}</div><div class="card-sub">${d.sub}</div></div>`;
+
+  // ── Visão Geral ───────────────────────────────────────────
+  const ev = document.getElementById('cards-visao');
+  if (ev) ev.innerHTML = [
+    {label:'Faturamento do Mês', value:fmt(D.receita),   sub:'01 a 19/03/2026 · '+nPed+' pedidos',                           cls:'green',                             icon:'&#128200;'},
+    {label:'Ticket M&eacute;dio',value:fmt(ticketMed),   sub:'Receita &divide; total de pedidos',                             cls:'blue',                              icon:'&#127915;'},
+    {label:'CMV (Custo Compras)',value:fmt(D.cmv),       sub:fmtPct(D.pct(D.cmv))+' da receita &middot; '+((NOTAS_COMPRA||[]).length)+' NFs', cls:'red',             icon:'&#128666;'},
+    {label:'Resultado L&iacute;quido',value:fmt(D.resultLiq),sub:'Ap&oacute;s CMV, fixas e impostos &middot; '+fmtPct(D.pct(D.resultLiq)), cls:D.resultLiq>=0?'green':'red', icon:'&#9878;'},
+  ].map(cardHtml).join('');
+
+  // ── Financeiro: cards ─────────────────────────────────────
+  const ef = document.getElementById('cards-fin');
+  if (ef) ef.innerHTML = [
+    {label:'Receita Bruta',       value:fmt(D.receita),    sub:nPed+' pedidos &middot; 01&ndash;19/03/2026',                  cls:'green',                      icon:'&#128200;'},
+    {label:'CMV &mdash; Compras', value:fmt(D.cmv),        sub:fmtPct(D.pct(D.cmv))+' da receita &middot; '+(NOTAS_COMPRA||[]).length+' notas', cls:'red',      icon:'&#128666;'},
+    {label:'Margem Bruta',        value:fmt(D.lucroBruto), sub:fmtPct(D.pct(D.lucroBruto))+' &mdash; ap&oacute;s deduzir CMV',cls:D.lucroBruto>=0?'green':'red',icon:'&#128202;'},
+    {label:'Resultado L&iacute;quido',value:fmt(D.resultLiq),sub:fmtPct(D.pct(D.resultLiq))+' &mdash; ap&oacute;s tudo',     cls:D.resultLiq>=0?'green':'red', icon:'&#9878;'},
+  ].map(cardHtml).join('');
+
+  // ── Financeiro: DRE ───────────────────────────────────────
+  const ed = document.getElementById('dre-content');
+  if (ed) ed.innerHTML = _buildDRE(D);
+
+  // ── Financeiro: legenda composição (sem redesenhar canvas) ─
+  const el = document.getElementById('composicao-legenda');
+  if (el) {
+    const lucroPos = Math.max(D.resultLiq, 0);
+    const prejuizo = D.resultLiq < 0 ? Math.abs(D.resultLiq) : 0;
+    const cv = [D.cmv, D.despYooga, D.despFixas, D.impostos, D.resultLiq>=0?lucroPos:prejuizo];
+    const cc = ['#ef4444','#f97316','#f59e0b','#8b5cf6', D.resultLiq>=0?'#22c55e':'#dc2626'];
+    const cl = ['CMV (Compras)','Desp. Operac.','Desp. Fixas','Impostos', D.resultLiq>=0?'Lucro L&iacute;quido':'Resultado Negativo'];
+    el.innerHTML = cl.map((lb,i)=>`
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px">
+        <span style="width:11px;height:11px;border-radius:50%;background:${cc[i]};flex-shrink:0"></span>
+        <span style="flex:1;font-size:.78rem">${lb}</span>
+        <span style="font-size:.78rem;font-weight:600;color:${cc[i]}">${fmtPct(D.receita>0?cv[i]/D.receita*100:0)}</span>
+      </div>`).join('');
+    // Redesenha donut para refletir novos valores
+    const compLabels = ['CMV (Compras)','Desp. Operac.','Desp. Fixas','Impostos', D.resultLiq>=0?'Lucro Líquido':'Resultado Negativo'];
+    drawDonut('chart-composicao', compLabels, cv, cc);
+  }
+
+  // ── Impostos: cards (se aba já foi aberta) ────────────────
+  const ei = document.getElementById('cards-imp');
+  if (ei && _impostosInited) ei.innerHTML = _buildCardsImp(D);
+
+  // ── Precificação: sincroniza custos fixos % ───────────────
+  sincronizarCustosFixos(loadDespesas());
+}
+
 // ═══ UTILITÁRIO FINANCEIRO CENTRAL ═══
 function calcDRE() {
   const receita    = EXTOPT.order_revenue_total || 0;
@@ -754,20 +869,7 @@ function calcDRE() {
 
 // ═══ VISÃO GERAL ═══
 function initVisao() {
-  const D       = calcDRE();
-  const nPed    = D.nPed;
-  const ticketMed = nPed > 0 ? D.receita/nPed : 0;
-
-  const cmvPct  = D.pct(D.cmv);
-  const mbPct   = D.pct(D.lucroBruto);
-  const rlPct   = D.pct(D.resultLiq);
-
-  document.getElementById('cards-visao').innerHTML = [
-    {label:'Faturamento do Mês', value:fmt(D.receita),    sub:'01 a 19/03/2026 · '+nPed+' pedidos',  cls:'green',                              icon:'&#128200;'},
-    {label:'Ticket Médio',       value:fmt(ticketMed),    sub:'Receita ÷ total de pedidos',           cls:'blue',                               icon:'&#127915;'},
-    {label:'CMV (Custo Compras)',value:fmt(D.cmv),        sub:fmtPct(cmvPct)+' da receita bruta · '+((NOTAS_COMPRA||[]).length)+' NFs',        cls:'red',                                icon:'&#128666;'},
-    {label:'Resultado Líquido',  value:fmt(D.resultLiq),  sub:'Após CMV, fixas e impostos · '+fmtPct(rlPct), cls:D.resultLiq>=0?'green':'red', icon:'&#9878;'},
-  ].map(d=>`<div class="card ${d.cls}"><div class="card-icon">${d.icon}</div><div class="card-label">${d.label}</div><div class="card-value">${d.value}</div><div class="card-sub">${d.sub}</div></div>`).join('');
+  refreshFinanceiro(); // garante cards atualizados
 
   // Alerta estoque
   const criticos = [];
@@ -808,71 +910,7 @@ function redrawVisao() {
 
 // ═══ FINANCEIRO ═══
 function initFinanceiro() {
-  const D = calcDRE();
-
-  // ─ Cards ──────────────────────────────────────────────────
-  document.getElementById('cards-fin').innerHTML = [
-    {label:'Receita Bruta',    value:fmt(D.receita),      sub:D.nPed+' pedidos · 01–19/03/2026',             cls:'green',                              icon:'&#128200;'},
-    {label:'CMV — Compras NF', value:fmt(D.cmv),          sub:fmtPct(D.pct(D.cmv))+' da receita · '+(NOTAS_COMPRA||[]).length+' notas',          cls:'red',                                icon:'&#128666;'},
-    {label:'Margem Bruta',     value:fmt(D.lucroBruto),   sub:fmtPct(D.pct(D.lucroBruto))+' — após deduzir CMV',                                  cls:D.lucroBruto>=0?'green':'red',        icon:'&#128202;'},
-    {label:'Resultado Líquido',value:fmt(D.resultLiq),    sub:fmtPct(D.pct(D.resultLiq))+' — após tudo (CMV+fixas+impostos)',                     cls:D.resultLiq>=0?'green':'red',         icon:'&#9878;'},
-  ].map(d=>`<div class="card ${d.cls}"><div class="card-icon">${d.icon}</div><div class="card-label">${d.label}</div><div class="card-value">${d.value}</div><div class="card-sub">${d.sub}</div></div>`).join('');
-
-  // ─ DRE completo ───────────────────────────────────────────
-  const row = (label, val, indent, cls, pct, bold) => {
-    const v = val < 0 ? `<span class="dre-value neg">${fmt(val)}</span>` :
-              val > 0 ? `<span class="dre-value ${cls||'pos'}">${fmt(val)}</span>` :
-                        `<span class="dre-value" style="color:var(--text2)">${fmt(0)}</span>`;
-    return `<div class="dre-row${bold?' result':''}">
-      <span class="dre-label${indent?' dre-indent':''}" ${bold?'style="font-weight:700"':''}>${label}</span>
-      <span class="dre-pct">${pct!==undefined?fmtPct(pct):''}</span>
-      ${v}
-    </div>`;
-  };
-
-  const despTotaisOp = D.despYooga + D.despFixas;
-  const alertaCMV = D.pct(D.cmv) > 40
-    ? `<div style="background:#7c2d1222;border:1px solid var(--yellow);border-radius:7px;padding:8px 12px;margin-bottom:10px;font-size:.78rem;color:var(--yellow)">
-        &#9888; CMV acima de 40% da receita — revise preços ou renegocie fornecedores</div>` : '';
-
-  document.getElementById('dre-content').innerHTML = alertaCMV + `
-    ${row('(+) Receita Operacional Bruta', D.receita, false, 'pos', 100, false)}
-    ${row('(-) CMV — Notas de Compra', -D.cmv, true, '', D.pct(D.cmv), false)}
-    ${row('(=) Lucro Bruto', D.lucroBruto, false, D.lucroBruto>=0?'pos':'neg', D.pct(D.lucroBruto), true)}
-    ${row('(-) Desp. Operacionais Yooga', -D.despYooga, true, '', D.pct(D.despYooga), false)}
-    ${row('(-) Despesas Fixas Cadastradas', -D.despFixas, true, '', D.pct(D.despFixas), false)}
-    ${row('(=) EBITDA', D.ebitda, false, D.ebitda>=0?'pos':'neg', D.pct(D.ebitda), true)}
-    ${row('(-) Impostos (~'+D.aliqPct.toFixed(1)+'%)', -D.impostos, true, '', D.aliqPct, false)}
-    <div class="dre-row result-final">
-      <span class="dre-label" style="font-weight:700">&#9783; Resultado Líquido</span>
-      <span class="dre-pct">${fmtPct(D.pct(D.resultLiq))}</span>
-      <span class="dre-value ${D.resultLiq>=0?'pos':'neg'}" style="font-size:1.05rem">${fmt(D.resultLiq)}</span>
-    </div>
-    <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border)">
-      ${row('Pendente a receber', D.receita>0?(EXTOPT.pending_revenue_total||0):0, false, 'pos', undefined, false)}
-      ${row('Pendente a pagar', -(EXTOPT.pending_expense_total||0), false, '', undefined, false)}
-    </div>`;
-
-  // ─ Gráfico composição de custos ──────────────────────────
-  const lucroPos = Math.max(D.resultLiq, 0);
-  const prejuizo = D.resultLiq < 0 ? Math.abs(D.resultLiq) : 0;
-  const compLabels = ['CMV (Compras)', 'Desp. Operac.', 'Desp. Fixas', 'Impostos',
-                      D.resultLiq>=0 ? 'Lucro Líquido' : 'Resultado Negativo'];
-  const compValues = [D.cmv, D.despYooga, D.despFixas, D.impostos,
-                      D.resultLiq>=0 ? lucroPos : prejuizo];
-  const compColors = ['#ef4444','#f97316','#f59e0b','#8b5cf6',
-                      D.resultLiq>=0 ? '#22c55e' : '#dc2626'];
-  setTimeout(() => {
-    drawDonut('chart-composicao', compLabels, compValues, compColors);
-    const total = compValues.reduce((s,v)=>s+v,0)||1;
-    document.getElementById('composicao-legenda').innerHTML =
-      compLabels.map((l,i)=>`
-        <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px">
-          <span style="width:11px;height:11px;border-radius:50%;background:${compColors[i]};flex-shrink:0"></span>
-          <span style="flex:1;font-size:.78rem">${l}</span>
-          <span style="font-size:.78rem;font-weight:600;color:${compColors[i]}">${fmtPct(compValues[i]/D.receita*100)}</span>
-        </div>`).join('');
-  }, 80);
+  refreshFinanceiro(); // cards + DRE + composição
 
   // Tabela lançamentos
   const tbody = document.querySelector('#tbl-lancamentos tbody');
@@ -999,6 +1037,10 @@ function onRegimeChange() {
   const r = REGIMES[regime];
   document.getElementById('tax-desc').textContent = r.desc;
   if (r.aliq !== null) document.getElementById('cfg-imposto').value = r.aliq;
+  // Propaga para aba Impostos e atualiza DRE
+  const elImp = document.getElementById('imp-regime');
+  if (elImp && REGIMES_IMP[regime]) elImp.value = regime;
+  refreshFinanceiro();
 }
 
 function initPrecificacao() {
@@ -1637,14 +1679,14 @@ function adicionarDespesa() {
   document.getElementById('df-dia').value='';
   document.getElementById('df-obs').value='';
   renderDespesas();
-  // Atualiza custos fixos na precificação
-  sincronizarCustosFixos(arr);
+  refreshFinanceiro();
 }
 
 function deletarDespesa(id) {
   if (!confirm('Remover esta despesa?')) return;
   saveDespesas(loadDespesas().filter(d=>d.id!==id));
   renderDespesas();
+  refreshFinanceiro();
 }
 
 function sincronizarCustosFixos(arr) {
@@ -1816,21 +1858,11 @@ function calcImpostos() {
   const totalImp = Object.values(tributos).reduce((s,v)=>s+v,0);
   const pctEfet  = fat>0?(totalImp/fat*100):0;
 
-  // Cards
-  const despFixas = loadDespesas().reduce((s,d)=>{
-    const vM=d.recorr==='anual'?d.valor/12:d.recorr==='semanal'?d.valor*4.33:d.recorr==='quinzenal'?d.valor*2:d.valor;
-    return s+vM;
-  },0);
-  const cmvImp     = (NOTAS_COMPRA||[]).reduce((s,n)=>s+(n.vNF||0),0);
-  const despOpImp  = EXTOPT.order_expense_total||0;
-  const resultadoLiq = fat - cmvImp - despOpImp - despFixas - totalImp;
-
-  document.getElementById('cards-imp').innerHTML = [
-    {label:'Total de Impostos',    value:fmt(totalImp),      sub:fmtPct(pctEfet)+' do faturamento',            cls:'red',                          icon:'&#127963;'},
-    {label:'CMV (Notas de Compra)',value:fmt(cmvImp),        sub:fmtPct(fat>0?cmvImp/fat*100:0)+' da receita', cls:'red',                          icon:'&#128666;'},
-    {label:'Despesas Fixas',       value:fmt(despFixas),     sub:'Cadastradas na aba Despesas Fixas',           cls:'yellow',                       icon:'&#128203;'},
-    {label:'Resultado Líquido',    value:fmt(resultadoLiq),  sub:'Fat - CMV - Fixas - Impostos',                cls:resultadoLiq>=0?'green':'red',  icon:'&#9878;'},
-  ].map(d=>`<div class="card ${d.cls}"><div class="card-icon">${d.icon}</div><div class="card-label">${d.label}</div><div class="card-value">${d.value}</div><div class="card-sub">${d.sub}</div></div>`).join('');
+  // Cards (via helper compartilhado) + atualiza demais abas
+  document.getElementById('cards-imp').innerHTML = _buildCardsImp(calcDRE());
+  // Propaga mudança de regime para DRE e Visão Geral
+  const evCards = document.getElementById('cards-visao');
+  if (evCards) refreshFinanceiro();
 
   // Timeline de vencimentos
   const mesAtual = hoje.getMonth()+1;
@@ -1932,8 +1964,12 @@ function calcImpostos() {
 }
 
 function initImpostos() {
+  _impostosInited = true;
   const fat = EXTOPT.order_revenue_total||0;
   document.getElementById('imp-fat').value = fat.toFixed(2);
+  // Sincroniza regime com o selecionado em Precificação
+  const regPrec = document.getElementById('cfg-regime')?.value;
+  if (regPrec) document.getElementById('imp-regime').value = regPrec;
   calcImpostos();
 }
 
