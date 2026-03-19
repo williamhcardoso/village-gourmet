@@ -271,13 +271,29 @@ tr:last-child td{border-bottom:none}
   <div class="cards" id="cards-comp"></div>
   <div class="grid2">
     <div class="section">
-      <div class="section-title">Fornecedores Cadastrados</div>
-      <div id="lista-fornec"></div>
+      <div class="section-title">&#128666; Compras por Fornecedor — Notas Fiscais</div>
+      <div id="comp-por-fornec"></div>
     </div>
     <div class="section">
-      <div class="section-title">Despesas por Categoria</div>
-      <div id="desp-categoria"></div>
+      <div class="section-title">&#128197; Compras por Dia — Março 2026</div>
+      <div class="chart-wrap"><canvas id="chart-compras-dia" height="200"></canvas></div>
     </div>
+  </div>
+  <div class="section">
+    <div class="section-title">&#127981; Notas de Compra Recebidas — Março 2026</div>
+    <div style="display:flex;gap:9px;margin-bottom:11px;flex-wrap:wrap">
+      <input id="busca-comp" type="text" placeholder="Buscar fornecedor, N&#186; NF..."
+        oninput="filtrarCompras()"
+        style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 11px;color:var(--text);font-size:.82rem;width:240px">
+      <select id="flt-comp-forn" onchange="filtrarCompras()"
+        style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 11px;color:var(--text);font-size:.82rem">
+        <option value="">Todos os fornecedores</option>
+      </select>
+    </div>
+    <div class="tbl-wrap"><table id="tbl-notas-comp">
+      <thead><tr><th>Data</th><th>N&#186; NF</th><th>Fornecedor</th><th>CNPJ</th><th>Nat. Operação</th><th>Valor Produtos</th><th>Valor Total NF</th><th>Status</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
   </div>
   <div class="section">
     <div class="section-title">Histórico de Caixas — Março 2026</div>
@@ -1119,48 +1135,81 @@ function renderEstoque() {
 
 // ═══ COMPRAS ═══
 function initCompras() {
-  const despTotal = EXTRATO.filter(e=>e.type==='e').reduce((s,e)=>s+e.value,0);
+  const compras   = NOTAS_COMPRA || [];
+  const totComp   = compras.reduce((s,n) => s+( n.vNF||0), 0);
+  const totProd   = compras.reduce((s,n) => s+(n.vProd||0), 0);
+
+  // Agrupa por fornecedor
+  const porFornec = {};
+  compras.forEach(n => {
+    const nome = n.xNome || 'Desconhecido';
+    if (!porFornec[nome]) porFornec[nome] = {qt:0, val:0, cnpj:n.CNPJ||''};
+    porFornec[nome].qt++;
+    porFornec[nome].val += n.vNF||0;
+  });
+  const fornArr = Object.entries(porFornec).sort((a,b) => b[1].val - a[1].val);
+  const maiorForn = fornArr[0];
+
+  // ─ Cards ──────────────────────────────────────────────────
   document.getElementById('cards-comp').innerHTML = [
-    {label:'Fornecedores',       value:FORNEC.length,      sub:'Cadastrados',       cls:'blue',   icon:'&#127981;'},
-    {label:'Despesas no Período',value:fmt(despTotal),      sub:'01 a 19/03/2026',   cls:'red',    icon:'&#128176;'},
-    {label:'Média por Dia',      value:fmt(despTotal/19),   sub:'19 dias coletados', cls:'yellow', icon:'&#128197;'},
+    {label:'Total em Compras (NF)',    value:fmt(totComp),          sub:`${compras.length} notas fiscais recebidas`, cls:'red',    icon:'&#128666;'},
+    {label:'Fornecedores com NF',      value:fornArr.length,         sub:'No período 01–19/03/2026',                  cls:'blue',   icon:'&#127981;'},
+    {label:'Maior Fornecedor',         value:maiorForn?fmt(maiorForn[1].val):'—',
+                                       sub:maiorForn?maiorForn[0].slice(0,28):'—',                                   cls:'yellow', icon:'&#127942;'},
+    {label:'Ticket Médio por NF',      value:fmt(compras.length?totComp/compras.length:0), sub:'Valor médio por nota recebida', cls:'',  icon:'&#128200;'},
   ].map(d=>`<div class="card ${d.cls}"><div class="card-icon">${d.icon}</div><div class="card-label">${d.label}</div><div class="card-value">${d.value}</div><div class="card-sub">${d.sub}</div></div>`).join('');
 
-  document.getElementById('lista-fornec').innerHTML = FORNEC.length===0
-    ? '<p style="color:var(--text2);font-size:.82rem">Nenhum fornecedor cadastrado.</p>'
-    : FORNEC.map(f=>`<div class="rank-item">
-        <div class="rank-num">&#127981;</div>
-        <div>
-          <div style="font-size:.85rem;font-weight:500">${f.nome_fantasia||f.razao_nome||'-'}</div>
-          <div style="font-size:.75rem;color:var(--text2)">${f.cnpj_cpf||''}</div>
+  // ─ Ranking de fornecedores ─────────────────────────────────
+  const maxFV = fornArr[0]?.[1].val || 1;
+  document.getElementById('comp-por-fornec').innerHTML = fornArr.length === 0
+    ? '<p style="color:var(--text2);font-size:.82rem">Nenhuma nota de compra encontrada.</p>'
+    : fornArr.map(([nome, v], i) => `
+      <div style="margin-bottom:11px">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:.83rem;margin-bottom:4px">
+          <span style="display:flex;align-items:center;gap:7px">
+            <span style="background:var(--bg3);border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:${i===0?'var(--accent2)':'var(--text2)'}">${i+1}</span>
+            <span style="font-weight:500">${nome}</span>
+          </span>
+          <span style="display:flex;flex-direction:column;align-items:flex-end">
+            <span style="color:var(--red);font-weight:700">${fmt(v.val)}</span>
+            <span style="font-size:.7rem;color:var(--text2)">${v.qt} nota${v.qt!==1?'s':''}</span>
+          </span>
         </div>
+        <div class="prog-wrap"><div class="prog-bar" style="width:${(v.val/maxFV*100).toFixed(0)}%;background:var(--red)"></div></div>
       </div>`).join('');
 
-  const catDesp = {};
-  EXTRATO.filter(e=>e.type==='e').forEach(e=>{
-    const cat = e.category_name||'Outros';
-    catDesp[cat] = (catDesp[cat]||0)+e.value;
+  // ─ Preenche filtro de fornecedor ──────────────────────────
+  const sel = document.getElementById('flt-comp-forn');
+  if (sel) {
+    fornArr.forEach(([nome]) => {
+      const o = document.createElement('option');
+      o.value = nome; o.textContent = nome; sel.appendChild(o);
+    });
+  }
+
+  // ─ Tabela de notas ────────────────────────────────────────
+  filtrarCompras();
+
+  // ─ Gráfico compras por dia ────────────────────────────────
+  const porDia = {};
+  compras.forEach(n => {
+    const dia = (n.dhEmi||'').slice(0,10);
+    if (dia) porDia[dia] = (porDia[dia]||0) + (n.vNF||0);
   });
-  const catArr = Object.entries(catDesp).sort((a,b)=>b[1]-a[1]);
-  const maxD = catArr[0]?.[1]||1;
-  document.getElementById('desp-categoria').innerHTML = catArr.length===0
-    ? '<p style="color:var(--text2);font-size:.82rem">Sem despesas registradas.</p>'
-    : catArr.map(([cat,val])=>`
-      <div style="margin-bottom:9px">
-        <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:3px">
-          <span>${cat}</span><span style="color:var(--red)">${fmt(val)}</span>
-        </div>
-        <div class="prog-wrap"><div class="prog-bar" style="width:${(val/maxD*100).toFixed(0)}%;background:var(--red)"></div></div>
-      </div>`).join('');
+  const diasK = Object.keys(porDia).sort();
+  const diasV = diasK.map(d => porDia[d]);
+  const diasL = diasK.map(d => d.slice(5).replace('-','/'));
+  setTimeout(() => drawBarChart('chart-compras-dia', diasL, diasV, '#ef4444'), 50);
 
+  // ─ Histórico de caixas ────────────────────────────────────
   const caixaData = CAIXAS.data || [];
   const tbody = document.querySelector('#tbl-caixas tbody');
-  tbody.innerHTML = caixaData.length===0
+  tbody.innerHTML = caixaData.length === 0
     ? '<tr><td colspan="6" style="color:var(--text2);text-align:center">Nenhum caixa encontrado</td></tr>'
-    : caixaData.slice(0,30).map(cx=>{
+    : caixaData.slice(0,30).map(cx => {
         const rec  = cx.total_receita||cx.receita||0;
         const desp = cx.total_despesa||cx.despesa||0;
-        const sal  = rec-desp;
+        const sal  = rec - desp;
         return `<tr>
           <td>${fmtDate(cx.data_abertura||cx.created_at)}</td>
           <td>${cx.data_fechamento?fmtDate(cx.data_fechamento):'<span style="color:var(--yellow)">Aberto</span>'}</td>
@@ -1170,6 +1219,47 @@ function initCompras() {
           <td><span class="badge ${cx.data_fechamento?'badge-ok':'badge-warn'}">${cx.data_fechamento?'FECHADO':'ABERTO'}</span></td>
         </tr>`;
       }).join('');
+}
+
+function filtrarCompras() {
+  const compras = NOTAS_COMPRA || [];
+  const busca   = (document.getElementById('busca-comp')?.value||'').toLowerCase();
+  const forn    = document.getElementById('flt-comp-forn')?.value||'';
+
+  let lista = compras.filter(n => {
+    if (forn && n.xNome !== forn) return false;
+    if (busca) {
+      return (n.xNome||'').toLowerCase().includes(busca) ||
+             String(n.nNF||'').includes(busca) ||
+             (n.CNPJ||'').includes(busca) ||
+             (n.natOp||'').toLowerCase().includes(busca);
+    }
+    return true;
+  });
+  lista.sort((a,b) => new Date(b.dhEmi) - new Date(a.dhEmi));
+
+  const tbody = document.querySelector('#tbl-notas-comp tbody');
+  if (!tbody) return;
+  if (!lista.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text2);padding:20px">Nenhuma nota encontrada</td></tr>';
+    return;
+  }
+  tbody.innerHTML = lista.map(n => {
+    const cnpj = (n.CNPJ||'').replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+    const stat = (n.cSitNFe===1||n.status===0)
+      ? '<span class="badge badge-ok">Autorizada</span>'
+      : '<span class="badge badge-warn">'+n.cSitNFe+'</span>';
+    return `<tr>
+      <td>${fmtDate(n.dhEmi)}</td>
+      <td>${n.nNF||'-'} <span style="font-size:.68rem;color:var(--text2)">s${n.serie||1}</span></td>
+      <td style="font-weight:500">${n.xNome||'-'}</td>
+      <td style="font-size:.75rem;color:var(--text2)">${cnpj||'-'}</td>
+      <td style="font-size:.78rem;color:var(--text2)">${n.natOp||'-'}</td>
+      <td style="color:var(--text2)">${fmt(n.vProd||0)}</td>
+      <td style="font-weight:700;color:var(--red)">${fmt(n.vNF||0)}</td>
+      <td>${stat}</td>
+    </tr>`;
+  }).join('');
 }
 
 // ═══ CHARTS ═══
