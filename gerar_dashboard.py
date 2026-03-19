@@ -26,7 +26,8 @@ cats     = ler("categorias.json", [])
 fornec   = ler("fornecedores_completo.json", [])
 caixas   = ler("caixas.json", {})
 cardapio = ler("cardapio_completo.json", [])
-notas_f  = ler("notas_fiscais.json", {})
+notas_f   = ler("notas_fiscais.json", {})
+notas_cmp = ler("notas_compra.json", [])
 
 prods_card = []
 if cardapio and isinstance(cardapio, list) and cardapio[0].get("data"):
@@ -51,6 +52,7 @@ const CATS   = {js(cats)};
 const FORNEC = {js(fornec)};
 const CAIXAS = {js(caixas)};
 const NOTAS  = {js(notas_f)};
+const NOTAS_COMPRA = {js(notas_cmp)};
 """
 
 # HTML/CSS/JS — string normal, sem f-string
@@ -609,20 +611,24 @@ tr:last-child td{border-bottom:none}
   </div>
 
   <div class="section">
-    <div class="section-title">&#128229; Notas de Entrada</div>
+    <div class="section-title">&#128229; Notas de Compra (Entrada)</div>
     <div style="display:flex;gap:9px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
-      <button class="nf-detail-toggle" id="btn-det-entrada" onclick="toggleNFDetail('entrada')">&#128269; Detalhar Entrada</button>
+      <button class="nf-detail-toggle" id="btn-det-entrada" onclick="toggleNFDetail('entrada')">&#128269; Detalhar Compras</button>
       <span style="font-size:.78rem;color:var(--text2)" id="nf-entrada-count"></span>
     </div>
     <div id="nf-resumo-entrada"></div>
     <div class="nf-detail-block" id="nf-detail-entrada">
-      <div style="display:flex;gap:9px;margin-bottom:9px">
-        <input id="busca-nf-entrada" type="text" placeholder="Buscar nota, emitente..."
+      <div style="display:flex;gap:9px;margin-bottom:9px;flex-wrap:wrap">
+        <input id="busca-nf-entrada" type="text" placeholder="Buscar fornecedor, N&#186; NF..."
           oninput="renderNFTable('entrada')"
           style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 11px;color:var(--text);font-size:.82rem;width:260px">
+        <select id="flt-nf-forn" onchange="renderNFTable('entrada')"
+          style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 11px;color:var(--text);font-size:.82rem">
+          <option value="">Todos os fornecedores</option>
+        </select>
       </div>
       <div class="tbl-wrap"><table id="tbl-nf-entrada">
-        <thead><tr><th>Data</th><th>N&#186; NF</th><th>Modelo</th><th>Emitente</th><th>Nat. Operação</th><th>Valor (R$)</th><th>Status</th></tr></thead>
+        <thead><tr><th>Data</th><th>N&#186; NF</th><th>Fornecedor</th><th>CNPJ</th><th>Nat. Operação</th><th>Valor Produtos</th><th>Valor NF</th><th>Status</th></tr></thead>
         <tbody></tbody>
       </table></div>
     </div>
@@ -1763,10 +1769,9 @@ function initImpostos() {
 let _notasInited = false;
 
 function cStatLabel(c) {
-  if (c === 100) return '<span class="badge badge-ok">Autorizada</span>';
-  if (c === 101) return '<span class="badge badge-warn">Cancelada</span>';
-  if (c === 135) return '<span class="badge badge-warn">Cancelada</span>';
-  return '<span class="badge badge-info">'+c+'</span>';
+  if (c === 100 || c === 1) return '<span class="badge badge-ok">Autorizada</span>';
+  if (c === 101 || c === 135) return '<span class="badge badge-warn">Cancelada</span>';
+  return '<span class="badge badge-info">'+(c||'?')+'</span>';
 }
 
 function initNotas() {
@@ -1774,54 +1779,53 @@ function initNotas() {
   _notasInited = true;
 
   // ─ Notas saída ─────────────────────────────────────────────
-  const nfce = NOTAS.nfce_lista || [];
-  const nfe  = NOTAS.nfe_lista  || [];
+  const nfce  = NOTAS.nfce_lista || [];
+  const nfe   = NOTAS.nfe_lista  || [];
   const saida = [...nfce, ...nfe];
 
-  // ─ Notas entrada ───────────────────────────────────────────
-  const entBruta = NOTAS.entrada_lista || [];
-  // Entrada = tpNF==0 OU notas que não são de saída emitidas por terceiros
-  const entrada = entBruta.filter(n => n.tpNF === 0);
+  // ─ Notas de Compra (Entrada) ────────────────────────────────
+  const compras = NOTAS_COMPRA || [];
 
   // Totais
-  const totSaida   = saida.reduce((a,n) => a + (n.vNF||0), 0);
-  const totEntrada = entrada.reduce((a,n) => a + (n.vNF||0), 0);
-  const totGeral   = totSaida + totEntrada;
+  const totSaida   = saida.reduce((a,n)   => a + (n.vNF||0), 0);
+  const totCompras = compras.reduce((a,n) => a + (n.vNF||0), 0);
+  const balanco    = totSaida - totCompras;
 
-  // Cards resumo
+  // ─ Cards resumo ────────────────────────────────────────────
   document.getElementById('nf-cards').innerHTML = `
     <div class="nf-card saida">
       <div class="nf-card-label">&#128228; Total Saída (NFC-e + NF-e)</div>
       <div class="nf-card-value">${fmt(totSaida)}</div>
-      <div class="nf-card-sub">${saida.length} nota${saida.length!==1?'s':''} emitida${saida.length!==1?'s':''} no período</div>
+      <div class="nf-card-sub">${saida.length} nota${saida.length!==1?'s':''} emitida${saida.length!==1?'s':''}</div>
     </div>
     <div class="nf-card entrada">
-      <div class="nf-card-label">&#128229; Total Entrada</div>
-      <div class="nf-card-value">${fmt(totEntrada)}</div>
-      <div class="nf-card-sub">${entrada.length} nota${entrada.length!==1?'s':''} recebida${entrada.length!==1?'s':''} no período</div>
+      <div class="nf-card-label">&#128229; Total Compras (Notas de Entrada)</div>
+      <div class="nf-card-value">${fmt(totCompras)}</div>
+      <div class="nf-card-sub">${compras.length} nota${compras.length!==1?'s':''} recebida${compras.length!==1?'s':''}</div>
     </div>
     <div class="nf-card total">
-      <div class="nf-card-label">&#9971; Movimento Total</div>
-      <div class="nf-card-value">${fmt(totGeral)}</div>
-      <div class="nf-card-sub">Saída - Entrada: ${fmt(totSaida - totEntrada)}</div>
+      <div class="nf-card-label">&#9971; Balanço (Saída − Compras)</div>
+      <div class="nf-card-value" style="color:${balanco>=0?'var(--green)':'var(--red)'}">${fmt(balanco)}</div>
+      <div class="nf-card-sub">CMV via NF: ${totSaida>0?(totCompras/totSaida*100).toFixed(1)+'%':'—'}</div>
     </div>
-    <div class="nf-card" style="">
+    <div class="nf-card">
       <div class="nf-card-label">&#128200; NFC-e emitidas</div>
       <div class="nf-card-value" style="color:var(--blue)">${nfce.length}</div>
-      <div class="nf-card-sub">Cupons fiscais eletrônicos (modelo 65)</div>
+      <div class="nf-card-sub">${fmt(nfce.reduce((a,n)=>a+(n.vNF||0),0))} (cupons mod.65)</div>
     </div>
   `;
 
-  // Resumo saída por status
+  // ─ Resumo saída por status/modelo ──────────────────────────
   const resumoSaida = {};
   saida.forEach(n => {
-    const k = n.cStat === 100 ? 'Autorizada' : n.cStat === 101 || n.cStat === 135 ? 'Cancelada' : 'Outro';
-    if (!resumoSaida[k]) resumoSaida[k] = {qt:0, val:0};
+    const k = (n.cStat===100||n.cStat===1)?'Autorizada':'Outro';
+    if (!resumoSaida[k]) resumoSaida[k] = {qt:0,val:0};
     resumoSaida[k].qt++;
     resumoSaida[k].val += n.vNF||0;
   });
   document.getElementById('nf-saida-count').textContent =
-    saida.length + ' nota(s) | ' + Object.entries(resumoSaida).map(([k,v])=>k+': '+v.qt+' ('+fmt(v.val)+')').join(' · ');
+    saida.length+' nota(s) | '+
+    Object.entries(resumoSaida).map(([k,v])=>k+': '+v.qt+' ('+fmt(v.val)+')').join(' · ');
 
   document.getElementById('nf-resumo-saida').innerHTML = `
     <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px">
@@ -1832,29 +1836,50 @@ function initNotas() {
           <div style="font-size:.75rem;color:var(--text2)">${v.qt} nota${v.qt!==1?'s':''}</div>
         </div>`).join('')}
       <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 16px;min-width:160px">
-        <div style="font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em">NFC-e</div>
+        <div style="font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em">NFC-e (mod.65)</div>
         <div style="font-size:1.15rem;font-weight:700;color:var(--blue)">${fmt(nfce.reduce((a,n)=>a+(n.vNF||0),0))}</div>
-        <div style="font-size:.75rem;color:var(--text2)">${nfce.length} cupons (mod.65)</div>
+        <div style="font-size:.75rem;color:var(--text2)">${nfce.length} cupons</div>
       </div>
       <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 16px;min-width:160px">
-        <div style="font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em">NF-e Saída</div>
+        <div style="font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em">NF-e Saída (mod.55)</div>
         <div style="font-size:1.15rem;font-weight:700;color:#a78bfa">${fmt(nfe.reduce((a,n)=>a+(n.vNF||0),0))}</div>
-        <div style="font-size:.75rem;color:var(--text2)">${nfe.length} nota${nfe.length!==1?'s':''} (mod.55)</div>
+        <div style="font-size:.75rem;color:var(--text2)">${nfe.length} nota${nfe.length!==1?'s':''}</div>
       </div>
     </div>`;
 
-  document.getElementById('nf-entrada-count').textContent =
-    entrada.length + ' nota(s) de entrada | Total: ' + fmt(totEntrada);
+  // ─ Resumo compras por fornecedor ───────────────────────────
+  const porFornec = {};
+  compras.forEach(n => {
+    const nome = n.xNome || 'Desconhecido';
+    if (!porFornec[nome]) porFornec[nome] = {qt:0,val:0,vProd:0};
+    porFornec[nome].qt++;
+    porFornec[nome].val   += n.vNF||0;
+    porFornec[nome].vProd += n.vProd||0;
+  });
 
-  if (entrada.length === 0) {
-    document.getElementById('nf-resumo-entrada').innerHTML =
-      '<div style="color:var(--text2);font-size:.85rem;padding:10px 0">Nenhuma nota de entrada encontrada para o período.</div>';
-    document.getElementById('btn-det-entrada').style.display = 'none';
+  document.getElementById('nf-entrada-count').textContent =
+    compras.length+' nota(s) de compra | Total: '+fmt(totCompras)+' | '+Object.keys(porFornec).length+' fornecedores';
+
+  document.getElementById('nf-resumo-entrada').innerHTML = `
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px">
+      ${Object.entries(porFornec).sort((a,b)=>b[1].val-a[1].val).map(([nome,v])=>`
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 16px;min-width:200px;flex:1">
+          <div style="font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">${nome}</div>
+          <div style="font-size:1.1rem;font-weight:700;color:var(--green)">${fmt(v.val)}</div>
+          <div style="font-size:.75rem;color:var(--text2)">${v.qt} nota${v.qt!==1?'s':''}</div>
+        </div>`).join('')}
+    </div>`;
+
+  // Preenche o select de fornecedor
+  const sel = document.getElementById('flt-nf-forn');
+  if (sel) {
+    const nomes = [...new Set(compras.map(n=>n.xNome||'?'))].sort();
+    nomes.forEach(n => { const o=document.createElement('option'); o.value=n; o.textContent=n; sel.appendChild(o); });
   }
 
   // Armazena para uso nas tabelas
   window._nfSaida   = saida;
-  window._nfEntrada = entrada;
+  window._nfEntrada = compras;
   renderNFTable('saida');
   renderNFTable('entrada');
 }
@@ -1864,49 +1889,88 @@ function toggleNFDetail(tipo) {
   const btn   = document.getElementById('btn-det-'+tipo);
   const vis = block.classList.toggle('visible');
   btn.classList.toggle('active', vis);
-  btn.textContent = vis ? '\u25b2 Ocultar Detalhes' : '\uD83D\uDD0D Detalhar ' +
-    (tipo==='saida'?'Saída':'Entrada');
+  const label = tipo==='saida'?'Sa\u00edda':'Compras';
+  btn.innerHTML = vis
+    ? '\u25b2 Ocultar Detalhes'
+    : '\uD83D\uDD0D Detalhar '+label;
 }
 
 function renderNFTable(tipo) {
-  const notas  = tipo === 'saida' ? (window._nfSaida||[]) : (window._nfEntrada||[]);
-  const busca  = (document.getElementById('busca-nf-'+tipo)?.value||'').toLowerCase();
-  const modelo = tipo === 'saida' ? (document.getElementById('flt-nf-saida')?.value||'todas') : 'todas';
-
-  let lista = notas.filter(n => {
-    if (modelo !== 'todas' && String(n.modelo) !== modelo) return false;
-    if (busca) {
-      const dest = n.destinatario?.xNome || '';
-      const chave = n.chNFe || '';
-      const nNF   = String(n.nNF||'');
-      return dest.toLowerCase().includes(busca) || nNF.includes(busca) || chave.includes(busca);
-    }
-    return true;
-  });
-
   const tbody = document.querySelector('#tbl-nf-'+tipo+' tbody');
   if (!tbody) return;
-  if (!lista.length) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:20px">Nenhuma nota encontrada</td></tr>';
-    return;
-  }
 
-  lista.sort((a,b) => new Date(b.dhEmi||b.data) - new Date(a.dhEmi||a.data));
-  tbody.innerHTML = lista.map(n => {
-    const dest = n.destinatario?.xNome || '(consumidor)';
-    const modLabel = n.modelo===65
-      ? '<span class="nf-type-label nf-type-nfce">NFC-e</span>'
-      : '<span class="nf-type-label nf-type-nfe">NF-e</span>';
-    return `<tr>
-      <td>${fmtDate(n.dhEmi||n.data)}</td>
-      <td>${n.nNF||'-'} <span style="font-size:.68rem;color:var(--text2)">s${n.serie||1}</span></td>
-      <td>${modLabel}</td>
-      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${dest}">${dest}</td>
-      <td style="font-size:.78rem;color:var(--text2)">${n.natOp||'-'}</td>
-      <td style="font-weight:600;color:var(--blue)">${fmt(n.vNF||0)}</td>
-      <td>${cStatLabel(n.cStat)}</td>
-    </tr>`;
-  }).join('');
+  if (tipo === 'saida') {
+    const notas  = window._nfSaida || [];
+    const busca  = (document.getElementById('busca-nf-saida')?.value||'').toLowerCase();
+    const modelo = document.getElementById('flt-nf-saida')?.value||'todas';
+
+    let lista = notas.filter(n => {
+      if (modelo!=='todas' && String(n.modelo||n.mod)!==modelo) return false;
+      if (busca) {
+        const dest = n.destinatario?.xNome||'';
+        return dest.toLowerCase().includes(busca) ||
+               String(n.nNF||'').includes(busca) ||
+               (n.chNFe||'').includes(busca);
+      }
+      return true;
+    });
+    lista.sort((a,b)=>new Date(b.dhEmi||b.data)-new Date(a.dhEmi||a.data));
+
+    if (!lista.length) {
+      tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:20px">Nenhuma nota encontrada</td></tr>';
+      return;
+    }
+    tbody.innerHTML = lista.map(n=>{
+      const dest = n.destinatario?.xNome||'(consumidor)';
+      const modLabel = (n.modelo||n.mod)===65
+        ? '<span class="nf-type-label nf-type-nfce">NFC-e</span>'
+        : '<span class="nf-type-label nf-type-nfe">NF-e</span>';
+      return `<tr>
+        <td>${fmtDate(n.dhEmi||n.data)}</td>
+        <td>${n.nNF||'-'} <span style="font-size:.68rem;color:var(--text2)">s${n.serie||1}</span></td>
+        <td>${modLabel}</td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${dest}">${dest}</td>
+        <td style="font-size:.78rem;color:var(--text2)">${n.natOp||'-'}</td>
+        <td style="font-weight:600;color:var(--blue)">${fmt(n.vNF||0)}</td>
+        <td>${cStatLabel(n.cStat)}</td>
+      </tr>`;
+    }).join('');
+
+  } else {
+    // Notas de Compra
+    const notas = window._nfEntrada || [];
+    const busca = (document.getElementById('busca-nf-entrada')?.value||'').toLowerCase();
+    const forn  = document.getElementById('flt-nf-forn')?.value||'';
+
+    let lista = notas.filter(n => {
+      if (forn && n.xNome !== forn) return false;
+      if (busca) {
+        return (n.xNome||'').toLowerCase().includes(busca) ||
+               String(n.nNF||'').includes(busca) ||
+               (n.CNPJ||'').includes(busca);
+      }
+      return true;
+    });
+    lista.sort((a,b)=>new Date(b.dhEmi)-new Date(a.dhEmi));
+
+    if (!lista.length) {
+      tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text2);padding:20px">Nenhuma nota de compra encontrada</td></tr>';
+      return;
+    }
+    tbody.innerHTML = lista.map(n=>{
+      const cnpj = (n.CNPJ||'').replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,'$1.$2.$3/$4-$5');
+      return `<tr>
+        <td>${fmtDate(n.dhEmi)}</td>
+        <td>${n.nNF||'-'} <span style="font-size:.68rem;color:var(--text2)">s${n.serie||1}</span></td>
+        <td style="font-size:.82rem">${n.xNome||'-'}</td>
+        <td style="font-size:.75rem;color:var(--text2)">${cnpj||'-'}</td>
+        <td style="font-size:.78rem;color:var(--text2)">${n.natOp||'-'}</td>
+        <td style="color:var(--text2)">${fmt(n.vProd||0)}</td>
+        <td style="font-weight:600;color:var(--green)">${fmt(n.vNF||0)}</td>
+        <td>${cStatLabel(n.cSitNFe)}</td>
+      </tr>`;
+    }).join('');
+  }
 }
 
 // ═══ INIT ═══
