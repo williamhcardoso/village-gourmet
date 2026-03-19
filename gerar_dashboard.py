@@ -26,6 +26,7 @@ cats     = ler("categorias.json", [])
 fornec   = ler("fornecedores_completo.json", [])
 caixas   = ler("caixas.json", {})
 cardapio = ler("cardapio_completo.json", [])
+notas_f  = ler("notas_fiscais.json", {})
 
 prods_card = []
 if cardapio and isinstance(cardapio, list) and cardapio[0].get("data"):
@@ -49,6 +50,7 @@ const DRE    = {js(dre_raw)};
 const CATS   = {js(cats)};
 const FORNEC = {js(fornec)};
 const CAIXAS = {js(caixas)};
+const NOTAS  = {js(notas_f)};
 """
 
 # HTML/CSS/JS — string normal, sem f-string
@@ -188,6 +190,24 @@ tr:last-child td{border-bottom:none}
 .tl-label{font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
 .tl-value{font-size:1.1rem;font-weight:700}
 .tl-date{font-size:.72rem;color:var(--text2);margin-top:2px}
+/* NOTAS FISCAIS */
+.nf-resumo-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px}
+.nf-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px}
+.nf-card-label{font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.nf-card-value{font-size:1.6rem;font-weight:700}
+.nf-card-sub{font-size:.75rem;color:var(--text2);margin-top:4px}
+.nf-card.saida .nf-card-value{color:var(--blue)}
+.nf-card.entrada .nf-card-value{color:var(--green)}
+.nf-card.total .nf-card-value{color:var(--accent2)}
+.nf-detail-toggle{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 16px;cursor:pointer;font-size:.82rem;color:var(--text2);transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.nf-detail-toggle:hover{border-color:var(--accent);color:var(--text)}
+.nf-detail-toggle.active{border-color:var(--accent);color:var(--accent2);background:var(--bg2)}
+.nf-detail-block{display:none;margin-top:12px}
+.nf-detail-block.visible{display:block}
+.nf-type-label{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.7rem;font-weight:600;margin-right:4px}
+.nf-type-nfce{background:#1d4ed822;color:var(--blue)}
+.nf-type-nfe{background:#7c3aed22;color:#a78bfa}
+.nf-type-entrada{background:#16a34a22;color:var(--green)}
 </style>
 </head>
 <body>
@@ -203,6 +223,7 @@ tr:last-child td{border-bottom:none}
     <div class="nav-tab" onclick="showTab('precificacao',this)">&#127881; Precificação</div>
     <div class="nav-tab" onclick="showTab('despesas',this)">&#128200; Despesas Fixas</div>
     <div class="nav-tab" onclick="showTab('impostos',this)">&#127981; Impostos</div>
+    <div class="nav-tab" onclick="showTab('notas',this)">&#128196; Notas Fiscais</div>
     <div class="nav-tab" onclick="showTab('chat',this)">&#128172; Chat IA</div>
   </nav>
   <button class="refresh-btn" onclick="showRefreshInfo()">&#8635; Atualizar</button>
@@ -558,6 +579,56 @@ tr:last-child td{border-bottom:none}
   </div>
 </div>
 
+<!-- NOTAS FISCAIS -->
+<div id="tab-notas" class="page">
+  <div class="nf-resumo-cards" id="nf-cards"></div>
+  <div class="section">
+    <div class="section-title">&#128196; Notas Emitidas — Saída (NFC-e + NF-e)</div>
+    <div style="display:flex;gap:9px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+      <button class="nf-detail-toggle" id="btn-det-saida" onclick="toggleNFDetail('saida')">&#128269; Detalhar Saída</button>
+      <span style="font-size:.78rem;color:var(--text2)" id="nf-saida-count"></span>
+    </div>
+    <div id="nf-resumo-saida"></div>
+    <div class="nf-detail-block" id="nf-detail-saida">
+      <div style="display:flex;gap:9px;margin-bottom:9px;flex-wrap:wrap">
+        <input id="busca-nf-saida" type="text" placeholder="Buscar nota, destinatário..."
+          oninput="renderNFTable('saida')"
+          style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 11px;color:var(--text);font-size:.82rem;width:260px">
+        <select id="flt-nf-saida" onchange="renderNFTable('saida')"
+          style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 11px;color:var(--text);font-size:.82rem">
+          <option value="todas">Todos os modelos</option>
+          <option value="65">NFC-e (modelo 65)</option>
+          <option value="55">NF-e (modelo 55)</option>
+        </select>
+      </div>
+      <div class="tbl-wrap"><table id="tbl-nf-saida">
+        <thead><tr><th>Data</th><th>N&#186; NF</th><th>Modelo</th><th>Destinatário</th><th>Nat. Operação</th><th>Valor (R$)</th><th>Status</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">&#128229; Notas de Entrada</div>
+    <div style="display:flex;gap:9px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+      <button class="nf-detail-toggle" id="btn-det-entrada" onclick="toggleNFDetail('entrada')">&#128269; Detalhar Entrada</button>
+      <span style="font-size:.78rem;color:var(--text2)" id="nf-entrada-count"></span>
+    </div>
+    <div id="nf-resumo-entrada"></div>
+    <div class="nf-detail-block" id="nf-detail-entrada">
+      <div style="display:flex;gap:9px;margin-bottom:9px">
+        <input id="busca-nf-entrada" type="text" placeholder="Buscar nota, emitente..."
+          oninput="renderNFTable('entrada')"
+          style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 11px;color:var(--text);font-size:.82rem;width:260px">
+      </div>
+      <div class="tbl-wrap"><table id="tbl-nf-entrada">
+        <thead><tr><th>Data</th><th>N&#186; NF</th><th>Modelo</th><th>Emitente</th><th>Nat. Operação</th><th>Valor (R$)</th><th>Status</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+
 <!-- CHAT -->
 <div id="tab-chat" class="page" style="padding:0">
   <div class="chat-wrap">
@@ -615,6 +686,7 @@ function showTab(id, el) {
   if (id==='precificacao') setTimeout(()=>calcPrecificacao(),50);
   if (id==='despesas')    renderDespesas();
   if (id==='impostos')    calcImpostos();
+  if (id==='notas')       initNotas();
 }
 
 function showRefreshInfo() {
@@ -1687,6 +1759,156 @@ function initImpostos() {
   calcImpostos();
 }
 
+// ═══ NOTAS FISCAIS ═══
+let _notasInited = false;
+
+function cStatLabel(c) {
+  if (c === 100) return '<span class="badge badge-ok">Autorizada</span>';
+  if (c === 101) return '<span class="badge badge-warn">Cancelada</span>';
+  if (c === 135) return '<span class="badge badge-warn">Cancelada</span>';
+  return '<span class="badge badge-info">'+c+'</span>';
+}
+
+function initNotas() {
+  if (_notasInited) return;
+  _notasInited = true;
+
+  // ─ Notas saída ─────────────────────────────────────────────
+  const nfce = NOTAS.nfce_lista || [];
+  const nfe  = NOTAS.nfe_lista  || [];
+  const saida = [...nfce, ...nfe];
+
+  // ─ Notas entrada ───────────────────────────────────────────
+  const entBruta = NOTAS.entrada_lista || [];
+  // Entrada = tpNF==0 OU notas que não são de saída emitidas por terceiros
+  const entrada = entBruta.filter(n => n.tpNF === 0);
+
+  // Totais
+  const totSaida   = saida.reduce((a,n) => a + (n.vNF||0), 0);
+  const totEntrada = entrada.reduce((a,n) => a + (n.vNF||0), 0);
+  const totGeral   = totSaida + totEntrada;
+
+  // Cards resumo
+  document.getElementById('nf-cards').innerHTML = `
+    <div class="nf-card saida">
+      <div class="nf-card-label">&#128228; Total Saída (NFC-e + NF-e)</div>
+      <div class="nf-card-value">${fmt(totSaida)}</div>
+      <div class="nf-card-sub">${saida.length} nota${saida.length!==1?'s':''} emitida${saida.length!==1?'s':''} no período</div>
+    </div>
+    <div class="nf-card entrada">
+      <div class="nf-card-label">&#128229; Total Entrada</div>
+      <div class="nf-card-value">${fmt(totEntrada)}</div>
+      <div class="nf-card-sub">${entrada.length} nota${entrada.length!==1?'s':''} recebida${entrada.length!==1?'s':''} no período</div>
+    </div>
+    <div class="nf-card total">
+      <div class="nf-card-label">&#9971; Movimento Total</div>
+      <div class="nf-card-value">${fmt(totGeral)}</div>
+      <div class="nf-card-sub">Saída - Entrada: ${fmt(totSaida - totEntrada)}</div>
+    </div>
+    <div class="nf-card" style="">
+      <div class="nf-card-label">&#128200; NFC-e emitidas</div>
+      <div class="nf-card-value" style="color:var(--blue)">${nfce.length}</div>
+      <div class="nf-card-sub">Cupons fiscais eletrônicos (modelo 65)</div>
+    </div>
+  `;
+
+  // Resumo saída por status
+  const resumoSaida = {};
+  saida.forEach(n => {
+    const k = n.cStat === 100 ? 'Autorizada' : n.cStat === 101 || n.cStat === 135 ? 'Cancelada' : 'Outro';
+    if (!resumoSaida[k]) resumoSaida[k] = {qt:0, val:0};
+    resumoSaida[k].qt++;
+    resumoSaida[k].val += n.vNF||0;
+  });
+  document.getElementById('nf-saida-count').textContent =
+    saida.length + ' nota(s) | ' + Object.entries(resumoSaida).map(([k,v])=>k+': '+v.qt+' ('+fmt(v.val)+')').join(' · ');
+
+  document.getElementById('nf-resumo-saida').innerHTML = `
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px">
+      ${Object.entries(resumoSaida).map(([k,v])=>`
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 16px;min-width:160px">
+          <div style="font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em">${k}</div>
+          <div style="font-size:1.15rem;font-weight:700;color:${k==='Autorizada'?'var(--green)':'var(--red)'}">${fmt(v.val)}</div>
+          <div style="font-size:.75rem;color:var(--text2)">${v.qt} nota${v.qt!==1?'s':''}</div>
+        </div>`).join('')}
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 16px;min-width:160px">
+        <div style="font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em">NFC-e</div>
+        <div style="font-size:1.15rem;font-weight:700;color:var(--blue)">${fmt(nfce.reduce((a,n)=>a+(n.vNF||0),0))}</div>
+        <div style="font-size:.75rem;color:var(--text2)">${nfce.length} cupons (mod.65)</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 16px;min-width:160px">
+        <div style="font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em">NF-e Saída</div>
+        <div style="font-size:1.15rem;font-weight:700;color:#a78bfa">${fmt(nfe.reduce((a,n)=>a+(n.vNF||0),0))}</div>
+        <div style="font-size:.75rem;color:var(--text2)">${nfe.length} nota${nfe.length!==1?'s':''} (mod.55)</div>
+      </div>
+    </div>`;
+
+  document.getElementById('nf-entrada-count').textContent =
+    entrada.length + ' nota(s) de entrada | Total: ' + fmt(totEntrada);
+
+  if (entrada.length === 0) {
+    document.getElementById('nf-resumo-entrada').innerHTML =
+      '<div style="color:var(--text2);font-size:.85rem;padding:10px 0">Nenhuma nota de entrada encontrada para o período.</div>';
+    document.getElementById('btn-det-entrada').style.display = 'none';
+  }
+
+  // Armazena para uso nas tabelas
+  window._nfSaida   = saida;
+  window._nfEntrada = entrada;
+  renderNFTable('saida');
+  renderNFTable('entrada');
+}
+
+function toggleNFDetail(tipo) {
+  const block = document.getElementById('nf-detail-'+tipo);
+  const btn   = document.getElementById('btn-det-'+tipo);
+  const vis = block.classList.toggle('visible');
+  btn.classList.toggle('active', vis);
+  btn.textContent = vis ? '\u25b2 Ocultar Detalhes' : '\uD83D\uDD0D Detalhar ' +
+    (tipo==='saida'?'Saída':'Entrada');
+}
+
+function renderNFTable(tipo) {
+  const notas  = tipo === 'saida' ? (window._nfSaida||[]) : (window._nfEntrada||[]);
+  const busca  = (document.getElementById('busca-nf-'+tipo)?.value||'').toLowerCase();
+  const modelo = tipo === 'saida' ? (document.getElementById('flt-nf-saida')?.value||'todas') : 'todas';
+
+  let lista = notas.filter(n => {
+    if (modelo !== 'todas' && String(n.modelo) !== modelo) return false;
+    if (busca) {
+      const dest = n.destinatario?.xNome || '';
+      const chave = n.chNFe || '';
+      const nNF   = String(n.nNF||'');
+      return dest.toLowerCase().includes(busca) || nNF.includes(busca) || chave.includes(busca);
+    }
+    return true;
+  });
+
+  const tbody = document.querySelector('#tbl-nf-'+tipo+' tbody');
+  if (!tbody) return;
+  if (!lista.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:20px">Nenhuma nota encontrada</td></tr>';
+    return;
+  }
+
+  lista.sort((a,b) => new Date(b.dhEmi||b.data) - new Date(a.dhEmi||a.data));
+  tbody.innerHTML = lista.map(n => {
+    const dest = n.destinatario?.xNome || '(consumidor)';
+    const modLabel = n.modelo===65
+      ? '<span class="nf-type-label nf-type-nfce">NFC-e</span>'
+      : '<span class="nf-type-label nf-type-nfe">NF-e</span>';
+    return `<tr>
+      <td>${fmtDate(n.dhEmi||n.data)}</td>
+      <td>${n.nNF||'-'} <span style="font-size:.68rem;color:var(--text2)">s${n.serie||1}</span></td>
+      <td>${modLabel}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${dest}">${dest}</td>
+      <td style="font-size:.78rem;color:var(--text2)">${n.natOp||'-'}</td>
+      <td style="font-weight:600;color:var(--blue)">${fmt(n.vNF||0)}</td>
+      <td>${cStatLabel(n.cStat)}</td>
+    </tr>`;
+  }).join('');
+}
+
 // ═══ INIT ═══
 document.addEventListener('DOMContentLoaded',()=>{
   initVisao();
@@ -1711,7 +1933,7 @@ window.addEventListener('resize',()=>{
 final = HTML.replace('__DATA_PLACEHOLDER__', DATA_JS)
 
 OUT.parent.mkdir(parents=True, exist_ok=True)
-with open(OUT, "w", encoding="utf-8") as f:
+with open(OUT, "w", encoding="utf-8", errors="replace") as f:
     f.write(final)
 
 print(f"Dashboard gerado: {OUT}")
