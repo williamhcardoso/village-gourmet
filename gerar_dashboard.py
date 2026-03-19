@@ -127,12 +127,17 @@ tr:last-child td{border-bottom:none}
 .suggestions{display:flex;flex-wrap:wrap;gap:7px;padding:0 14px 10px}
 .sug-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:5px 11px;border-radius:20px;cursor:pointer;font-size:.72rem;transition:.2s}
 .sug-btn:hover{border-color:var(--accent);color:var(--text)}
-.dre-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)}
+.dre-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)}
 .dre-row:last-child{border-bottom:none}
-.dre-row.result{background:var(--bg3);padding:7px 11px;border-radius:6px;margin:3px -11px;border-bottom:none}
-.dre-value{font-weight:600}
+.dre-row.result{background:var(--bg3);padding:7px 11px;border-radius:6px;margin:3px -11px;border-bottom:none;margin-top:4px}
+.dre-row.result-final{background:linear-gradient(90deg,var(--accent)18,transparent);border:1px solid var(--accent);padding:9px 11px;border-radius:8px;margin:6px -11px;border-bottom:none}
+.dre-row.section-sep{border-bottom:2px solid var(--border);margin-bottom:4px}
+.dre-label{flex:1;font-size:.83rem}
+.dre-pct{font-size:.72rem;color:var(--text2);width:48px;text-align:right;margin-right:10px}
+.dre-value{font-weight:600;min-width:110px;text-align:right}
 .dre-value.pos{color:var(--green)}
 .dre-value.neg{color:var(--red)}
+.dre-indent{padding-left:14px;opacity:.85}
 .rank-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
 .rank-item:last-child{border-bottom:none}
 .rank-num{width:26px;height:26px;background:var(--bg3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:var(--text2);flex-shrink:0}
@@ -256,13 +261,20 @@ tr:last-child td{border-bottom:none}
   <div class="cards" id="cards-fin"></div>
   <div class="grid2">
     <div class="section">
-      <div class="section-title">DRE Simplificado — Março 2026</div>
+      <div class="section-title">DRE — Demonstrativo de Resultado — Março 2026</div>
       <div id="dre-content"></div>
     </div>
     <div class="section">
-      <div class="section-title">Fluxo de Caixa — Saldo Acumulado Diário</div>
-      <div class="chart-wrap"><canvas id="chart-fluxo" height="240"></canvas></div>
+      <div class="section-title">Composição dos Custos</div>
+      <div class="chart-wrap" style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+        <canvas id="chart-composicao" height="220" style="max-width:220px"></canvas>
+        <div id="composicao-legenda" style="font-size:.8rem;flex:1;min-width:160px"></div>
+      </div>
     </div>
+  </div>
+  <div class="section">
+    <div class="section-title">Fluxo de Caixa — Saldo Acumulado Diário</div>
+    <div class="chart-wrap"><canvas id="chart-fluxo" height="200"></canvas></div>
   </div>
   <div class="section">
     <div class="section-title">Lançamentos do Período</div>
@@ -704,7 +716,7 @@ function showTab(id, el) {
   document.getElementById('tab-'+id).classList.add('active');
   if (el) el.classList.add('active');
   if (id==='visao') redrawVisao();
-  if (id==='financeiro') redrawFluxo();
+  if (id==='financeiro') initFinanceiro();
   if (id==='precificacao') setTimeout(()=>calcPrecificacao(),50);
   if (id==='despesas')    renderDespesas();
   if (id==='impostos')    calcImpostos();
@@ -715,20 +727,46 @@ function showRefreshInfo() {
   alert('Para atualizar os dados:\\n\\n1. Execute: python coletar_endpoints.py\\n2. Execute: python gerar_dashboard.py\\n3. Recarregue esta página (F5)');
 }
 
+// ═══ UTILITÁRIO FINANCEIRO CENTRAL ═══
+function calcDRE() {
+  const receita    = EXTOPT.order_revenue_total || 0;
+  const nPed       = EXTOPT.order_count || 0;
+  const cmv        = (NOTAS_COMPRA||[]).reduce((s,n) => s + (n.vNF||0), 0);
+  const despYooga  = EXTOPT.order_expense_total || 0;
+  const despFixas  = loadDespesas().reduce((s,d) => {
+    const v = d.recorr==='anual'?d.valor/12 : d.recorr==='semanal'?d.valor*4.33 : d.recorr==='quinzenal'?d.valor*2 : d.valor;
+    return s + v;
+  }, 0);
+  // Usa regime da aba impostos se disponível, senão precificação, senão padrão
+  const regimeEl = document.getElementById('imp-regime') || document.getElementById('cfg-regime');
+  const regime   = regimeEl?.value || 'simples_2';
+  const aliqPct  = (REGIMES_IMP[regime]?.aliq_total || 7.3);
+  const impostos = receita * aliqPct / 100;
+
+  const lucroBruto  = receita - cmv;
+  const ebitda      = lucroBruto - despYooga - despFixas;
+  const resultLiq   = ebitda - impostos;
+  const pct = v => receita > 0 ? (v/receita*100) : 0;
+
+  return {receita, nPed, cmv, despYooga, despFixas, impostos, aliqPct,
+          lucroBruto, ebitda, resultLiq, pct};
+}
+
 // ═══ VISÃO GERAL ═══
 function initVisao() {
-  const receita = EXTOPT.order_revenue_total || 0;
-  const despesa = EXTOPT.order_expense_total || 0;
-  const saldo   = receita - despesa;
-  const nPed    = EXTOPT.order_count || 0;
-  const ticketMed = nPed > 0 ? receita/nPed : 0;
-  const dias    = VPD.length || 1;
+  const D       = calcDRE();
+  const nPed    = D.nPed;
+  const ticketMed = nPed > 0 ? D.receita/nPed : 0;
+
+  const cmvPct  = D.pct(D.cmv);
+  const mbPct   = D.pct(D.lucroBruto);
+  const rlPct   = D.pct(D.resultLiq);
 
   document.getElementById('cards-visao').innerHTML = [
-    {label:'Faturamento do Mês',  value:fmt(receita),   sub:'01 a 19/03/2026',         cls:'green',  icon:'&#128200;'},
-    {label:'Ticket Médio',        value:fmt(ticketMed), sub:nPed+' pedidos no período', cls:'blue',   icon:'&#127915;'},
-    {label:'Total Despesas',      value:fmt(despesa),   sub:'Lançamentos registrados',  cls:'red',    icon:'&#128203;'},
-    {label:'Resultado Líquido',   value:fmt(saldo),     sub:'Receita menos despesas',   cls:saldo>=0?'green':'red', icon:'&#9878;'},
+    {label:'Faturamento do Mês', value:fmt(D.receita),    sub:'01 a 19/03/2026 · '+nPed+' pedidos',  cls:'green',                              icon:'&#128200;'},
+    {label:'Ticket Médio',       value:fmt(ticketMed),    sub:'Receita ÷ total de pedidos',           cls:'blue',                               icon:'&#127915;'},
+    {label:'CMV (Custo Compras)',value:fmt(D.cmv),        sub:fmtPct(cmvPct)+' da receita bruta · '+((NOTAS_COMPRA||[]).length)+' NFs',        cls:'red',                                icon:'&#128666;'},
+    {label:'Resultado Líquido',  value:fmt(D.resultLiq),  sub:'Após CMV, fixas e impostos · '+fmtPct(rlPct), cls:D.resultLiq>=0?'green':'red', icon:'&#9878;'},
   ].map(d=>`<div class="card ${d.cls}"><div class="card-icon">${d.icon}</div><div class="card-label">${d.label}</div><div class="card-value">${d.value}</div><div class="card-sub">${d.sub}</div></div>`).join('');
 
   // Alerta estoque
@@ -770,29 +808,71 @@ function redrawVisao() {
 
 // ═══ FINANCEIRO ═══
 function initFinanceiro() {
-  const receita = EXTOPT.order_revenue_total || 0;
-  const despesa = EXTOPT.order_expense_total || 0;
-  const saldo   = receita - despesa;
-  const nPed    = EXTOPT.order_count || 0;
+  const D = calcDRE();
 
+  // ─ Cards ──────────────────────────────────────────────────
   document.getElementById('cards-fin').innerHTML = [
-    {label:'Receita Bruta',        value:fmt(receita),                              sub:nPed+' lançamentos',   cls:'green',  icon:'&#128200;'},
-    {label:'Despesas',             value:fmt(despesa),                              sub:'Saídas registradas',  cls:'red',    icon:'&#128202;'},
-    {label:'Resultado',            value:fmt(saldo),                                sub:'Receita - Despesas',  cls:saldo>=0?'green':'red', icon:'&#9878;'},
-    {label:'Pendente a Receber',   value:fmt(EXTOPT.pending_revenue_total||0),      sub:(EXTOPT.pending_revenue_count||0)+' títulos', cls:'yellow', icon:'&#9203;'},
+    {label:'Receita Bruta',    value:fmt(D.receita),      sub:D.nPed+' pedidos · 01–19/03/2026',             cls:'green',                              icon:'&#128200;'},
+    {label:'CMV — Compras NF', value:fmt(D.cmv),          sub:fmtPct(D.pct(D.cmv))+' da receita · '+(NOTAS_COMPRA||[]).length+' notas',          cls:'red',                                icon:'&#128666;'},
+    {label:'Margem Bruta',     value:fmt(D.lucroBruto),   sub:fmtPct(D.pct(D.lucroBruto))+' — após deduzir CMV',                                  cls:D.lucroBruto>=0?'green':'red',        icon:'&#128202;'},
+    {label:'Resultado Líquido',value:fmt(D.resultLiq),    sub:fmtPct(D.pct(D.resultLiq))+' — após tudo (CMV+fixas+impostos)',                     cls:D.resultLiq>=0?'green':'red',         icon:'&#9878;'},
   ].map(d=>`<div class="card ${d.cls}"><div class="card-icon">${d.icon}</div><div class="card-label">${d.label}</div><div class="card-value">${d.value}</div><div class="card-sub">${d.sub}</div></div>`).join('');
 
-  const margem = receita>0?(saldo/receita*100):0;
-  document.getElementById('dre-content').innerHTML = `
-    <div class="dre-row"><span>Receita Operacional Bruta</span><span class="dre-value pos">${fmt(receita)}</span></div>
-    <div class="dre-row" style="color:var(--text2)"><span>(-) Despesas / Saídas</span><span class="dre-value neg">${fmt(-despesa)}</span></div>
-    <div class="dre-row result"><span style="font-weight:600">= Resultado Operacional</span><span class="dre-value ${saldo>=0?'pos':'neg'}">${fmt(saldo)}</span></div>
-    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
-      <div class="dre-row"><span style="color:var(--text2)">Margem %</span><span class="dre-value" style="color:var(--accent2)">${fmtPct(margem)}</span></div>
-      <div class="dre-row"><span style="color:var(--text2)">Pendente receber</span><span class="dre-value pos">${fmt(EXTOPT.pending_revenue_total||0)}</span></div>
-      <div class="dre-row"><span style="color:var(--text2)">Pendente a pagar</span><span class="dre-value neg">${fmt(-(EXTOPT.pending_expense_total||0))}</span></div>
-      <div class="dre-row"><span style="color:var(--text2)">Saldo total (Yooga)</span><span class="dre-value ${(EXTOPT.saldo||0)>=0?'pos':'neg'}">${fmt(EXTOPT.saldo||0)}</span></div>
+  // ─ DRE completo ───────────────────────────────────────────
+  const row = (label, val, indent, cls, pct, bold) => {
+    const v = val < 0 ? `<span class="dre-value neg">${fmt(val)}</span>` :
+              val > 0 ? `<span class="dre-value ${cls||'pos'}">${fmt(val)}</span>` :
+                        `<span class="dre-value" style="color:var(--text2)">${fmt(0)}</span>`;
+    return `<div class="dre-row${bold?' result':''}">
+      <span class="dre-label${indent?' dre-indent':''}" ${bold?'style="font-weight:700"':''}>${label}</span>
+      <span class="dre-pct">${pct!==undefined?fmtPct(pct):''}</span>
+      ${v}
     </div>`;
+  };
+
+  const despTotaisOp = D.despYooga + D.despFixas;
+  const alertaCMV = D.pct(D.cmv) > 40
+    ? `<div style="background:#7c2d1222;border:1px solid var(--yellow);border-radius:7px;padding:8px 12px;margin-bottom:10px;font-size:.78rem;color:var(--yellow)">
+        &#9888; CMV acima de 40% da receita — revise preços ou renegocie fornecedores</div>` : '';
+
+  document.getElementById('dre-content').innerHTML = alertaCMV + `
+    ${row('(+) Receita Operacional Bruta', D.receita, false, 'pos', 100, false)}
+    ${row('(-) CMV — Notas de Compra', -D.cmv, true, '', D.pct(D.cmv), false)}
+    ${row('(=) Lucro Bruto', D.lucroBruto, false, D.lucroBruto>=0?'pos':'neg', D.pct(D.lucroBruto), true)}
+    ${row('(-) Desp. Operacionais Yooga', -D.despYooga, true, '', D.pct(D.despYooga), false)}
+    ${row('(-) Despesas Fixas Cadastradas', -D.despFixas, true, '', D.pct(D.despFixas), false)}
+    ${row('(=) EBITDA', D.ebitda, false, D.ebitda>=0?'pos':'neg', D.pct(D.ebitda), true)}
+    ${row('(-) Impostos (~'+D.aliqPct.toFixed(1)+'%)', -D.impostos, true, '', D.aliqPct, false)}
+    <div class="dre-row result-final">
+      <span class="dre-label" style="font-weight:700">&#9783; Resultado Líquido</span>
+      <span class="dre-pct">${fmtPct(D.pct(D.resultLiq))}</span>
+      <span class="dre-value ${D.resultLiq>=0?'pos':'neg'}" style="font-size:1.05rem">${fmt(D.resultLiq)}</span>
+    </div>
+    <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border)">
+      ${row('Pendente a receber', D.receita>0?(EXTOPT.pending_revenue_total||0):0, false, 'pos', undefined, false)}
+      ${row('Pendente a pagar', -(EXTOPT.pending_expense_total||0), false, '', undefined, false)}
+    </div>`;
+
+  // ─ Gráfico composição de custos ──────────────────────────
+  const lucroPos = Math.max(D.resultLiq, 0);
+  const prejuizo = D.resultLiq < 0 ? Math.abs(D.resultLiq) : 0;
+  const compLabels = ['CMV (Compras)', 'Desp. Operac.', 'Desp. Fixas', 'Impostos',
+                      D.resultLiq>=0 ? 'Lucro Líquido' : 'Resultado Negativo'];
+  const compValues = [D.cmv, D.despYooga, D.despFixas, D.impostos,
+                      D.resultLiq>=0 ? lucroPos : prejuizo];
+  const compColors = ['#ef4444','#f97316','#f59e0b','#8b5cf6',
+                      D.resultLiq>=0 ? '#22c55e' : '#dc2626'];
+  setTimeout(() => {
+    drawDonut('chart-composicao', compLabels, compValues, compColors);
+    const total = compValues.reduce((s,v)=>s+v,0)||1;
+    document.getElementById('composicao-legenda').innerHTML =
+      compLabels.map((l,i)=>`
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px">
+          <span style="width:11px;height:11px;border-radius:50%;background:${compColors[i]};flex-shrink:0"></span>
+          <span style="flex:1;font-size:.78rem">${l}</span>
+          <span style="font-size:.78rem;font-weight:600;color:${compColors[i]}">${fmtPct(compValues[i]/D.receita*100)}</span>
+        </div>`).join('');
+  }, 80);
 
   // Tabela lançamentos
   const tbody = document.querySelector('#tbl-lancamentos tbody');
@@ -1741,13 +1821,15 @@ function calcImpostos() {
     const vM=d.recorr==='anual'?d.valor/12:d.recorr==='semanal'?d.valor*4.33:d.recorr==='quinzenal'?d.valor*2:d.valor;
     return s+vM;
   },0);
-  const resultadoLiq = fat - totalImp - despFixas;
+  const cmvImp     = (NOTAS_COMPRA||[]).reduce((s,n)=>s+(n.vNF||0),0);
+  const despOpImp  = EXTOPT.order_expense_total||0;
+  const resultadoLiq = fat - cmvImp - despOpImp - despFixas - totalImp;
 
   document.getElementById('cards-imp').innerHTML = [
-    {label:'Total de Impostos',        value:fmt(totalImp),       sub:fmtPct(pctEfet)+' do faturamento',   cls:'red',    icon:'🏛'},
-    {label:'Faturamento Base',         value:fmt(fat),            sub:'Mês de referência',                  cls:'green',  icon:'💰'},
-    {label:'Despesas Fixas',           value:fmt(despFixas),      sub:'Cadastradas',                        cls:'yellow', icon:'📋'},
-    {label:'Resultado após tudo',      value:fmt(resultadoLiq),   sub:'Fat - Impostos - Fixas',             cls:resultadoLiq>=0?'green':'red', icon:'⚖️'},
+    {label:'Total de Impostos',    value:fmt(totalImp),      sub:fmtPct(pctEfet)+' do faturamento',            cls:'red',                          icon:'&#127963;'},
+    {label:'CMV (Notas de Compra)',value:fmt(cmvImp),        sub:fmtPct(fat>0?cmvImp/fat*100:0)+' da receita', cls:'red',                          icon:'&#128666;'},
+    {label:'Despesas Fixas',       value:fmt(despFixas),     sub:'Cadastradas na aba Despesas Fixas',           cls:'yellow',                       icon:'&#128203;'},
+    {label:'Resultado Líquido',    value:fmt(resultadoLiq),  sub:'Fat - CMV - Fixas - Impostos',                cls:resultadoLiq>=0?'green':'red',  icon:'&#9878;'},
   ].map(d=>`<div class="card ${d.cls}"><div class="card-icon">${d.icon}</div><div class="card-label">${d.label}</div><div class="card-value">${d.value}</div><div class="card-sub">${d.sub}</div></div>`).join('');
 
   // Timeline de vencimentos
