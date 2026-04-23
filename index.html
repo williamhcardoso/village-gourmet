@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Village Gourmet — Custos</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #e8e4df; color: #0f0f0f; }
+    #root { display: flex; flex-direction: column; min-height: 100vh; }
+    input, select, button, textarea { font-family: inherit; }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+    button { cursor: pointer; border: none; outline: none; }
+    input:focus, select:focus { outline: 2px solid #c9973a; outline-offset: -1px; }
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-thumb { background: #c9973a55; border-radius: 2px; }
+
+    /* Layout responsivo centralizado */
+    .app-shell {
+      display: flex; flex-direction: column; min-height: 100vh;
+      max-width: 640px; margin: 0 auto;
+      background: #f5f2ee;
+      box-shadow: 0 0 40px rgba(0,0,0,0.12);
+    }
+    .footer-wrap {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 640px; z-index: 100;
+      background: #fff; border-top: 1px solid #e9e6e1;
+      box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+    }
+
+    /* Grid de 2 colunas para insumos em telas maiores */
+    @media (min-width: 540px) {
+      .insumos-grid { display: grid; grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useCallback, useRef } = React;
+
+// ─── DADOS ───────────────────────────────────────────────────────────────────
+const INSUMOS = [
+  // ── CARNES ──────────────────────────────────────────
+  {g:'CARNES',id:'acem',      n:'Acem Moido (blend hamburguer)', u:'kg',      f:1000,b:'g'},
+  {g:'CARNES',id:'fraldinha', n:'Fraldinha',                      u:'kg',      f:1000,b:'g'},
+  {g:'CARNES',id:'alcatra',   n:'Alcatra',                        u:'kg',      f:1000,b:'g'},
+  {g:'CARNES',id:'cupim',     n:'Cupim',                          u:'kg',      f:1000,b:'g'},
+  {g:'CARNES',id:'filemig',   n:'File Mignon',                    u:'kg',      f:1000,b:'g'},
+  {g:'CARNES',id:'frango',    n:'File de Frango',                 u:'kg',      f:1000,b:'g'},
+  {g:'CARNES',id:'tilapia',   n:'File de Tilapia',                u:'kg',      f:1000,b:'g'},
+  {g:'CARNES',id:'desfiada',  n:'Carne Desfiada (pronta)',         u:'kg',      f:1000,b:'g'},
+  // ── PÃES ─────────────────────────────────────────────
+  {g:'PAES',  id:'pb_ger',    n:'Pao Brioche com Gergelim',       u:'caixa',   f:12,  b:'un'},
+  {g:'PAES',  id:'pb_aust',   n:'Pao Australiano',                u:'caixa',   f:12,  b:'un'},
+  {g:'PAES',  id:'pb_black',  n:'Pao Black',                      u:'caixa',   f:12,  b:'un'},
+  {g:'PAES',  id:'pb_gold',   n:'Pao Queijo Parmesao (Gold)',      u:'caixa',   f:12,  b:'un'},
+  {g:'PAES',  id:'pb_pap',    n:'Pao Paprica',                    u:'caixa',   f:12,  b:'un'},
+  {g:'PAES',  id:'pb_vil',    n:'Pao Village (Piscininha)',        u:'caixa',   f:12,  b:'un'},
+  // ── LATICÍNIOS ───────────────────────────────────────
+  {g:'LATICINIOS',id:'muss',  n:'Queijo Mussarela',               u:'kg',      f:1000,b:'g'},
+  {g:'LATICINIOS',id:'chedd', n:'Cheddar / Creme de Cheddar',     u:'kg',      f:1000,b:'g'},
+  {g:'LATICINIOS',id:'cream', n:'Cream Cheese',                   u:'kg',      f:1000,b:'g'},
+  {g:'LATICINIOS',id:'reqij', n:'Requeijao Cremoso',              u:'kg',      f:1000,b:'g'},
+  {g:'LATICINIOS',id:'qprad', n:'Queijo Prado Fatiado',           u:'kg',      f:1000,b:'g'},
+  // ── OUTROS SECOS/FRIOS ───────────────────────────────
+  {g:'OUTROS',id:'bacon',     n:'Bacon',                          u:'kg',      f:1000,b:'g'},
+  {g:'OUTROS',id:'batata',    n:'Batata Palito (congelada)',       u:'kg',      f:1000,b:'g'},
+  {g:'OUTROS',id:'mandio',    n:'Mandioca (congelada)',            u:'kg',      f:1000,b:'g'},
+  {g:'OUTROS',id:'arroz',     n:'Arroz (cru)',                     u:'kg',      f:1000,b:'g'},
+  {g:'OUTROS',id:'panko',     n:'Farinha Panko',                  u:'kg',      f:1000,b:'g'},
+  {g:'OUTROS',id:'polenta',   n:'Polenta (flocada)',               u:'kg',      f:1000,b:'g'},
+  {g:'OUTROS',id:'geleia_pim',n:'Geleia de Pimenta',              u:'kg',      f:1000,b:'g'},
+  {g:'OUTROS',id:'geleia_bac',n:'Geleia de Bacon',                u:'kg',      f:1000,b:'g'},
+  {g:'OUTROS',id:'banana',    n:'Banana',                         u:'kg',      f:1000,b:'g'},
+  {g:'OUTROS',id:'chocolate', n:'Chocolate em po / cacau',        u:'kg',      f:1000,b:'g'},
+  {g:'OUTROS',id:'sorvete',   n:'Sorvete de Creme',               u:'kg',      f:1000,b:'g'},
+  {g:'OUTROS',id:'ovos',      n:'Ovos',                           u:'duzia',   f:12,  b:'un'},
+  // ── CERVEJAS 600ML ───────────────────────────────────
+  {g:'CERVEJAS_600',id:'pilsen600',  n:'Antarctica Pilsen 600ml', u:'caixa',   f:12,  b:'un'},
+  {g:'CERVEJAS_600',id:'brahma600',  n:'Brahma 600ml',            u:'caixa',   f:12,  b:'un'},
+  {g:'CERVEJAS_600',id:'original600',n:'Original 600ml',          u:'caixa',   f:12,  b:'un'},
+  {g:'CERVEJAS_600',id:'spaten600',  n:'Spaten 600ml',            u:'caixa',   f:12,  b:'un'},
+  {g:'CERVEJAS_600',id:'stella600',  n:'Stella Artois 600ml',     u:'caixa',   f:12,  b:'un'},
+  {g:'CERVEJAS_600',id:'corona600',  n:'Corona 600ml',            u:'caixa',   f:12,  b:'un'},
+  {g:'CERVEJAS_600',id:'budwei600',  n:'Budweiser 600ml',         u:'caixa',   f:12,  b:'un'},
+  // ── LONG NECKS 330ML ─────────────────────────────────
+  {g:'LONG_NECKS',id:'bud_ln',    n:'Budweiser Long Neck 330ml',  u:'caixa',   f:24,  b:'un'},
+  {g:'LONG_NECKS',id:'bud_zero',  n:'Budweiser LN Zero 330ml',    u:'caixa',   f:24,  b:'un'},
+  {g:'LONG_NECKS',id:'stella_ln', n:'Stella Artois Long Neck',    u:'caixa',   f:24,  b:'un'},
+  {g:'LONG_NECKS',id:'stelgold',  n:'Stella Pure Gold sem Gluten',u:'caixa',   f:24,  b:'un'},
+  {g:'LONG_NECKS',id:'spaten_ln', n:'Spaten Long Neck',           u:'caixa',   f:24,  b:'un'},
+  {g:'LONG_NECKS',id:'corln',     n:'Corona Extra LN 330ml',      u:'caixa',   f:24,  b:'un'},
+  {g:'LONG_NECKS',id:'coronit',   n:'Coronita 210ml',             u:'caixa',   f:24,  b:'un'},
+  {g:'LONG_NECKS',id:'corozero',  n:'Corona Cero (zero alcool)',  u:'caixa',   f:24,  b:'un'},
+  {g:'LONG_NECKS',id:'michelob',  n:'Michelob Ultra Long Neck',   u:'caixa',   f:24,  b:'un'},
+  // ── REFRIGERANTES / ÁGUA ─────────────────────────────
+  {g:'NAO_ALCOOLICOS',id:'coca_ln',  n:'Coca-Cola Lata 310ml',    u:'caixa',   f:24,  b:'un'},
+  {g:'NAO_ALCOOLICOS',id:'cocazero', n:'Coca-Cola Zero Lata 310ml',u:'caixa',  f:24,  b:'un'},
+  {g:'NAO_ALCOOLICOS',id:'coca_lit', n:'Coca-Cola 1 Litro',       u:'fardo',   f:6,   b:'un'},
+  {g:'NAO_ALCOOLICOS',id:'guarana',  n:'Guarana Antarctica Lata', u:'caixa',   f:24,  b:'un'},
+  {g:'NAO_ALCOOLICOS',id:'guar_lit', n:'Guarana Antarctica 1 Litro',u:'fardo', f:6,   b:'un'},
+  {g:'NAO_ALCOOLICOS',id:'pepsi',    n:'Pepsi Black Lata 350ml',  u:'caixa',   f:24,  b:'un'},
+  {g:'NAO_ALCOOLICOS',id:'tonica',   n:'Tonica Antarctica Lata',  u:'caixa',   f:24,  b:'un'},
+  {g:'NAO_ALCOOLICOS',id:'h2o_lim',  n:'H2O Limao 500ml',         u:'caixa',   f:12,  b:'un'},
+  {g:'NAO_ALCOOLICOS',id:'agua_sg',  n:'Agua Mineral sem Gas 500ml',u:'caixa', f:24,  b:'un'},
+  {g:'NAO_ALCOOLICOS',id:'agua_cg',  n:'Agua Mineral com Gas 500ml',u:'caixa', f:24,  b:'un'},
+  {g:'NAO_ALCOOLICOS',id:'redbull',  n:'Red Bull 250ml',          u:'caixa',   f:24,  b:'un'},
+  // ── DESTILADOS / DRINKS ──────────────────────────────
+  {g:'DRINKS',id:'cachaca',  n:'Cachaca',                          u:'garrafa', f:700, b:'ml'},
+  {g:'DRINKS',id:'vodka',    n:'Vodka Smirnoff',                   u:'garrafa', f:700, b:'ml'},
+  {g:'DRINKS',id:'rum',      n:'Rum',                              u:'garrafa', f:700, b:'ml'},
+  {g:'DRINKS',id:'gin',      n:'Gin',                              u:'garrafa', f:700, b:'ml'},
+  {g:'DRINKS',id:'campari',  n:'Campari',                          u:'garrafa', f:700, b:'ml'},
+  {g:'DRINKS',id:'aperol',   n:'Aperol',                           u:'garrafa', f:700, b:'ml'},
+  {g:'DRINKS',id:'vinho',    n:'Vinho',                            u:'garrafa', f:750, b:'ml'},
+  {g:'DRINKS',id:'malibu',   n:'Malibu',                           u:'garrafa', f:700, b:'ml'},
+  {g:'DRINKS',id:'uisque',   n:'Uisque Red Label',                 u:'garrafa', f:1000,b:'ml'},
+  {g:'DRINKS',id:'lcoco',    n:'Leite de Coco (lata 400ml)',       u:'lata',    f:400, b:'ml'},
+  {g:'DRINKS',id:'lcond',    n:'Leite Condensado (lata 395g)',     u:'lata',    f:395, b:'g'},
+  {g:'DRINKS',id:'gmor',     n:'Geleia de Morango',                u:'kg',      f:1000,b:'g'},
+  {g:'DRINKS',id:'xarope',   n:'Xarope Soda Italiana',             u:'garrafa', f:700, b:'ml'},
+  {g:'DRINKS',id:'limao',    n:'Limao',                            u:'kg',      f:1000,b:'g'},
+  {g:'DRINKS',id:'marac',    n:'Maracuja (polpa)',                 u:'kg',      f:1000,b:'g'},
+  {g:'DRINKS',id:'abacaxi',  n:'Abacaxi',                          u:'unidade', f:1,   b:'un'},
+  {g:'DRINKS',id:'cocoral',  n:'Coco Ralado',                      u:'kg',      f:1000,b:'g'},
+  {g:'DRINKS',id:'suco_lj',  n:'Suco de Laranja Natural',          u:'kg',      f:1000,b:'g'},
+];
+
+const FIC = [
+  // ── CHOPP ────────────────────────────────────────────
+  {c:'CHOPP',n:'Chopp Brahma Copo 300ml',  p:10,  m:.65,a:.0809,i:[{n:'Chopp (custo por ml)',r:null,q:300, u:'ml'}]},
+  {c:'CHOPP',n:'Chopp Brahma Caneca 350ml',p:13,  m:.65,a:.0809,i:[{n:'Chopp (custo por ml)',r:null,q:350, u:'ml'}]},
+  {c:'CHOPP',n:'Torre Chopp 2,5 Litros',   p:89,  m:.65,a:.0809,i:[{n:'Chopp (custo por ml)',r:null,q:2500,u:'ml'}]},
+  // ── HAMBÚRGUERES ─────────────────────────────────────
+  {c:'HAMBURGUERES',n:'Village Burguer',p:39,m:.65,a:.0809,i:[
+    {n:'Acem Moido 150g',r:'acem',q:150,u:'g'},{n:'Pao Brioche Gergelim',r:'pb_ger',q:1,u:'un'},
+    {n:'Bacon',r:'bacon',q:null,u:'g'},{n:'Queijo Mussarela',r:'muss',q:null,u:'g'},
+    {n:'Maionese de Bacon / Molho',r:null,q:null,u:'g'},{n:'Cebola Caramelizada / Roxa',r:null,q:null,u:'g'}]},
+  {c:'HAMBURGUERES',n:'Village Salada Burguer',p:39,m:.65,a:.0809,i:[
+    {n:'Acem Moido 150g',r:'acem',q:150,u:'g'},{n:'Pao Brioche Gergelim',r:'pb_ger',q:1,u:'un'},
+    {n:'Queijo Mussarela',r:'muss',q:null,u:'g'},{n:'Queijo Cheddar',r:'chedd',q:null,u:'g'},
+    {n:'Bacon',r:'bacon',q:null,u:'g'},{n:'Alface / Tomate / Cebola',r:null,q:null,u:'g'},
+    {n:'Maionese Bacon / Molho Especial',r:null,q:null,u:'g'}]},
+  {c:'HAMBURGUERES',n:'Burger Chicken Pepper',p:39.9,m:.65,a:.0809,i:[
+    {n:'File de Frango Empanado Panko',r:'frango',q:null,u:'g'},{n:'Farinha Panko',r:'panko',q:null,u:'g'},
+    {n:'Pao Brioche',r:'pb_ger',q:1,u:'un'},{n:'Bacon',r:'bacon',q:null,u:'g'},
+    {n:'Queijo Mussarela',r:'muss',q:null,u:'g'},{n:'Molho da Casa / Salada',r:null,q:null,u:'g'}]},
+  {c:'HAMBURGUERES',n:'Village Burguer Crispy',p:42,m:.65,a:.0809,i:[
+    {n:'Acem Moido 150g',r:'acem',q:150,u:'g'},{n:'Pao Australiano',r:'pb_aust',q:1,u:'un'},
+    {n:'Cheddar',r:'chedd',q:null,u:'g'},{n:'Bacon',r:'bacon',q:null,u:'g'},
+    {n:'Geleia de Pimenta',r:'geleia_pim',q:null,u:'g'},{n:'Molho / Crispy de Couve',r:null,q:null,u:'g'}]},
+  {c:'HAMBURGUERES',n:'Village Australiano Burguer',p:42,m:.65,a:.0809,i:[
+    {n:'Acem Moido 150g',r:'acem',q:150,u:'g'},{n:'Pao Australiano',r:'pb_aust',q:1,u:'un'},
+    {n:'Creme de Cheddar',r:'chedd',q:null,u:'g'},{n:'Bacon',r:'bacon',q:null,u:'g'},
+    {n:'Maionese Bacon / Cebola Caramelizada',r:null,q:null,u:'g'}]},
+  {c:'HAMBURGUERES',n:'Village Paprica Burguer',p:42.9,m:.65,a:.0809,i:[
+    {n:'Acem Moido 150g',r:'acem',q:150,u:'g'},{n:'Pao Paprica',r:'pb_pap',q:1,u:'un'},
+    {n:'Queijo Mussarela',r:'muss',q:null,u:'g'},{n:'Bacon',r:'bacon',q:null,u:'g'},
+    {n:'Maionese / Molho Especial',r:null,q:null,u:'g'},{n:'Alface / Tomate / Cebola',r:null,q:null,u:'g'}]},
+  {c:'HAMBURGUERES',n:'Village Burguer Duplo',p:49,m:.65,a:.0809,i:[
+    {n:'Acem Moido 300g (duplo)',r:'acem',q:300,u:'g'},{n:'Pao Brioche Gergelim',r:'pb_ger',q:1,u:'un'},
+    {n:'Queijo Mussarela',r:'muss',q:null,u:'g'},{n:'Bacon',r:'bacon',q:null,u:'g'},
+    {n:'Maionese Bacon / Cebola',r:null,q:null,u:'g'}]},
+  {c:'HAMBURGUERES',n:'Village Piscininha de Cheddar',p:49.9,m:.65,a:.0809,i:[
+    {n:'Acem Moido 150g',r:'acem',q:150,u:'g'},{n:'Pao Village',r:'pb_vil',q:1,u:'un'},
+    {n:'Cheddar (piscina)',r:'chedd',q:null,u:'g'},{n:'Molho Especial / Salada',r:null,q:null,u:'g'}]},
+  {c:'HAMBURGUERES',n:'Village Australiano Duplo',p:52,m:.65,a:.0809,i:[
+    {n:'Acem Moido 300g (duplo)',r:'acem',q:300,u:'g'},{n:'Pao Australiano',r:'pb_aust',q:1,u:'un'},
+    {n:'Queijo Mussarela',r:'muss',q:null,u:'g'},{n:'Bacon',r:'bacon',q:null,u:'g'},
+    {n:'Maionese Bacon / Cebola',r:null,q:null,u:'g'}]},
+  {c:'HAMBURGUERES',n:'Black Burguer',p:53.77,m:.65,a:.0809,i:[
+    {n:'Acem Moido 150g',r:'acem',q:150,u:'g'},{n:'Pao Black',r:'pb_black',q:1,u:'un'},
+    {n:'Queijo Mussarela',r:'muss',q:null,u:'g'},{n:'Bacon Crocante',r:'bacon',q:null,u:'g'},
+    {n:'Geleia de Pimenta',r:'geleia_pim',q:null,u:'g'},{n:'Molho Especial / Cebola Crispy',r:null,q:null,u:'g'}]},
+  {c:'HAMBURGUERES',n:'Gold Burguer',p:53.77,m:.65,a:.0809,i:[
+    {n:'Acem Moido 150g',r:'acem',q:150,u:'g'},{n:'Pao de Queijo Parmesao',r:'pb_gold',q:1,u:'un'},
+    {n:'Queijo Mussarela',r:'muss',q:null,u:'g'},{n:'Bacon Crocante',r:'bacon',q:null,u:'g'},
+    {n:'Geleia de Pimenta',r:'geleia_pim',q:null,u:'g'},{n:'Banana Caramelizada / Piques',r:'banana',q:null,u:'g'}]},
+  {c:'HAMBURGUERES',n:'Village Burguer Cheese',p:57.7,m:.65,a:.0809,i:[
+    {n:'Acem Moido 150g (empanado)',r:'acem',q:150,u:'g'},{n:'Cream Cheese (recheio)',r:'cream',q:null,u:'g'},
+    {n:'Pao Brioche Gergelim',r:'pb_ger',q:1,u:'un'},{n:'Molho Bacon / Alface',r:null,q:null,u:'g'}]},
+  {c:'HAMBURGUERES',n:'Burguer Doce Pecado',p:58.9,m:.65,a:.0809,i:[
+    {n:'Acem Moido 150g',r:'acem',q:150,u:'g'},{n:'Pao Brioche',r:'pb_ger',q:1,u:'un'},
+    {n:'Queijo Prado Fatiado',r:'qprad',q:null,u:'g'},{n:'Geleia de Bacon',r:'geleia_bac',q:null,u:'g'},
+    {n:'Maionese Bacon / Cebola Crisp',r:null,q:null,u:'g'}]},
+  // ── COMBOS ───────────────────────────────────────────
+  {c:'COMBOS',n:'Combo Village',p:49,m:.60,a:.0809,i:[
+    {n:'Acem Moido 150g',r:'acem',q:150,u:'g'},{n:'Pao Brioche Gergelim',r:'pb_ger',q:1,u:'un'},
+    {n:'Batata Palito Congelada',r:'batata',q:null,u:'g'},{n:'Queijo / Bacon / Molho',r:null,q:null,u:'g'}]},
+  {c:'COMBOS',n:'Combo Australiano',p:52,m:.60,a:.0809,i:[
+    {n:'Acem Moido 150g',r:'acem',q:150,u:'g'},{n:'Pao Australiano',r:'pb_aust',q:1,u:'un'},
+    {n:'Batata Palito Congelada',r:'batata',q:null,u:'g'},{n:'Cheddar / Bacon / Molho',r:null,q:null,u:'g'}]},
+  // ── BATATAS ──────────────────────────────────────────
+  {c:'BATATAS',n:'Batata Simples',p:39,m:.70,a:.0809,i:[
+    {n:'Batata Palito Congelada',r:'batata',q:null,u:'g'},{n:'Molho Artesanal da Casa',r:null,q:null,u:'g'}]},
+  {c:'BATATAS',n:'Batata dos Deuses',p:52.9,m:.70,a:.0809,i:[
+    {n:'Batata Palito Congelada',r:'batata',q:null,u:'g'},{n:'Creme de Cheddar',r:'chedd',q:null,u:'g'},
+    {n:'Bacon',r:'bacon',q:null,u:'g'}]},
+  {c:'BATATAS',n:'Batata Supreme',p:52.9,m:.70,a:.0809,i:[
+    {n:'Batata Palito Congelada',r:'batata',q:null,u:'g'},{n:'Molho Artesanal de Queijo',r:'chedd',q:null,u:'g'}]},
+  {c:'BATATAS',n:'Batata Mista',p:59.9,m:.70,a:.0809,i:[
+    {n:'Batata Palito Congelada',r:'batata',q:null,u:'g'},{n:'Carne Desfiada',r:'desfiada',q:null,u:'g'},
+    {n:'Creme de Queijo',r:'chedd',q:null,u:'g'},{n:'Cheddar / Bacon',r:'bacon',q:null,u:'g'}]},
+  {c:'BATATAS',n:'Batata Mistura Perfeita',p:59.9,m:.70,a:.0809,i:[
+    {n:'Batata Palito Congelada',r:'batata',q:null,u:'g'},{n:'Carne Desfiada',r:'desfiada',q:null,u:'g'},
+    {n:'Creme de Queijo',r:'chedd',q:null,u:'g'}]},
+  {c:'BATATAS',n:'Batata Recheada no Pote',p:63.9,m:.70,a:.0809,i:[
+    {n:'Batata Palito Congelada',r:'batata',q:null,u:'g'},{n:'Carne Desfiada',r:'desfiada',q:null,u:'g'},
+    {n:'Queijo Mussarela',r:'muss',q:null,u:'g'},{n:'Creme de Cheddar',r:'chedd',q:null,u:'g'},
+    {n:'Bacon',r:'bacon',q:null,u:'g'}]},
+  // ── PANQUECAS ────────────────────────────────────────
+  {c:'PANQUECAS',n:'Panqueca Maria Bonita Molho Vermelho',p:37.7,m:.60,a:.0809,i:[
+    {n:'Massa de Panqueca (2 unid)',r:null,q:null,u:'g'},{n:'Carne Defumada Desfiada',r:'desfiada',q:null,u:'g'},
+    {n:'Molho de Tomate / Cebola Brasa',r:null,q:null,u:'g'},{n:'Arroz',r:'arroz',q:null,u:'g'},
+    {n:'Batata Frita',r:'batata',q:null,u:'g'}]},
+  {c:'PANQUECAS',n:'Panqueca Maria Bonita Molho Branco',p:43.9,m:.60,a:.0809,i:[
+    {n:'Massa de Panqueca (2 unid)',r:null,q:null,u:'g'},{n:'Carne Defumada Desfiada',r:'desfiada',q:null,u:'g'},
+    {n:'Molho Branco Cremoso de Queijo',r:null,q:null,u:'g'},{n:'Requeijao',r:'reqij',q:null,u:'g'},
+    {n:'Arroz',r:'arroz',q:null,u:'g'},{n:'Batata Frita',r:'batata',q:null,u:'g'}]},
+  // ── CARNES ───────────────────────────────────────────
+  {c:'CARNES',n:'1/2 Porcao de Cupim 250g',p:50.9,m:.60,a:.0809,i:[
+    {n:'Cupim (peso bruto +20%)',r:'cupim',q:null,u:'g'},{n:'Molho / Temperos',r:null,q:null,u:'g'}]},
+  {c:'CARNES',n:'1/2 Porcao de Alcatra 250g',p:72.9,m:.60,a:.0809,i:[
+    {n:'Alcatra (peso bruto +20%)',r:'alcatra',q:null,u:'g'},{n:'Polenta Caseira com Queijo',r:'polenta',q:null,u:'g'},
+    {n:'Queijo Mussarela (polenta)',r:'muss',q:null,u:'g'},{n:'Manteiga de Alho / Molho',r:null,q:null,u:'g'}]},
+  {c:'CARNES',n:'Fraldinha Nobre',p:89.9,m:.60,a:.0809,i:[
+    {n:'Fraldinha (peso bruto +20%)',r:'fraldinha',q:null,u:'g'},{n:'Molho Artesanal de Queijo',r:null,q:null,u:'g'},
+    {n:'Batata Frita OU Mandioca Frita',r:'batata',q:null,u:'g'},{n:'Manteiga / Temperos',r:null,q:null,u:'g'}]},
+  {c:'CARNES',n:'Cupim Mexicano',p:94.9,m:.60,a:.0809,i:[
+    {n:'Cupim (peso bruto +20%)',r:'cupim',q:null,u:'g'},{n:'Mandioca Frita',r:'mandio',q:null,u:'g'},
+    {n:'Mostarda / Molho Artesanal Alho',r:null,q:null,u:'g'}]},
+  {c:'CARNES',n:'Cupim do Patrao',p:99.9,m:.60,a:.0809,i:[
+    {n:'Cupim (peso bruto +20%)',r:'cupim',q:null,u:'g'},{n:'Mandioca Frita OU Polenta',r:'mandio',q:null,u:'g'},
+    {n:'Manteiga de Alho / Molho',r:null,q:null,u:'g'}]},
+  {c:'CARNES',n:'Alcatra Embrasada 500g',p:119.9,m:.60,a:.0809,i:[
+    {n:'Alcatra (peso bruto +20%)',r:'alcatra',q:null,u:'g'},{n:'Polenta Caseira com Queijo',r:'polenta',q:null,u:'g'},
+    {n:'Queijo Mussarela (polenta)',r:'muss',q:null,u:'g'},{n:'Manteiga de Alho / Molho',r:null,q:null,u:'g'}]},
+  {c:'CARNES',n:'File Mignon a Parmegiana (2px)',p:119.9,m:.60,a:.0809,i:[
+    {n:'File Mignon (peso bruto x2)',r:'filemig',q:null,u:'g'},{n:'Queijo Mussarela Gratinada',r:'muss',q:null,u:'g'},
+    {n:'Arroz',r:'arroz',q:null,u:'g'},{n:'Batata Frita',r:'batata',q:null,u:'g'},
+    {n:'Molho Artesanal / Empanamento',r:null,q:null,u:'g'}]},
+  // ── SOBREMESAS ───────────────────────────────────────
+  {c:'SOBREMESAS',n:'Petit Gateau',p:37.9,m:.70,a:.0809,i:[
+    {n:'Chocolate em po / massa',r:'chocolate',q:null,u:'g'},{n:'Ovos',r:'ovos',q:2,u:'un'},
+    {n:'Sorvete de Creme (2 bolas)',r:'sorvete',q:null,u:'g'},{n:'Manteiga / Farinha / Acucar',r:null,q:null,u:'g'}]},
+  // ── PETISCOS ─────────────────────────────────────────
+  {c:'PETISCOS',n:'Porcao de Polenta',p:19.99,m:.70,a:.0809,i:[
+    {n:'Polenta (frita com mussarela)',r:'polenta',q:null,u:'g'},{n:'Queijo Mussarela',r:'muss',q:null,u:'g'}]},
+  {c:'PETISCOS',n:'Porcao de Mandioca Frita 500g',p:39,m:.70,a:.0809,i:[
+    {n:'Mandioca Congelada 500g',r:'mandio',q:500,u:'g'}]},
+  {c:'PETISCOS',n:'Coxinha Supreme',p:53.99,m:.65,a:.0809,i:[
+    {n:'File de Frango',r:'frango',q:null,u:'g'},{n:'Requeijao Cremoso',r:'reqij',q:null,u:'g'},
+    {n:'Massa Coxinha (farinha/manteiga)',r:null,q:null,u:'g'}]},
+  {c:'PETISCOS',n:'Bolinho Lampiao (porcao)',p:53.99,m:.65,a:.0809,i:[
+    {n:'Carne Desfiada Defumada',r:'desfiada',q:null,u:'g'},{n:'Requeijao Cremoso',r:'reqij',q:null,u:'g'},
+    {n:'Massa Bolinho (farinha/ovo)',r:null,q:null,u:'g'}]},
+  {c:'PETISCOS',n:'Bolinho Village - Tilapia',p:53.99,m:.65,a:.0809,i:[
+    {n:'File de Tilapia',r:'tilapia',q:null,u:'g'},{n:'Cream Cheese',r:'cream',q:null,u:'g'},
+    {n:'Massa Bolinho',r:null,q:null,u:'g'}]},
+  {c:'PETISCOS',n:'Frango Crocante (porcao)',p:49.9,m:.65,a:.0809,i:[
+    {n:'File de Frango',r:'frango',q:null,u:'g'},{n:'Farinha Especial Empanamento',r:'panko',q:null,u:'g'}]},
+  {c:'PETISCOS',n:'Frango Oriental (porcao)',p:64.9,m:.65,a:.0809,i:[
+    {n:'File de Frango',r:'frango',q:null,u:'g'},{n:'Farinha Especial Empanamento',r:'panko',q:null,u:'g'},
+    {n:'Molho Artesanal Agridoce',r:null,q:null,u:'g'},{n:'Gergelim',r:null,q:null,u:'g'}]},
+  {c:'PETISCOS',n:'Porcao File de Peixe 400g',p:79.9,m:.65,a:.0809,i:[
+    {n:'File de Tilapia (500g bruto)',r:'tilapia',q:500,u:'g'},{n:'Farinha Especial Empanamento',r:'panko',q:null,u:'g'}]},
+  // ── PRATOS EXECUTIVOS ────────────────────────────────
+  {c:'EXECUTIVOS',n:'Prato Executivo de Cupim 150g',p:57.9,m:.55,a:.0809,i:[
+    {n:'Cupim 150g',r:'cupim',q:150,u:'g'},{n:'Arroz',r:'arroz',q:null,u:'g'},
+    {n:'Vinagrete',r:null,q:null,u:'g'},{n:'Mandioca Frita',r:'mandio',q:null,u:'g'}]},
+  {c:'EXECUTIVOS',n:'Prato Executivo File Frango Parmegiana',p:59.9,m:.55,a:.0809,i:[
+    {n:'File de Frango Empanado',r:'frango',q:null,u:'g'},{n:'Molho de Tomate / Mussarela',r:'muss',q:null,u:'g'},
+    {n:'Arroz',r:'arroz',q:null,u:'g'},{n:'Batata Frita',r:'batata',q:null,u:'g'}]},
+  // ── DRINKS ───────────────────────────────────────────
+  {c:'DRINKS',n:'CDB Village',p:4,m:.70,a:.0809,i:[
+    {n:'Cachaca / Destilado base',r:'cachaca',q:null,u:'ml'},{n:'Limao / Complementos',r:'limao',q:null,u:'g'}]},
+  {c:'DRINKS',n:'Copo Especial Limao e Gelo',p:5,m:.70,a:.0809,i:[
+    {n:'Limao',r:'limao',q:null,u:'g'},{n:'Gelo / Agua',r:null,q:null,u:'g'}]},
+  {c:'DRINKS',n:'Preparo do Cozumel',p:10,m:.70,a:.0809,i:[
+    {n:'Limao',r:'limao',q:null,u:'g'},{n:'Sal / Gelo',r:null,q:null,u:'g'}]},
+  {c:'DRINKS',n:'Caipirinha de Limao',p:15,m:.72,a:.0809,i:[
+    {n:'Cachaca',r:'cachaca',q:null,u:'ml'},{n:'Limao',r:'limao',q:null,u:'g'},{n:'Acucar / Gelo',r:null,q:null,u:'g'}]},
+  {c:'DRINKS',n:'Campari Orange',p:21.7,m:.72,a:.0809,i:[
+    {n:'Campari',r:'campari',q:null,u:'ml'},{n:'Suco de Laranja Natural',r:'suco_lj',q:null,u:'ml'}]},
+  {c:'DRINKS',n:'Caipirinha de Maracuja',p:20,m:.72,a:.0809,i:[
+    {n:'Cachaca',r:'cachaca',q:null,u:'ml'},{n:'Maracuja',r:'marac',q:null,u:'g'},{n:'Acucar / Gelo',r:null,q:null,u:'g'}]},
+  {c:'DRINKS',n:'Caipirinha Tropical SM',p:25,m:.72,a:.0809,i:[
+    {n:'Cachaca',r:'cachaca',q:null,u:'ml'},{n:'Maracuja',r:'marac',q:null,u:'g'},
+    {n:'Abacaxi',r:'abacaxi',q:null,u:'g'},{n:'Acucar / Gelo',r:null,q:null,u:'g'}]},
+  {c:'DRINKS',n:'Soda Italiana (Morango/Maca/Maracuja)',p:25,m:.72,a:.0809,i:[
+    {n:'Xarope Soda Italiana',r:'xarope',q:null,u:'ml'},{n:'Agua com Gas / Gelo / Limao',r:'limao',q:null,u:'g'}]},
+  {c:'DRINKS',n:'Cozumel',p:25,m:.72,a:.0809,i:[
+    {n:'Corona Extra Long Neck',r:'corln',q:1,u:'un'},{n:'Limao',r:'limao',q:null,u:'g'},{n:'Sal / Gelo',r:null,q:null,u:'g'}]},
+  {c:'DRINKS',n:'Necta Dourado',p:26.9,m:.72,a:.0809,i:[
+    {n:'Aperol',r:'aperol',q:null,u:'ml'},{n:'Maracuja',r:'marac',q:null,u:'g'},
+    {n:'Leite Condensado',r:'lcond',q:null,u:'g'},{n:'Limao / Gelo',r:'limao',q:null,u:'g'}]},
+  {c:'DRINKS',n:'Limina Aperol',p:27.3,m:.72,a:.0809,i:[
+    {n:'Aperol',r:'aperol',q:null,u:'ml'},{n:'Coronita',r:'coronit',q:1,u:'un'},{n:'Limao / Gelo',r:'limao',q:null,u:'g'}]},
+  {c:'DRINKS',n:'Drink Negroni',p:29.9,m:.72,a:.0809,i:[
+    {n:'Campari',r:'campari',q:null,u:'ml'},{n:'Gin',r:'gin',q:null,u:'ml'},
+    {n:'Vinho (vermute)',r:'vinho',q:null,u:'ml'},{n:'Laranja / Gelo',r:null,q:null,u:'g'}]},
+  {c:'DRINKS',n:'Frozzen de Morango',p:29.99,m:.72,a:.0809,i:[
+    {n:'Vodka',r:'vodka',q:null,u:'ml'},{n:'Geleia de Morango',r:'gmor',q:null,u:'g'},
+    {n:'Leite Condensado',r:'lcond',q:null,u:'g'},{n:'Limao / Gelo',r:'limao',q:null,u:'g'}]},
+  {c:'DRINKS',n:'Pina Colada',p:30,m:.72,a:.0809,i:[
+    {n:'Rum',r:'rum',q:null,u:'ml'},{n:'Leite de Coco',r:'lcoco',q:null,u:'ml'},
+    {n:'Leite Condensado',r:'lcond',q:null,u:'g'},{n:'Coco Ralado',r:'cocoral',q:null,u:'g'},
+    {n:'Malibu',r:'malibu',q:null,u:'ml'},{n:'Abacaxi',r:'abacaxi',q:null,u:'g'}]},
+  {c:'DRINKS',n:'Mojito de Maracuja com Corona',p:30,m:.72,a:.0809,i:[
+    {n:'Rum',r:'rum',q:null,u:'ml'},{n:'Maracuja',r:'marac',q:null,u:'g'},
+    {n:'Limao / Acucar / Gelo',r:'limao',q:null,u:'g'},{n:'Corona Extra LN',r:'corln',q:1,u:'un'}]},
+  {c:'DRINKS',n:'Gin Tonica Morango',p:35,m:.72,a:.0809,i:[
+    {n:'Gin',r:'gin',q:null,u:'ml'},{n:'Tonica Antarctica',r:'tonica',q:1,u:'un'},
+    {n:'Geleia de Morango',r:'gmor',q:null,u:'g'},{n:'Gelo',r:null,q:null,u:'g'}]},
+  // ── CERVEJAS 600ML ───────────────────────────────────
+  {c:'CERVEJAS_600',n:'Budweiser 600ml',     p:12,m:.50,a:.0444,i:[{n:'Budweiser 600ml',        r:'budwei600', q:1,u:'un'}]},
+  {c:'CERVEJAS_600',n:'Antarctica Pilsen 600ml',p:12,m:.50,a:.0444,i:[{n:'Antarctica Pilsen 600ml',r:'pilsen600', q:1,u:'un'}]},
+  {c:'CERVEJAS_600',n:'Brahma 600ml',        p:12,m:.50,a:.0444,i:[{n:'Brahma 600ml',           r:'brahma600', q:1,u:'un'}]},
+  {c:'CERVEJAS_600',n:'Spaten 600ml',        p:13,m:.50,a:.0444,i:[{n:'Spaten 600ml',           r:'spaten600', q:1,u:'un'}]},
+  {c:'CERVEJAS_600',n:'Original 600ml',      p:15,m:.50,a:.0444,i:[{n:'Original 600ml',         r:'original600',q:1,u:'un'}]},
+  {c:'CERVEJAS_600',n:'Stella Artois 600ml', p:15,m:.50,a:.0444,i:[{n:'Stella Artois 600ml',    r:'stella600', q:1,u:'un'}]},
+  {c:'CERVEJAS_600',n:'Corona 600ml',        p:15,m:.50,a:.0444,i:[{n:'Corona 600ml',           r:'corona600', q:1,u:'un'}]},
+  // ── LONG NECKS ───────────────────────────────────────
+  {c:'LONG_NECKS',n:'Budweiser Long Neck 330ml',   p:10,m:.45,a:.0444,i:[{n:'Budweiser LN',      r:'bud_ln',   q:1,u:'un'}]},
+  {c:'LONG_NECKS',n:'Budweiser LN Zero 330ml',     p:10,m:.45,a:.0444,i:[{n:'Budweiser LN Zero', r:'bud_zero', q:1,u:'un'}]},
+  {c:'LONG_NECKS',n:'Stella Artois Long Neck',     p:10,m:.45,a:.0444,i:[{n:'Stella Artois LN',  r:'stella_ln',q:1,u:'un'}]},
+  {c:'LONG_NECKS',n:'Stella Pure Gold sem Gluten', p:10,m:.45,a:.0444,i:[{n:'Stella Pure Gold',  r:'stelgold', q:1,u:'un'}]},
+  {c:'LONG_NECKS',n:'Spaten Long Neck',            p:10,m:.45,a:.0444,i:[{n:'Spaten LN',         r:'spaten_ln',q:1,u:'un'}]},
+  {c:'LONG_NECKS',n:'Corona Extra Long Neck 330ml',p:10,m:.45,a:.0444,i:[{n:'Corona Extra LN',   r:'corln',    q:1,u:'un'}]},
+  {c:'LONG_NECKS',n:'Coronita 210ml',              p:8, m:.45,a:.0444,i:[{n:'Coronita',          r:'coronit',  q:1,u:'un'}]},
+  {c:'LONG_NECKS',n:'Corona Cero (zero alcool)',   p:10,m:.45,a:.0444,i:[{n:'Corona Cero',       r:'corozero', q:1,u:'un'}]},
+  {c:'LONG_NECKS',n:'Michelob Ultra Long Neck',    p:10,m:.45,a:.0444,i:[{n:'Michelob Ultra LN', r:'michelob', q:1,u:'un'}]},
+  // ── SUCOS / ÁGUAS ────────────────────────────────────
+  {c:'SUCOS_AGUAS',n:'Agua Mineral sem Gas 500ml',p:6, m:.60,a:.0444,i:[{n:'Agua Mineral SG',r:'agua_sg',q:1,u:'un'}]},
+  {c:'SUCOS_AGUAS',n:'Agua Mineral com Gas 500ml',p:7, m:.60,a:.0444,i:[{n:'Agua Mineral CG',r:'agua_cg',q:1,u:'un'}]},
+  {c:'SUCOS_AGUAS',n:'Suco de Laranja Natural',   p:13,m:.65,a:.0809,i:[{n:'Laranja (suco natural)',r:'suco_lj',q:null,u:'g'}]},
+  {c:'SUCOS_AGUAS',n:'Suco de Maracuja Natural',  p:15,m:.65,a:.0809,i:[{n:'Maracuja (polpa)',r:'marac',q:null,u:'g'}]},
+  // ── REFRIGERANTES ────────────────────────────────────
+  {c:'REFRIGERANTES',n:'Guarana Antarctica Lata 350ml',p:6,  m:.55,a:.0444,i:[{n:'Guarana Antarctica Lata',r:'guarana', q:1,u:'un'}]},
+  {c:'REFRIGERANTES',n:'Guarana Antarctica Zero Lata', p:6,  m:.55,a:.0444,i:[{n:'Guarana Antarctica Zero',r:'guarana', q:1,u:'un'}]},
+  {c:'REFRIGERANTES',n:'Pepsi Black Lata 350ml',       p:6,  m:.55,a:.0444,i:[{n:'Pepsi Lata Black',       r:'pepsi',   q:1,u:'un'}]},
+  {c:'REFRIGERANTES',n:'Coca-Cola Lata 310ml',         p:6.5,m:.55,a:.0444,i:[{n:'Coca-Cola Lata',         r:'coca_ln', q:1,u:'un'}]},
+  {c:'REFRIGERANTES',n:'Coca-Cola Zero Lata 310ml',    p:6.5,m:.55,a:.0444,i:[{n:'Coca-Cola Zero Lata',    r:'cocazero',q:1,u:'un'}]},
+  {c:'REFRIGERANTES',n:'Tonica Antarctica Lata 350ml', p:7,  m:.55,a:.0444,i:[{n:'Tonica Antarctica',      r:'tonica',  q:1,u:'un'}]},
+  {c:'REFRIGERANTES',n:'H2O Limoneto 500ml',           p:8.9,m:.55,a:.0444,i:[{n:'H2O Limoneto',           r:'h2o_lim', q:1,u:'un'}]},
+  {c:'REFRIGERANTES',n:'H2O Limao 500ml',              p:8.9,m:.55,a:.0444,i:[{n:'H2O Limao',              r:'h2o_lim', q:1,u:'un'}]},
+  {c:'REFRIGERANTES',n:'Guarana Antarctica 1 Litro',   p:10, m:.55,a:.0444,i:[{n:'Guarana Antarctica 1L',  r:'guar_lit',q:1,u:'un'}]},
+  {c:'REFRIGERANTES',n:'Coca-Cola 1 Litro',            p:12, m:.55,a:.0444,i:[{n:'Coca-Cola 1 Litro',      r:'coca_lit',q:1,u:'un'}]},
+  // ── ENERGÉTICOS ──────────────────────────────────────
+  {c:'ENERGETICOS',n:'Red Bull 250ml',           p:12,m:.50,a:.0444,i:[{n:'Red Bull 250ml',      r:'redbull',q:1,u:'un'}]},
+  {c:'ENERGETICOS',n:'Red Bull Sugar Free 250ml',p:12,m:.50,a:.0444,i:[{n:'Red Bull Sugar Free', r:'redbull',q:1,u:'un'}]},
+  // ── DESTILADOS ───────────────────────────────────────
+  {c:'DESTILADOS',n:'Dose Uisque Red Label',   p:20, m:.72,a:.0809,i:[{n:'Uisque Red Label (dose ~50ml)',r:'uisque',q:50, u:'ml'}]},
+  {c:'DESTILADOS',n:'Dose Vodka Smirnoff',     p:12, m:.72,a:.0809,i:[{n:'Vodka Smirnoff (dose ~50ml)', r:'vodka', q:50, u:'ml'}]},
+  {c:'DESTILADOS',n:'Vodka Smirnoff (garrafa)',p:140,m:.65,a:.0809,i:[{n:'Vodka Smirnoff 700ml',         r:'vodka', q:700,u:'ml'}]},
+  // ── GUARNIÇÕES ───────────────────────────────────────
+  {c:'GUARNICOES',n:'Guarnicao de Mandioca 150g',p:8, m:.70,a:.0809,i:[{n:'Mandioca Congelada 150g',r:'mandio',q:150,u:'g'}]},
+  {c:'GUARNICOES',n:'Guarnicao de Arroz',        p:10,m:.70,a:.0809,i:[{n:'Arroz (cru)',r:'arroz',q:null,u:'g'}]},
+  {c:'GUARNICOES',n:'Guarnicao de Vinagrete',    p:12,m:.70,a:.0809,i:[{n:'Tomate / Cebola / Temperos',r:null,q:null,u:'g'}]},
+  // ── ADICIONAIS ───────────────────────────────────────
+  {c:'ADICIONAIS',n:'Adicional de Hamburguer Extra', p:10,m:.65,a:.0809,i:[{n:'Acem Moido 150g',             r:'acem',  q:150,u:'g'}]},
+  {c:'ADICIONAIS',n:'Adicional de Ovo Frito',        p:4, m:.70,a:.0809,i:[{n:'Ovo',                         r:'ovos',  q:1,  u:'un'}]},
+  {c:'ADICIONAIS',n:'Adicional de Cheddar',          p:5, m:.70,a:.0809,i:[{n:'Cheddar / Creme de Cheddar',  r:'chedd', q:null,u:'g'}]},
+  {c:'ADICIONAIS',n:'Adicional de Bacon',            p:5, m:.70,a:.0809,i:[{n:'Bacon',                       r:'bacon', q:null,u:'g'}]},
+  {c:'ADICIONAIS',n:'Adicional de Batata Frita 100g',p:5, m:.70,a:.0809,i:[{n:'Batata Palito Congelada 100g',r:'batata',q:100, u:'g'}]},
+  // ── SORTIDOS ─────────────────────────────────────────
+  {c:'SORTIDOS',n:'Trident',   p:4,m:.60,a:.0809,i:[{n:'Trident (unidade)', r:null,q:1,u:'un'}]},
+  {c:'SORTIDOS',n:'Bala Halls',p:4,m:.60,a:.0809,i:[{n:'Halls (unidade)',   r:null,q:1,u:'un'}]},
+];
+
+// ─── CONSTANTES ───────────────────────────────────────────────────────────────
+const LS_KEY = 'vg5';
+const BIN_ID = '69e92ba8856a68218960a41b';
+const API_KEY = '$2a$10$jBpvmE1mUNUbJcvHjevmkux7wMBaerquOgxEJ/xveOYNgOGn/Ig7.';
+const API_URL = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
+
+const UNID_COMPRA = ['kg','g','garrafa','lata','caixa','unidade','fardo','pacote','L','ml','duzia'];
+const UNID_ING = ['g','kg','ml','L','un','cx','dose','fatia','colher','pitada','fio'];
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+function loadLS() {
+  try { const v = localStorage.getItem(LS_KEY); return v ? JSON.parse(v) : null; } catch { return null; }
+}
+function saveLS(d) { try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch {} }
+function emptyState() { return { insumos: {}, fichas: {} }; }
+
+function custoBase(id, state) {
+  const ins = INSUMOS.find(i => i.id === id);
+  if (!ins) return 0;
+  const sv = (state.insumos || {})[id] || {};
+  const preco = parseFloat(sv.preco) || 0;
+  if (!preco) return 0;
+  const unid = sv.unid || ins.u;
+  const fator = unid === 'caixa' ? (parseInt(sv.qtd_caixa) || ins.f) : ins.f;
+  return fator > 0 ? preco / fator : 0;
+}
+
+function calcFicha(fid, state) {
+  const ficha = FIC[fid];
+  const sf = (state.fichas || {})[fid] || {};
+  let total = 0, temQtd = false;
+  ficha.i.forEach((ing, ii) => {
+    const si = sf['i' + ii] || {};
+    const rawQ = si.qtd !== undefined ? si.qtd : (ing.q !== null ? String(ing.q) : '');
+    const q = parseFloat(rawQ) || 0;
+    if (q > 0) temQtd = true;
+    if (ing.r && q > 0) total += q * custoBase(ing.r, state);
+  });
+  if (!temQtd || total === 0) return { total: 0, mb: 0, ml: 0, pmin: 0, pdes: 0, calculado: false };
+  const mb = (ficha.p - total) / ficha.p;
+  const ml = (ficha.p - total - ficha.p * ficha.a) / ficha.p;
+  const pmin = total / (1 - ficha.m - ficha.a);
+  const pdes = total / (1 - (ficha.m + 0.05) - ficha.a);
+  return { total, mb, ml, pmin, pdes, calculado: true };
+}
+
+function fmt2(v) { return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function fmt4(v) { return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 }); }
+function fmtPct(v) { return (v * 100).toFixed(1) + '%'; }
+function fmtTime(d) { return d ? d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }) : '--:--'; }
+
+// ─── EXPORT EXCEL ─────────────────────────────────────────────────────────────
+function exportExcel(state) {
+  const wb = XLSX.utils.book_new();
+
+  const NOME_INS = {
+    acem:'Acém Moído (blend hamburgueres)', fraldinha:'Fraldinha', alcatra:'Alcatra',
+    cupim:'Cupim', filemig:'Filé Mignon', frango:'Filé de Frango', tilapia:'Filé de Tilápia',
+    desfiada:'Carne Desfiada (pronta)', pb_ger:'Pão Brioche com Gergelim',
+    pb_aust:'Pão Australiano', pb_black:'Pão Black', pb_gold:'Pão de Queijo Parmesão (Gold)',
+    pb_pap:'Pão Páprica', pb_vil:'Pão Village (Piscininha)', muss:'Queijo Mussarela',
+    chedd:'Cheddar / Creme de Cheddar', cream:'Cream Cheese', reqij:'Requeijão Cremoso',
+    qprad:'Queijo Prado Fatiado', bacon:'Bacon', batata:'Batata Palito (congelada)',
+    mandio:'Mandioca (congelada)', arroz:'Arroz (cru)', panko:'Farinha Panko',
+    polenta:'Polenta (flocada)', geleia_pim:'Geleia de Pimenta', geleia_bac:'Geleia de Bacon',
+    banana:'Banana', chocolate:'Chocolate em pó / Cacau', sorvete:'Sorvete de Creme',
+    ovos:'Ovos (unidade)',
+    pilsen600:'Antarctica Pilsen 600ml', brahma600:'Brahma 600ml', original600:'Original 600ml',
+    spaten600:'Spaten 600ml', stella600:'Stella Artois 600ml', corona600:'Corona 600ml', budwei600:'Budweiser 600ml',
+    bud_ln:'Budweiser Long Neck 330ml', bud_zero:'Budweiser LN Zero 330ml', stella_ln:'Stella Artois Long Neck',
+    stelgold:'Stella Pure Gold sem Glúten', spaten_ln:'Spaten Long Neck', corln:'Corona Extra LN 330ml',
+    coronit:'Coronita 210ml', corozero:'Corona Cero (zero álcool)', michelob:'Michelob Ultra Long Neck',
+    coca_ln:'Coca-Cola Lata 310ml', cocazero:'Coca-Cola Zero Lata 310ml', coca_lit:'Coca-Cola 1 Litro',
+    guarana:'Guaraná Antarctica Lata', guar_lit:'Guaraná Antarctica 1 Litro', pepsi:'Pepsi Black Lata 350ml',
+    tonica:'Tônica Antarctica Lata', h2o_lim:'H2O Limão 500ml', agua_sg:'Água Mineral s/ Gás 500ml',
+    agua_cg:'Água Mineral c/ Gás 500ml', redbull:'Red Bull 250ml',
+    cachaca:'Cachaça (garrafa 700ml)', vodka:'Vodka Smirnoff (garrafa 700ml)', rum:'Rum (garrafa 700ml)',
+    gin:'Gin (garrafa 700ml)', campari:'Campari (garrafa 700ml)', aperol:'Aperol (garrafa 700ml)',
+    vinho:'Vinho (garrafa 750ml)', malibu:'Malibu (garrafa 700ml)', uisque:'Uísque Red Label (garrafa 1L)',
+    lcoco:'Leite de Coco (lata 400ml)', lcond:'Leite Condensado (lata 395g)', gmor:'Geleia de Morango',
+    xarope:'Xarope Soda Italiana', limao:'Limão (kg)', marac:'Maracujá (kg)',
+    abacaxi:'Abacaxi (unidade)', cocoral:'Coco Ralado', suco_lj:'Suco de Laranja Natural (kg)',
+  };
+
+  const NOME_FIC = FIC.map(f => f.n);
+
+  const CAT_LABEL = {
+    CHOPP:'  CHOPP', HAMBURGUERES:'  HAMBÚRGUERES', COMBOS:'  COMBOS',
+    BATATAS:'  BATATAS', PANQUECAS:'  PANQUECAS', CARNES:'  CARNES',
+    SOBREMESAS:'  SOBREMESAS', PETISCOS:'  PETISCOS', EXECUTIVOS:'  EXECUTIVOS',
+    DRINKS:'  DRINKS', CERVEJAS_600:'  CERVEJAS 600ML', LONG_NECKS:'  LONG NECKS',
+    SUCOS_AGUAS:'  SUCOS E ÁGUAS', REFRIGERANTES:'  REFRIGERANTES',
+    ENERGETICOS:'  ENERGÉTICOS', DESTILADOS:'  DESTILADOS',
+    GUARNICOES:'  GUARNIÇÕES', ADICIONAIS:'  ADICIONAIS', SORTIDOS:'  SORTIDOS',
+  };
+  const GRP_LABEL = {
+    CARNES:'  CARNES', PAES:'  PÃES', LATICINIOS:'  LATICÍNIOS',
+    OUTROS:'  OUTROS', CERVEJAS_600:'  CERVEJAS 600ML', LONG_NECKS:'  LONG NECKS',
+    NAO_ALCOOLICOS:'  REFRIG. / ÁGUA', DRINKS:'  DESTILADOS / DRINKS',
+  };
+
+  function unidDesc(ins) {
+    if (ins.u === 'kg')      return `kg (1 ${ins.b})`;
+    if (ins.u === 'caixa')   return `caixa (${ins.f} un/cx)`;
+    if (ins.u === 'garrafa') return `garrafa (${ins.f} ${ins.b})`;
+    if (ins.u === 'lata')    return `lata (${ins.f} ${ins.b})`;
+    if (ins.u === 'unidade') return `unidade (1 ${ins.b})`;
+    return `${ins.u} (${ins.f} ${ins.b})`;
+  }
+
+  function obsText(ins) {
+    if (ins.b === 'g' && ins.u === 'kg') return 'Custo por grama = Preço/1000';
+    if (ins.b === 'g')  return `Custo por grama = Preço/${ins.f}`;
+    if (ins.b === 'ml') return `Custo por ml = Preço/${ins.f}`;
+    if (ins.b === 'un' && ins.f === 1) return 'Custo por unidade';
+    return `Custo por unidade = Preço/${ins.f}`;
+  }
+
+  // ── ABA 1: Insumos Base ──────────────────────────────────────────────────────
+  const aoa1 = [
+    ['VILLAGE GOURMET — INSUMOS BASE'],
+    ['Insira o preço de compra de cada insumo. Toda a planilha se atualiza automaticamente.'],
+    ['#', 'Insumo', 'Unid. Compra', 'Preço de Compra (R$)', 'Custo Unitário Base', 'Observação'],
+  ];
+  let insNum = 1, curGrp = null;
+  INSUMOS.forEach(ins => {
+    if (ins.g !== curGrp) {
+      curGrp = ins.g;
+      aoa1.push([GRP_LABEL[ins.g] || ins.g]);
+    }
+    const sv = (state.insumos || {})[ins.id] || {};
+    const preco = parseFloat(sv.preco) || null;
+    const cu = preco ? custoBase(ins.id, state) : null;
+    aoa1.push([
+      String(insNum++),
+      NOME_INS[ins.id] || ins.n,
+      unidDesc(ins),
+      preco !== null ? preco : '',
+      cu !== null ? cu : '',
+      obsText(ins),
+    ]);
+  });
+  const ws1 = XLSX.utils.aoa_to_sheet(aoa1);
+  ws1['!cols'] = [{wch:4},{wch:40},{wch:20},{wch:22},{wch:20},{wch:34}];
+  XLSX.utils.book_append_sheet(wb, ws1, '📦 Insumos Base');
+
+  // ── ABA 2: Fichas Técnicas ───────────────────────────────────────────────────
+  const aoa2 = [
+    ['VILLAGE GOURMET — FICHAS TÉCNICAS DE CUSTO'],
+    ['Insira o peso/quantidade de cada ingrediente. O custo é calculado automaticamente com base nos preços da aba Insumos Base.'],
+    ['#', 'Produto / Ingrediente', 'Insumo Base', 'Peso/Qtd', 'Unidade', 'Custo Unit. Base', 'Custo Ingrediente', 'Preço Venda', 'Margem %'],
+  ];
+  let ficNum = 1, curCat2 = null;
+  FIC.forEach((ficha, fid) => {
+    if (ficha.c !== curCat2) {
+      curCat2 = ficha.c;
+      aoa2.push([CAT_LABEL[ficha.c] || ficha.c]);
+    }
+    const sf = (state.fichas || {})[fid] || {};
+    const { total, mb, calculado } = calcFicha(fid, state);
+    const nomeProd = NOME_FIC[fid] || ficha.n;
+    // Linha cabeçalho do produto
+    aoa2.push([String(ficNum++), '  ' + nomeProd, null, null, null, null, null, ficha.p, `Meta: ${Math.round(ficha.m * 100)}%`]);
+    // Linhas de ingredientes
+    ficha.i.forEach((ing, ii) => {
+      const si = sf['i' + ii] || {};
+      const rawQ = si.qtd !== undefined ? si.qtd : (ing.q !== null ? String(ing.q) : '');
+      const q = parseFloat(rawQ) || null;
+      const insumoNome = ing.r ? (NOME_INS[ing.r] || ing.r) : '— sem rateio automático';
+      const cu = ing.r ? custoBase(ing.r, state) : null;
+      const cuIng = (q && cu) ? q * cu : null;
+      aoa2.push([
+        null,
+        '    ↳ ' + ing.n,
+        insumoNome,
+        rawQ !== '' ? (parseFloat(rawQ) || '') : '',
+        si.unid || ing.u,
+        cu || '',
+        cuIng || '',
+        null,
+        null,
+      ]);
+    });
+    // Linha custo total
+    aoa2.push([null, 'CUSTO TOTAL DO PRATO', null, null, null, null, calculado ? total : '', ficha.p, calculado ? mb : '']);
+  });
+  const ws2 = XLSX.utils.aoa_to_sheet(aoa2);
+  ws2['!cols'] = [{wch:4},{wch:42},{wch:40},{wch:10},{wch:8},{wch:16},{wch:18},{wch:12},{wch:10}];
+  XLSX.utils.book_append_sheet(wb, ws2, '🧾 Fichas Técnicas');
+
+  // ── ABA 3: Resumo Margens ────────────────────────────────────────────────────
+  const aoa3 = [
+    ['VILLAGE GOURMET — RESUMO DE MARGENS POR PRODUTO'],
+    ['Calculado automaticamente com base nas Fichas Técnicas. Preencha os custos na aba Insumos Base e os pesos na aba Fichas Técnicas.'],
+    ['#', 'Produto', 'Preço Venda', 'Custo Total', 'Margem R$', 'Margem %', 'Meta %', 'Situação'],
+  ];
+  let resNum = 1, curCat3 = null;
+  FIC.forEach((ficha, fid) => {
+    if (ficha.c !== curCat3) {
+      curCat3 = ficha.c;
+      aoa3.push([CAT_LABEL[ficha.c] || ficha.c]);
+    }
+    const { total, mb, calculado } = calcFicha(fid, state);
+    const nomeProd = NOME_FIC[fid] || ficha.n;
+    const margRs = calculado ? ficha.p - total : '';
+    const margPct = calculado ? mb : '';
+    const sit = !calculado ? '⬛ Preencher'
+      : mb >= ficha.m ? '✅ OK'
+      : mb >= ficha.m - 0.1 ? '⚠️ Atenção'
+      : '🔴 Abaixo';
+    aoa3.push([String(resNum++), nomeProd, ficha.p, calculado ? total : '', margRs, margPct, ficha.m, sit]);
+  });
+  const ws3 = XLSX.utils.aoa_to_sheet(aoa3);
+  ws3['!cols'] = [{wch:4},{wch:42},{wch:12},{wch:12},{wch:12},{wch:10},{wch:8},{wch:14}];
+  XLSX.utils.book_append_sheet(wb, ws3, '📊 Resumo Margens');
+
+  XLSX.writeFile(wb, 'village-gourmet-custos.xlsx');
+}
+
+// ─── COMPONENTE: HEADER ───────────────────────────────────────────────────────
+function Header({ tab, setTab, syncStatus, progress }) {
+  const badgeStyle = {
+    display:'inline-block', padding:'2px 10px', borderRadius:20, fontSize:11, fontWeight:600,
+    background: syncStatus === 'synced' ? '#d4edda' : syncStatus === 'offline' ? '#f8d7da' : syncStatus === 'saving' ? '#fff3cd' : '#e9ecef',
+    color: syncStatus === 'synced' ? '#155724' : syncStatus === 'offline' ? '#721c24' : syncStatus === 'saving' ? '#856404' : '#495057',
+  };
+  const badgeText = { synced:'Sincronizado ✓', offline:'Offline', saving:'Salvando...', loading:'Carregando...', idle:'...', error:'Erro' }[syncStatus] || '...';
+  const tabs = [
+    { id:'insumos', label:'📦 Insumos' },
+    { id:'fichas',  label:'🧾 Fichas' },
+    { id:'resumo',  label:'📊 Resumo' },
+  ];
+  return (
+    <div style={{ position:'sticky', top:0, zIndex:100, background:'#fff', boxShadow:'0 2px 8px rgba(0,0,0,0.1)' }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 16px 8px' }}>
+        <div style={{ fontSize:20, fontWeight:700, letterSpacing:-0.5 }}>
+          Village <span style={{ color:'#c9973a' }}>Gourmet</span>
+        </div>
+        <span style={badgeStyle}>{badgeText}</span>
+      </div>
+      <div style={{ display:'flex', borderTop:'1px solid #f0ede9' }}>
+        {tabs.map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)} style={{
+            flex:1, padding:'10px 4px', fontSize:12, fontWeight:600, border:'none',
+            background:'transparent', cursor:'pointer',
+            color: tab === t.id ? '#c9973a' : '#666',
+            borderBottom: tab === t.id ? '2px solid #c9973a' : '2px solid transparent',
+            transition:'all .15s',
+          }}>{t.label}</button>
+        ))}
+      </div>
+      <div style={{ height:3, background:'#f0ede9' }}>
+        <div style={{ height:'100%', background:'#c9973a', width: progress + '%', transition:'width .3s', borderRadius:2 }} />
+      </div>
+    </div>
+  );
+}
+
+// ─── COMPONENTE: FOOTER ───────────────────────────────────────────────────────
+function Footer({ onSave, onCancel, onExport, dirty, lastSync, syncStatus }) {
+  return (
+    <div className="footer-wrap" style={{
+      padding:'10px 16px', paddingBottom:'calc(10px + env(safe-area-inset-bottom))',
+    }}>
+      <div style={{ display:'flex', gap:8, marginBottom:6 }}>
+        <button onClick={onSave} style={{
+          flex:2, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:700,
+          background:'#1e8449', color:'#fff', opacity: syncStatus === 'saving' ? 0.7 : 1,
+        }}>☁️ Salvar</button>
+        <button onClick={onCancel} disabled={!dirty} style={{
+          flex:1, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:600,
+          background: dirty ? '#e9e6e1' : '#f5f2ee', color: dirty ? '#333' : '#aaa',
+          cursor: dirty ? 'pointer' : 'default',
+        }}>✕ Cancelar</button>
+        <button onClick={onExport} style={{
+          flex:2, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:700,
+          background:'#c9973a', color:'#fff',
+        }}>⬇️ Excel</button>
+      </div>
+      <div style={{ textAlign:'center', fontSize:11, color:'#999' }}>
+        {lastSync ? 'Última sync: ' + fmtTime(lastSync) : 'Não sincronizado ainda'}
+        {dirty ? ' • Alterações não salvas' : ''}
+      </div>
+    </div>
+  );
+}
+
+// ─── COMPONENTE: INSUMO ROW ───────────────────────────────────────────────────
+function InsumoRow({ ins, sv, updateInsumo }) {
+  const preco = parseFloat(sv.preco) || 0;
+  const unid = sv.unid || ins.u;
+  const isCaixa = unid === 'caixa';
+  const qtdCx = parseInt(sv.qtd_caixa) || 0;
+  const fator = isCaixa ? (qtdCx || ins.f) : ins.f;
+  const cu = preco > 0 && fator > 0 ? preco / fator : 0;
+  const filled = preco > 0;
+
+  const inpStyle = {
+    border:'1px solid #ddd', borderRadius:6, padding:'7px 10px', fontSize:16,
+    background:'#fafafa', width:'100%', color:'#0f0f0f',
+  };
+  const selStyle = { ...inpStyle, appearance:'none', WebkitAppearance:'none', paddingRight:8 };
+
+  return (
+    <div style={{
+      padding:'12px 16px', borderBottom:'1px solid #f0ede9',
+      background: filled ? '#f0faf4' : '#fff',
+    }}>
+      <div style={{ fontWeight:600, fontSize:14, marginBottom:8, color:'#0f0f0f' }}>{ins.n}</div>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom: isCaixa ? 8 : 0 }}>
+        <div>
+          <div style={{ fontSize:11, color:'#888', marginBottom:3 }}>Preço de Compra (R$)</div>
+          <input
+            type="number" inputMode="decimal" step="0.01" min="0"
+            placeholder="0,00"
+            value={sv.preco || ''}
+            onChange={e => updateInsumo(ins.id, 'preco', e.target.value)}
+            style={inpStyle}
+          />
+        </div>
+        <div>
+          <div style={{ fontSize:11, color:'#888', marginBottom:3 }}>Unidade de Compra</div>
+          <select value={unid} onChange={e => updateInsumo(ins.id, 'unid', e.target.value)} style={selStyle}>
+            {UNID_COMPRA.map(u => <option key={u} value={u}>{u}</option>)}
+          </select>
+        </div>
+      </div>
+      {isCaixa && (
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:6 }}>
+          <div>
+            <div style={{ fontSize:11, color:'#888', marginBottom:3 }}>Qtd por Caixa (un)</div>
+            <input
+              type="number" inputMode="numeric" min="1"
+              placeholder={String(ins.f)}
+              value={sv.qtd_caixa || ''}
+              onChange={e => updateInsumo(ins.id, 'qtd_caixa', e.target.value)}
+              style={inpStyle}
+            />
+          </div>
+          <div style={{ display:'flex', alignItems:'flex-end', paddingBottom:8 }}>
+            {preco > 0 && qtdCx > 0 && (
+              <span style={{ fontSize:12, color:'#1e8449', fontWeight:600 }}>
+                {fmt2(preco / qtdCx)}/un
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+      {cu > 0 && (
+        <div style={{ fontSize:12, color:'#888', marginTop:2 }}>
+          Custo por {ins.b}: <strong style={{ color:'#0f0f0f' }}>{fmt4(cu)}</strong>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── COMPONENTE: INSUMOS GROUP ────────────────────────────────────────────────
+function InsumosGroup({ grupo, insumos, stateInsumos, updateInsumo }) {
+  const [open, setOpen] = useState(true);
+  const filled = insumos.filter(ins => parseFloat((stateInsumos[ins.id] || {}).preco) > 0).length;
+  const groupIcons = { CARNES:'🥩', PAES:'🍞', LATICINIOS:'🧀', OUTROS:'🥔', CERVEJAS_600:'🍺', LONG_NECKS:'🍻', NAO_ALCOOLICOS:'🥤', DRINKS:'🍹' };
+  return (
+    <div style={{ marginBottom:2 }}>
+      <button onClick={() => setOpen(o => !o)} style={{
+        width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between',
+        padding:'12px 16px', background:'#f0ede9', border:'none', cursor:'pointer',
+        textAlign:'left',
+      }}>
+        <span style={{ fontWeight:700, fontSize:13, letterSpacing:.5 }}>
+          {groupIcons[grupo] || '📦'} {grupo}
+        </span>
+        <span style={{ fontSize:12, color:'#888', display:'flex', alignItems:'center', gap:8 }}>
+          <span style={{
+            padding:'2px 8px', borderRadius:10,
+            background: filled === insumos.length ? '#d4edda' : '#fff',
+            color: filled === insumos.length ? '#155724' : '#666',
+            fontWeight:600,
+          }}>{filled}/{insumos.length}</span>
+          <span style={{ fontSize:14, transition:'transform .2s', display:'inline-block', transform: open ? 'rotate(90deg)' : 'rotate(0)' }}>›</span>
+        </span>
+      </button>
+      {open && (
+        <div className="insumos-grid">
+          {insumos.map(ins => (
+            <InsumoRow key={ins.id} ins={ins} sv={stateInsumos[ins.id] || {}} updateInsumo={updateInsumo} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── COMPONENTE: INSUMOS TAB ──────────────────────────────────────────────────
+function InsumosTab({ state, updateInsumo }) {
+  const [search, setSearch] = useState('');
+  const grupos = {};
+  INSUMOS.forEach(ins => {
+    if (!search || ins.n.toLowerCase().includes(search.toLowerCase())) {
+      if (!grupos[ins.g]) grupos[ins.g] = [];
+      grupos[ins.g].push(ins);
+    }
+  });
+  return (
+    <div>
+      <div style={{ padding:'12px 16px', background:'#fff', borderBottom:'1px solid #f0ede9' }}>
+        <input
+          type="search" placeholder="Buscar insumo..." value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{
+            width:'100%', padding:'9px 14px', border:'1px solid #ddd', borderRadius:8,
+            fontSize:16, background:'#fafafa',
+          }}
+        />
+      </div>
+      {Object.entries(grupos).map(([g, insumos]) => (
+        <InsumosGroup
+          key={g} grupo={g} insumos={insumos}
+          stateInsumos={state.insumos || {}} updateInsumo={updateInsumo}
+        />
+      ))}
+      {Object.keys(grupos).length === 0 && (
+        <div style={{ textAlign:'center', padding:40, color:'#aaa' }}>Nenhum insumo encontrado</div>
+      )}
+      <div style={{ height:16 }} />
+    </div>
+  );
+}
+
+// ─── COMPONENTE: INGREDIENTE ROW ──────────────────────────────────────────────
+function IngRow({ ing, ii, fid, sf, stateGlobal, updateFicha }) {
+  const si = sf['i' + ii] || {};
+  const rawQ = si.qtd !== undefined ? si.qtd : (ing.q !== null ? String(ing.q) : '');
+  const q = parseFloat(rawQ) || 0;
+  const cu = ing.r ? custoBase(ing.r, stateGlobal) : 0;
+  const custoIng = q > 0 && cu > 0 ? q * cu : 0;
+  const hasRef = ing.r !== null;
+  const inpStyle = {
+    border:'1px solid #ddd', borderRadius:6, padding:'6px 8px',
+    fontSize:16, background:'#fafafa', width:'100%', color:'#0f0f0f',
+  };
+  return (
+    <div style={{ padding:'8px 12px', borderBottom:'1px solid #f7f5f2', display:'grid', gridTemplateColumns:'1fr 80px 70px', gap:6, alignItems:'start' }}>
+      <div>
+        <div style={{ display:'flex', alignItems:'center', gap:5, marginBottom:4 }}>
+          <span style={{
+            width:7, height:7, borderRadius:'50%', display:'inline-block', flexShrink:0,
+            background: hasRef ? '#1e8449' : '#bbb',
+          }} />
+          <span style={{ fontSize:13, color:'#333', fontWeight:500 }}>{ing.n}</span>
+        </div>
+        {custoIng > 0 && (
+          <div style={{ fontSize:11, color:'#888', paddingLeft:12 }}>Custo: {fmt2(custoIng)}</div>
+        )}
+      </div>
+      <input
+        type="number" inputMode="decimal" step="any" min="0"
+        placeholder={ing.q !== null ? String(ing.q) : 'qtd'}
+        value={rawQ}
+        onChange={e => updateFicha(fid, 'i' + ii, { ...si, qtd: e.target.value })}
+        style={inpStyle}
+      />
+      <select
+        value={si.unid || ing.u}
+        onChange={e => updateFicha(fid, 'i' + ii, { ...si, unid: e.target.value })}
+        style={{ ...inpStyle, appearance:'none', WebkitAppearance:'none', fontSize:13 }}
+      >
+        {UNID_ING.map(u => <option key={u} value={u}>{u}</option>)}
+      </select>
+    </div>
+  );
+}
+
+// ─── COMPONENTE: FICHA CARD ───────────────────────────────────────────────────
+function FichaCard({ fid, ficha, state, updateFicha }) {
+  const [open, setOpen] = useState(false);
+  const sf = (state.fichas || {})[fid] || {};
+  const { total, mb, ml, pmin, pdes, calculado } = calcFicha(fid, state);
+
+  const mbColor = calculado ? (mb >= ficha.m ? '#1e8449' : mb >= ficha.m - 0.05 ? '#c9973a' : '#c0392b') : '#aaa';
+
+  const metricBox = (label, value, color) => (
+    <div style={{ background:'#f8f6f3', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
+      <div style={{ fontSize:10, color:'#888', marginBottom:2 }}>{label}</div>
+      <div style={{ fontSize:14, fontWeight:700, color: color || '#0f0f0f' }}>{value}</div>
+    </div>
+  );
+
+  return (
+    <div style={{ margin:'0 0 2px', background:'#fff', borderBottom:'1px solid #f0ede9' }}>
+      <button onClick={() => setOpen(o => !o)} style={{
+        width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between',
+        padding:'12px 16px', background:'transparent', border:'none', cursor:'pointer', textAlign:'left',
+      }}>
+        <div>
+          <div style={{ fontWeight:600, fontSize:14, color:'#0f0f0f' }}>{ficha.n}</div>
+          <div style={{ fontSize:12, color:'#888', marginTop:2 }}>
+            Venda: {fmt2(ficha.p)}
+            {calculado && <span style={{ color: mbColor, marginLeft:8, fontWeight:600 }}>• MgB {fmtPct(mb)}</span>}
+          </div>
+        </div>
+        <span style={{ fontSize:16, color:'#ccc', transition:'transform .2s', display:'inline-block', transform: open ? 'rotate(90deg)' : 'rotate(0)' }}>›</span>
+      </button>
+      {open && (
+        <div>
+          {calculado && (
+            <div style={{ padding:'0 12px 12px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:6 }}>
+              {metricBox('Custo Total', fmt2(total))}
+              {metricBox('Margem Bruta', fmtPct(mb), mbColor)}
+              {metricBox('Margem Líquida', fmtPct(ml), mb > 0 && ml > 0 ? '#1e8449' : '#c0392b')}
+              {metricBox('Preço Mín. Viável', fmt2(pmin), pmin > ficha.p ? '#c0392b' : '#1e8449')}
+            </div>
+          )}
+          <div style={{ background:'#fafafa', borderTop:'1px solid #f0ede9', borderBottom:'1px solid #f0ede9' }}>
+            <div style={{ padding:'8px 12px 4px', fontSize:11, color:'#aaa', fontWeight:700, letterSpacing:.5 }}>
+              INGREDIENTES — Nome | Qtd | Unid
+            </div>
+            {ficha.i.map((ing, ii) => (
+              <IngRow key={ii} ing={ing} ii={ii} fid={fid} sf={sf} stateGlobal={state} updateFicha={updateFicha} />
+            ))}
+          </div>
+          {calculado && (
+            <div style={{ padding:'10px 16px', fontSize:12, color:'#666', display:'flex', gap:16 }}>
+              <span>Custo: <strong>{fmt2(total)}</strong></span>
+              <span>Mínimo: <strong style={{ color: pmin > ficha.p ? '#c0392b' : '#1e8449' }}>{fmt2(pmin)}</strong></span>
+              <span>Desejável: <strong>{fmt2(pdes)}</strong></span>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── COMPONENTE: FICHAS TAB ───────────────────────────────────────────────────
+function FichasTab({ state, updateFicha }) {
+  const [search, setSearch] = useState('');
+  const [openGroups, setOpenGroups] = useState({
+    CHOPP:true, HAMBURGUERES:true, COMBOS:true, BATATAS:true, PANQUECAS:true,
+    CARNES:true, SOBREMESAS:true, PETISCOS:true, EXECUTIVOS:true, DRINKS:true,
+    CERVEJAS_600:true, LONG_NECKS:true, SUCOS_AGUAS:true, REFRIGERANTES:true,
+    ENERGETICOS:true, DESTILADOS:true, GUARNICOES:true, ADICIONAIS:true, SORTIDOS:true,
+  });
+
+  const toggleGroup = g => setOpenGroups(prev => ({ ...prev, [g]: !prev[g] }));
+
+  const updateFichaIng = useCallback((fid, key, val) => {
+    updateFicha(fid, key, val);
+  }, [updateFicha]);
+
+  const grupos = {};
+  FIC.forEach((f, fid) => {
+    if (!search || f.n.toLowerCase().includes(search.toLowerCase())) {
+      if (!grupos[f.c]) grupos[f.c] = [];
+      grupos[f.c].push({ f, fid });
+    }
+  });
+
+  const catIcons = {
+    CHOPP:'🍺', HAMBURGUERES:'🍔', COMBOS:'🍔', BATATAS:'🍟', PANQUECAS:'🥞',
+    CARNES:'🥩', SOBREMESAS:'🍮', PETISCOS:'🍗', EXECUTIVOS:'🍽️',
+    DRINKS:'🍹', CERVEJAS_600:'🍺', LONG_NECKS:'🍻',
+    SUCOS_AGUAS:'💧', REFRIGERANTES:'🥤', ENERGETICOS:'⚡',
+    DESTILADOS:'🥃', GUARNICOES:'🌿', ADICIONAIS:'➕', SORTIDOS:'🍬',
+  };
+
+  return (
+    <div>
+      <div style={{ padding:'12px 16px', background:'#fff', borderBottom:'1px solid #f0ede9' }}>
+        <input
+          type="search" placeholder="Buscar ficha ou produto..." value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ width:'100%', padding:'9px 14px', border:'1px solid #ddd', borderRadius:8, fontSize:16, background:'#fafafa' }}
+        />
+      </div>
+      {Object.entries(grupos).map(([g, items]) => {
+        const calcCount = items.filter(({ fid }) => calcFicha(fid, state).calculado).length;
+        return (
+          <div key={g}>
+            <button onClick={() => toggleGroup(g)} style={{
+              width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between',
+              padding:'12px 16px', background:'#f0ede9', border:'none', cursor:'pointer', textAlign:'left',
+            }}>
+              <span style={{ fontWeight:700, fontSize:13, letterSpacing:.5 }}>
+                {catIcons[g] || '📋'} {g}
+              </span>
+              <span style={{ fontSize:12, color:'#888', display:'flex', alignItems:'center', gap:8 }}>
+                <span style={{
+                  padding:'2px 8px', borderRadius:10,
+                  background: calcCount === items.length ? '#d4edda' : '#fff',
+                  color: calcCount === items.length ? '#155724' : '#666', fontWeight:600,
+                }}>{calcCount}/{items.length}</span>
+                <span style={{ fontSize:14, transition:'transform .2s', display:'inline-block', transform: openGroups[g] ? 'rotate(90deg)' : 'rotate(0)' }}>›</span>
+              </span>
+            </button>
+            {openGroups[g] && items.map(({ f, fid }) => (
+              <FichaCard key={fid} fid={fid} ficha={f} state={state} updateFicha={updateFichaIng} />
+            ))}
+          </div>
+        );
+      })}
+      {Object.keys(grupos).length === 0 && (
+        <div style={{ textAlign:'center', padding:40, color:'#aaa' }}>Nenhuma ficha encontrada</div>
+      )}
+      <div style={{ height:16 }} />
+    </div>
+  );
+}
+
+// ─── COMPONENTE: RESUMO TAB ───────────────────────────────────────────────────
+function ResumoTab({ state }) {
+  const insFilledCount = INSUMOS.filter(ins => parseFloat((state.insumos || {})[ins.id]?.preco) > 0).length;
+  const calcFichas = FIC.map((f, fid) => ({ f, fid, ...calcFicha(fid, state) })).filter(x => x.calculado);
+  const catColors = {
+    CHOPP:'#e3f2fd', HAMBURGUERES:'#e8f4fd', COMBOS:'#e3f2fd', BATATAS:'#fff8e1',
+    PANQUECAS:'#fff3e0', CARNES:'#fde8e8', SOBREMESAS:'#fce4ec', PETISCOS:'#e8f5e9',
+    EXECUTIVOS:'#f3e5f5', DRINKS:'#ede7f6', CERVEJAS_600:'#e3f2fd', LONG_NECKS:'#e1f5fe',
+    SUCOS_AGUAS:'#e0f7fa', REFRIGERANTES:'#e8f5e9', ENERGETICOS:'#fff9c4',
+    DESTILADOS:'#efebe9', GUARNICOES:'#f1f8e9', ADICIONAIS:'#fafafa', SORTIDOS:'#fce4ec',
+  };
+  const catText = {
+    CHOPP:'#1565c0', HAMBURGUERES:'#1565c0', COMBOS:'#1565c0', BATATAS:'#f57f17',
+    PANQUECAS:'#e65100', CARNES:'#b71c1c', SOBREMESAS:'#880e4f', PETISCOS:'#1b5e20',
+    EXECUTIVOS:'#4a148c', DRINKS:'#4a148c', CERVEJAS_600:'#0d47a1', LONG_NECKS:'#01579b',
+    SUCOS_AGUAS:'#006064', REFRIGERANTES:'#1b5e20', ENERGETICOS:'#f57f17',
+    DESTILADOS:'#3e2723', GUARNICOES:'#33691e', ADICIONAIS:'#424242', SORTIDOS:'#880e4f',
+  };
+
+  return (
+    <div style={{ padding:'12px 16px' }}>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:16 }}>
+        <div style={{ background:'#fff', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px rgba(0,0,0,0.06)' }}>
+          <div style={{ fontSize:11, color:'#888', marginBottom:4 }}>INSUMOS PREENCHIDOS</div>
+          <div style={{ fontSize:28, fontWeight:800, color:'#c9973a' }}>{insFilledCount}<span style={{ fontSize:16, color:'#bbb' }}>/{INSUMOS.length}</span></div>
+          <div style={{ marginTop:6, height:4, background:'#f0ede9', borderRadius:2 }}>
+            <div style={{ height:'100%', background:'#c9973a', width: (insFilledCount/INSUMOS.length*100) + '%', borderRadius:2 }} />
+          </div>
+        </div>
+        <div style={{ background:'#fff', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px rgba(0,0,0,0.06)' }}>
+          <div style={{ fontSize:11, color:'#888', marginBottom:4 }}>FICHAS CALCULADAS</div>
+          <div style={{ fontSize:28, fontWeight:800, color:'#1e8449' }}>{calcFichas.length}<span style={{ fontSize:16, color:'#bbb' }}>/{FIC.length}</span></div>
+          <div style={{ marginTop:6, height:4, background:'#f0ede9', borderRadius:2 }}>
+            <div style={{ height:'100%', background:'#1e8449', width: (calcFichas.length/FIC.length*100) + '%', borderRadius:2 }} />
+          </div>
+        </div>
+      </div>
+
+      <div style={{
+        background:'#fff3cd', border:'1px solid #ffc107', borderRadius:10, padding:'14px 16px', marginBottom:16,
+        borderLeft:'4px solid #c0392b',
+      }}>
+        <div style={{ fontWeight:700, fontSize:13, color:'#721c24', marginBottom:6 }}>⚠️ Segregação Tributária — Ação Urgente</div>
+        <div style={{ fontSize:12, color:'#856404', lineHeight:1.6 }}>
+          Bebidas industrializadas (cervejas, refrigerantes, águas, energéticos) têm PIS/COFINS <strong>monofásico: 4,44%</strong> vs 8,09% padrão.
+          Contador não realiza segregação automática. <strong>Economia estimada: R$ 1.022/mês.</strong>
+        </div>
+      </div>
+
+      {calcFichas.length > 0 && (
+        <div>
+          <div style={{ fontSize:12, fontWeight:700, color:'#888', letterSpacing:.5, marginBottom:8 }}>PRODUTOS CALCULADOS</div>
+          {calcFichas.map(({ f, fid, total, mb, ml, pmin }) => {
+            const mbOk = mb >= f.m;
+            return (
+              <div key={fid} style={{
+                background:'#fff', borderRadius:8, padding:'12px 14px', marginBottom:8,
+                boxShadow:'0 1px 3px rgba(0,0,0,0.06)', borderLeft:'3px solid ' + (mbOk ? '#1e8449' : '#c0392b'),
+              }}>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:6 }}>
+                  <div>
+                    <div style={{ fontWeight:600, fontSize:14 }}>{f.n}</div>
+                    <span style={{
+                      display:'inline-block', fontSize:10, padding:'1px 6px', borderRadius:8, marginTop:2,
+                      background: catColors[f.c] || '#eee', color: catText[f.c] || '#666', fontWeight:600,
+                    }}>{f.c}</span>
+                  </div>
+                  <div style={{ textAlign:'right' }}>
+                    <div style={{ fontSize:16, fontWeight:700 }}>{fmt2(f.p)}</div>
+                    <div style={{ fontSize:11, color:'#aaa' }}>venda</div>
+                  </div>
+                </div>
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:6 }}>
+                  <div style={{ textAlign:'center' }}>
+                    <div style={{ fontSize:10, color:'#aaa' }}>Custo</div>
+                    <div style={{ fontSize:13, fontWeight:600 }}>{fmt2(total)}</div>
+                  </div>
+                  <div style={{ textAlign:'center' }}>
+                    <div style={{ fontSize:10, color:'#aaa' }}>Mg. Bruta</div>
+                    <div style={{ fontSize:13, fontWeight:700, color: mbOk ? '#1e8449' : '#c0392b' }}>{fmtPct(mb)}</div>
+                  </div>
+                  <div style={{ textAlign:'center' }}>
+                    <div style={{ fontSize:10, color:'#aaa' }}>Mg. Líq.</div>
+                    <div style={{ fontSize:13, fontWeight:600, color: ml > 0 ? '#555' : '#c0392b' }}>{fmtPct(ml)}</div>
+                  </div>
+                </div>
+                {!mbOk && (
+                  <div style={{ marginTop:6, fontSize:11, color:'#c0392b' }}>
+                    Abaixo da meta {fmtPct(f.m)} — Preço mínimo: {fmt2(pmin)}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {calcFichas.length === 0 && (
+        <div style={{ textAlign:'center', padding:'30px 20px', color:'#aaa' }}>
+          <div style={{ fontSize:40, marginBottom:8 }}>📋</div>
+          <div>Preencha os insumos e as quantidades das fichas para ver o resumo aqui.</div>
+        </div>
+      )}
+      <div style={{ height:16 }} />
+    </div>
+  );
+}
+
+// ─── MODAL DE CONFIRMAÇÃO ─────────────────────────────────────────────────────
+function ConfirmModal({ message, onConfirm, onCancel }) {
+  return (
+    <div style={{
+      position:'fixed', inset:0, zIndex:999, background:'rgba(0,0,0,0.5)',
+      display:'flex', alignItems:'center', justifyContent:'center', padding:24,
+    }}>
+      <div style={{ background:'#fff', borderRadius:12, padding:24, maxWidth:320, width:'100%', boxShadow:'0 8px 32px rgba(0,0,0,0.2)' }}>
+        <div style={{ fontSize:15, color:'#0f0f0f', marginBottom:20, lineHeight:1.5 }}>{message}</div>
+        <div style={{ display:'flex', gap:10 }}>
+          <button onClick={onCancel} style={{
+            flex:1, padding:'12px 0', borderRadius:8, fontSize:14, fontWeight:600,
+            background:'#f0ede9', color:'#333', border:'none', cursor:'pointer',
+          }}>Não</button>
+          <button onClick={onConfirm} style={{
+            flex:1, padding:'12px 0', borderRadius:8, fontSize:14, fontWeight:700,
+            background:'#c0392b', color:'#fff', border:'none', cursor:'pointer',
+          }}>Descartar</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── COMPONENTE: PIN SCREEN ───────────────────────────────────────────────────
+const PIN = '4321';
+
+function PinScreen({ onUnlock }) {
+  const [digits, setDigits] = useState('');
+  const [error, setError] = useState(false);
+
+  const addDigit = (d) => {
+    if (digits.length >= 4 || error) return;
+    const next = digits + d;
+    setDigits(next);
+    if (next.length === 4) {
+      if (next === PIN) {
+        sessionStorage.setItem('vg_auth', '1');
+        onUnlock();
+      } else {
+        setError(true);
+        setTimeout(() => { setDigits(''); setError(false); }, 800);
+      }
+    }
+  };
+
+  const del = () => { if (!error) setDigits(d => d.slice(0, -1)); };
+
+  const keys = [1,2,3,4,5,6,7,8,9,'',0,'⌫'];
+
+  return (
+    <div style={{
+      minHeight:'100vh', background:'#f5f2ee', display:'flex', flexDirection:'column',
+      alignItems:'center', justifyContent:'center', padding:24,
+    }}>
+      <div style={{ marginBottom:40, textAlign:'center' }}>
+        <div style={{ fontSize:28, fontWeight:700, letterSpacing:-0.5 }}>
+          Village <span style={{ color:'#c9973a' }}>Gourmet</span>
+        </div>
+        <div style={{ fontSize:13, color:'#888', marginTop:6 }}>Controle de Custos</div>
+      </div>
+
+      <div style={{ marginBottom:8, fontSize:13, color:'#888', fontWeight:500 }}>Digite o PIN</div>
+
+      <div style={{ display:'flex', gap:18, marginBottom:10 }}>
+        {[0,1,2,3].map(i => (
+          <div key={i} style={{
+            width:14, height:14, borderRadius:'50%',
+            background: digits.length > i ? (error ? '#c0392b' : '#c9973a') : '#ddd',
+            transition:'background .15s',
+          }} />
+        ))}
+      </div>
+
+      <div style={{ height:20, marginBottom:16, textAlign:'center' }}>
+        {error && <span style={{ fontSize:13, color:'#c0392b', fontWeight:600 }}>PIN incorreto</span>}
+      </div>
+
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 76px)', gap:12 }}>
+        {keys.map((k, i) => {
+          if (k === '') return <div key={i} />;
+          const isDel = k === '⌫';
+          return (
+            <button key={i} onClick={() => isDel ? del() : addDigit(String(k))} style={{
+              height:76, borderRadius:38, fontSize: isDel ? 22 : 26, fontWeight:600,
+              background: isDel ? 'transparent' : '#fff',
+              color: isDel ? '#888' : '#0f0f0f',
+              border: isDel ? 'none' : '1px solid #e9e6e1',
+              boxShadow: isDel ? 'none' : '0 2px 8px rgba(0,0,0,0.07)',
+              cursor:'pointer', WebkitTapHighlightColor:'transparent',
+            }}>{k}</button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── APP PRINCIPAL ────────────────────────────────────────────────────────────
+function App() {
+  const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem('vg_auth') === '1');
+  const [state, setState] = useState(() => loadLS() || emptyState());
+  const [savedState, setSavedState] = useState(() => loadLS() || emptyState());
+  const [tab, setTab] = useState('insumos');
+  const [syncStatus, setSyncStatus] = useState('idle');
+  const [lastSync, setLastSync] = useState(null);
+  const [dirty, setDirty] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
+
+  // Carregar do JSONBin na inicialização
+  useEffect(() => {
+    setSyncStatus('loading');
+    fetch(API_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } })
+      .then(r => r.json())
+      .then(data => {
+        if (data && data.record && data.record.vg) {
+          const remote = data.record.vg;
+          setState(remote);
+          setSavedState(remote);
+          saveLS(remote);
+          setLastSync(new Date());
+          setSyncStatus('synced');
+        } else {
+          setSyncStatus('idle');
+        }
+      })
+      .catch(() => setSyncStatus('offline'));
+  }, []);
+
+  const handleSave = useCallback(() => {
+    if (syncStatus === 'saving') return;
+    setSyncStatus('saving');
+    saveLS(state);
+    setSavedState(state);
+    setDirty(false);
+    fetch(API_URL, {
+      method: 'PUT',
+      headers: { 'X-Master-Key': API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ vg: state }),
+    })
+      .then(r => r.json())
+      .then(() => { setLastSync(new Date()); setSyncStatus('synced'); })
+      .catch(() => setSyncStatus('offline'));
+  }, [state, syncStatus]);
+
+  const handleCancel = useCallback(() => {
+    if (!dirty) return;
+    setConfirmCancel(true);
+  }, [dirty]);
+
+  const handleConfirmCancel = useCallback(() => {
+    setState(savedState);
+    setDirty(false);
+    setConfirmCancel(false);
+  }, [savedState]);
+
+  const updateInsumo = useCallback((id, field, value) => {
+    setState(prev => {
+      const next = {
+        ...prev,
+        insumos: { ...prev.insumos, [id]: { ...(prev.insumos || {})[id], [field]: value } },
+      };
+      saveLS(next);
+      return next;
+    });
+    setDirty(true);
+  }, []);
+
+  const updateFicha = useCallback((fid, key, val) => {
+    setState(prev => {
+      const next = {
+        ...prev,
+        fichas: { ...prev.fichas, [fid]: { ...(prev.fichas || {})[fid], [key]: val } },
+      };
+      saveLS(next);
+      return next;
+    });
+    setDirty(true);
+  }, []);
+
+  const handleExport = useCallback(() => exportExcel(state), [state]);
+
+  const filled = INSUMOS.filter(ins => parseFloat(((state.insumos || {})[ins.id] || {}).preco) > 0).length;
+  const progress = Math.round(filled / INSUMOS.length * 100);
+
+  if (!unlocked) return <PinScreen onUnlock={() => setUnlocked(true)} />;
+
+  return (
+    <div className="app-shell">
+      <Header tab={tab} setTab={setTab} syncStatus={syncStatus} progress={progress} />
+      <main style={{ flex:1, paddingBottom:90 }}>
+        {tab === 'insumos' && <InsumosTab state={state} updateInsumo={updateInsumo} />}
+        {tab === 'fichas'  && <FichasTab  state={state} updateFicha={updateFicha} />}
+        {tab === 'resumo'  && <ResumoTab  state={state} />}
+      </main>
+      <Footer
+        onSave={handleSave} onCancel={handleCancel} onExport={handleExport}
+        dirty={dirty} lastSync={lastSync} syncStatus={syncStatus}
+      />
+      {confirmCancel && (
+        <ConfirmModal
+          message="Descartar todas as alterações não salvas?"
+          onConfirm={handleConfirmCancel}
+          onCancel={() => setConfirmCancel(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
