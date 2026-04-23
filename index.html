@@ -692,7 +692,10 @@ function InsumoRow({ ins, sv, updateInsumo }) {
             type="number" inputMode="decimal" step="0.01" min="0"
             placeholder="0,00"
             value={sv.preco || ''}
-            onChange={e => updateInsumo(ins.id, 'preco', e.target.value)}
+            onChange={e => {
+              const v = e.target.value;
+              if (v === '' || /^\d*\.?\d{0,2}$/.test(v)) updateInsumo(ins.id, 'preco', v);
+            }}
             style={inpStyle}
           />
         </div>
