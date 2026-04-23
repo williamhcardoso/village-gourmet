@@ -396,7 +396,7 @@ function custoBase(id, state) {
   const ins = INSUMOS.find(i => i.id === id);
   if (!ins) return 0;
   const sv = (state.insumos || {})[id] || {};
-  const preco = parseFloat(sv.preco) || 0;
+  const preco = parsePreco(sv.preco);
   if (!preco) return 0;
   const unid = sv.unid || ins.u;
   const fator = unid === 'caixa' ? (parseInt(sv.qtd_caixa) || ins.f) : ins.f;
@@ -422,6 +422,7 @@ function calcFicha(fid, state) {
   return { total, mb, ml, pmin, pdes, calculado: true };
 }
 
+function parsePreco(v) { return parseFloat(String(v || '').replace(',', '.')) || 0; }
 function fmt2(v) { return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 function fmt4(v) { return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 }); }
 function fmtPct(v) { return (v * 100).toFixed(1) + '%'; }
@@ -507,7 +508,7 @@ function exportExcel(state) {
       aoa1.push([GRP_LABEL[ins.g] || ins.g]);
     }
     const sv = (state.insumos || {})[ins.id] || {};
-    const preco = parseFloat(sv.preco) || null;
+    const preco = parsePreco(sv.preco) || null;
     const cu = preco ? custoBase(ins.id, state) : null;
     aoa1.push([
       String(insNum++),
@@ -665,7 +666,7 @@ function Footer({ onSave, onCancel, onExport, dirty, lastSync, syncStatus }) {
 
 // ─── COMPONENTE: INSUMO ROW ───────────────────────────────────────────────────
 function InsumoRow({ ins, sv, updateInsumo }) {
-  const preco = parseFloat(sv.preco) || 0;
+  const preco = parsePreco(sv.preco);
   const unid = sv.unid || ins.u;
   const isCaixa = unid === 'caixa';
   const qtdCx = parseInt(sv.qtd_caixa) || 0;
@@ -689,12 +690,12 @@ function InsumoRow({ ins, sv, updateInsumo }) {
         <div>
           <div style={{ fontSize:11, color:'#888', marginBottom:3 }}>Preço de Compra (R$)</div>
           <input
-            type="number" inputMode="decimal" step="0.01" min="0"
+            type="text" inputMode="decimal"
             placeholder="0,00"
             value={sv.preco || ''}
             onChange={e => {
-              const v = e.target.value;
-              if (v === '' || /^\d*\.?\d{0,2}$/.test(v)) updateInsumo(ins.id, 'preco', v);
+              const v = e.target.value.replace('.', ',');
+              if (v === '' || /^\d*,?\d{0,2}$/.test(v)) updateInsumo(ins.id, 'preco', v);
             }}
             style={inpStyle}
           />
@@ -739,7 +740,7 @@ function InsumoRow({ ins, sv, updateInsumo }) {
 // ─── COMPONENTE: INSUMOS GROUP ────────────────────────────────────────────────
 function InsumosGroup({ grupo, insumos, stateInsumos, updateInsumo }) {
   const [open, setOpen] = useState(true);
-  const filled = insumos.filter(ins => parseFloat((stateInsumos[ins.id] || {}).preco) > 0).length;
+  const filled = insumos.filter(ins => parsePreco((stateInsumos[ins.id] || {}).preco) > 0).length;
   const groupIcons = { CARNES:'🥩', PAES:'🍞', LATICINIOS:'🧀', OUTROS:'🥔', CERVEJAS_600:'🍺', LONG_NECKS:'🍻', NAO_ALCOOLICOS:'🥤', DRINKS:'🍹' };
   return (
     <div style={{ marginBottom:2 }}>
@@ -990,7 +991,7 @@ function FichasTab({ state, updateFicha }) {
 
 // ─── COMPONENTE: RESUMO TAB ───────────────────────────────────────────────────
 function ResumoTab({ state }) {
-  const insFilledCount = INSUMOS.filter(ins => parseFloat((state.insumos || {})[ins.id]?.preco) > 0).length;
+  const insFilledCount = INSUMOS.filter(ins => parsePreco((state.insumos || {})[ins.id]?.preco) > 0).length;
   const calcFichas = FIC.map((f, fid) => ({ f, fid, ...calcFicha(fid, state) })).filter(x => x.calculado);
   const catColors = {
     CHOPP:'#e3f2fd', HAMBURGUERES:'#e8f4fd', COMBOS:'#e3f2fd', BATATAS:'#fff8e1',
@@ -1278,7 +1279,7 @@ function App() {
 
   const handleExport = useCallback(() => exportExcel(state), [state]);
 
-  const filled = INSUMOS.filter(ins => parseFloat(((state.insumos || {})[ins.id] || {}).preco) > 0).length;
+  const filled = INSUMOS.filter(ins => parsePreco(((state.insumos || {})[ins.id] || {}).preco) > 0).length;
   const progress = Math.round(filled / INSUMOS.length * 100);
 
   if (!unlocked) return <PinScreen onUnlock={() => setUnlocked(true)} />;
