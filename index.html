@@ -8,36 +8,124 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+  <script>
+    // Aplica o tema salvo antes do primeiro paint (evita flash de tema errado)
+    (function(){
+      try {
+        var t = localStorage.getItem('vg5_theme');
+        if (!t) t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch(e) { document.documentElement.setAttribute('data-theme', 'light'); }
+    })();
+  </script>
   <style>
+    /* ── Variáveis de tema ─────────────────────────────────────────────── */
+    :root {
+      --bg: #e8e4df;            /* plano de fundo da página */
+      --shell: #f5f2ee;         /* fundo do app */
+      --card: #ffffff;          /* cartões, header, footer, modais */
+      --soft: #f0ede9;          /* bordas e fundos suaves (grupos, botões secundários) */
+      --line-soft: #f7f5f2;     /* divisores de linha */
+      --inp-bg: #fafafa;        /* fundo de inputs */
+      --inp-line: #dddddd;      /* borda de inputs */
+      --box: #f8f6f3;           /* caixas de métrica */
+      --tx: #0f0f0f;            /* texto principal */
+      --tx1: #333333;           /* texto forte */
+      --tx2: #606060;           /* texto médio */
+      --tx3: #888888;           /* rótulos */
+      --tx4: #ababab;           /* texto apagado */
+      --gold: #c9973a;
+      --green: #1e8449;
+      --red: #c0392b;
+      --amber: #856404;
+      --on-accent: #ffffff;     /* texto sobre botões gold/green/red */
+      --ok-bg: #d4edda;  --ok-tx: #155724;
+      --err-bg: #fdecea; --err-line: #f5c6cb; --err-tx: #721c24;
+      --warn-bg: #fff8e1; --warn-line: #ffe082;
+      --filled: #f0faf4;        /* linha de insumo preenchido */
+      --shadow: rgba(0,0,0,0.08);
+      --overlay: rgba(0,0,0,0.5);
+      /* gráficos */
+      --ch-grid: #e1e0d9; --ch-tick: #898781;
+      --s1: #2a78d6; --s2: #eb6834;
+    }
+    html[data-theme="dark"] {
+      --bg: #121211;
+      --shell: #1a1a19;
+      --card: #232322;
+      --soft: #30302d;
+      --line-soft: #2b2b29;
+      --inp-bg: #2c2c2a;
+      --inp-line: #45453f;
+      --box: #2b2b28;
+      --tx: #f2f1ec;
+      --tx1: #d9d7d0;
+      --tx2: #b3b1a8;
+      --tx3: #92908a;
+      --tx4: #6d6c66;
+      --gold: #d5a54c;
+      --green: #43b476;
+      --red: #e26a5c;
+      --amber: #d9b45c;
+      --on-accent: #171712;
+      --ok-bg: #1c3a26;  --ok-tx: #8fd9a5;
+      --err-bg: #442522; --err-line: #6a3a35; --err-tx: #f1a79e;
+      --warn-bg: #3a3113; --warn-line: #63541f;
+      --filled: #20301f;
+      --shadow: rgba(0,0,0,0.45);
+      --overlay: rgba(0,0,0,0.65);
+      --ch-grid: #2c2c2a; --ch-tick: #898781;
+      --s1: #3987e5; --s2: #d95926;
+    }
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #e8e4df; color: #0f0f0f; }
+    html { background: var(--bg); }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--tx); }
     #root { display: flex; flex-direction: column; min-height: 100vh; }
     input, select, button, textarea { font-family: inherit; }
+    input, select { color-scheme: light; }
+    html[data-theme="dark"] input, html[data-theme="dark"] select { color-scheme: dark; }
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
     button { cursor: pointer; border: none; outline: none; }
-    input:focus, select:focus { outline: 2px solid #c9973a; outline-offset: -1px; }
-    ::-webkit-scrollbar { width: 3px; }
-    ::-webkit-scrollbar-thumb { background: #c9973a55; border-radius: 2px; }
+    input:focus, select:focus { outline: 2px solid var(--gold); outline-offset: -1px; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-thumb { background: #c9973a55; border-radius: 4px; }
 
-    /* Layout responsivo centralizado */
+    /* ── Layout responsivo ─────────────────────────────────────────────── */
     .app-shell {
       display: flex; flex-direction: column; min-height: 100vh;
       max-width: 640px; margin: 0 auto;
-      background: #f5f2ee;
+      background: var(--shell);
       box-shadow: 0 0 40px rgba(0,0,0,0.12);
     }
     .footer-wrap {
       position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
       width: 100%; max-width: 640px; z-index: 100;
-      background: #fff; border-top: 1px solid #e9e6e1;
-      box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+      background: var(--card); border-top: 1px solid var(--soft);
+      box-shadow: 0 -2px 12px var(--shadow);
     }
 
     /* Grid de 2 colunas para insumos em telas maiores */
     @media (min-width: 540px) {
       .insumos-grid { display: grid; grid-template-columns: 1fr 1fr; }
+    }
+
+    /* Desktop: shell amplo, conteúdo em grades */
+    @media (min-width: 900px) {
+      .app-shell, .footer-wrap { max-width: 1240px; }
+      .insumos-grid { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+      .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 2px; align-items: start; background: var(--line-soft); }
+      .resumo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 10px; align-items: start; }
+      .resumo-grid > div { margin-bottom: 0 !important; }
+      .gestao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+      .gestao-grid > div { margin-bottom: 0 !important; }
+      .kpi-row { grid-template-columns: repeat(4, 1fr) !important; }
+      .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+      .charts-grid > div { margin-bottom: 0 !important; }
+      .tab-content { padding-left: 24px !important; padding-right: 24px !important; }
     }
   </style>
 </head>
@@ -384,9 +472,13 @@ const FIC = [
 // ─── CONSTANTES ───────────────────────────────────────────────────────────────
 const LS_KEY = 'vg5';
 const LS_DIRTY = 'vg5_dirty';
+const LS_THEME = 'vg5_theme';
+const LS_VENDAS = 'vg5_vendas';
 const BIN_ID = '69e92ba8856a68218960a41b';
+const VENDAS_BIN_ID = '6a4ed9ddda38895dfe43051c';
 const API_KEY = '$2a$10$jBpvmE1mUNUbJcvHjevmkux7wMBaerquOgxEJ/xveOYNgOGn/Ig7.';
 const API_URL = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
+const VENDAS_URL = 'https://api.jsonbin.io/v3/b/' + VENDAS_BIN_ID;
 
 const UNID_COMPRA = ['kg','g','garrafa','lata','caixa','unidade','fardo','pacote','L','ml','duzia','barril'];
 const UNID_ING = ['g','kg','ml','L','un'];
@@ -594,6 +686,127 @@ function withHist(s) {
     }
   });
   return { ...s, insumos };
+}
+
+// ─── VENDAS IMPORTADAS (relatório .xls do sistema de PDV) ─────────────────────
+// O sistema exporta um HTML com extensão .xls. Título traz o período:
+//   "Relatório de venda por produto de 01/06/2026 até 30/06/2026"
+// Colunas: Código | Nome | Quantidade | Custo (IGNORADA) | Faturado
+
+function emptyVendas() { return { v:1, meses:{}, map:{}, updatedAt:null }; }
+function loadVendasLS() {
+  try { const v = localStorage.getItem(LS_VENDAS); return v ? JSON.parse(v) : null; } catch { return null; }
+}
+function saveVendasLS(d) { try { localStorage.setItem(LS_VENDAS, JSON.stringify(d)); } catch {} }
+
+// "7.069,91" → 7069.91 · "598,00" → 598
+function parseNumBR(s) {
+  const v = parseFloat(String(s == null ? '' : s).trim().replace(/\./g, '').replace(',', '.'));
+  return isNaN(v) ? 0 : v;
+}
+function stripTags(s) { return String(s).replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim(); }
+function dataBRparaISO(d) { const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(d).trim()); return m ? m[3] + '-' + m[2] + '-' + m[1] : null; }
+
+// Parseia o relatório (HTML) exportado pelo sistema. Retorna { ok, erro?, de, ate, mes, rows }
+function parseRelatorioVendas(html) {
+  const txt = String(html || '');
+  const per = /de\s+(\d{2}\/\d{2}\/\d{4})\s+at[ée]\s+(\d{2}\/\d{2}\/\d{4})/i.exec(stripTags(txt));
+  if (!per) return { ok:false, erro:'Período não encontrado no título — o arquivo é o relatório "Vendas por Produto" exportado pelo sistema?' };
+  const de = dataBRparaISO(per[1]), ate = dataBRparaISO(per[2]);
+  const rows = [];
+  const reTr = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+  let mTr;
+  while ((mTr = reTr.exec(txt)) !== null) {
+    const cells = [];
+    const reTd = /<td[^>]*>([\s\S]*?)<\/td>/gi;
+    let mTd;
+    while ((mTd = reTd.exec(mTr[1])) !== null) cells.push(stripTags(mTd[1]));
+    if (cells.length < 5) continue;              // cabeçalhos usam <th>
+    const nome = cells[1];
+    if (!nome) continue;
+    // cells[3] = Custo — ignorada de propósito (não reflete a realidade)
+    rows.push({ cod: cells[0], nome, qtd: parseNumBR(cells[2]), fat: parseNumBR(cells[4]) });
+  }
+  if (!rows.length) return { ok:false, erro:'Nenhuma linha de produto encontrada no arquivo.' };
+  return { ok:true, de, ate, mes: de.slice(0, 7), rows };
+}
+
+// ── Vínculo venda ↔ ficha técnica (por nome, com ajuste manual por código) ────
+function normNome(s) {
+  return String(s || '').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/(\d)([a-z])/g, '$1 $2').replace(/([a-z])(\d)/g, '$1 $2')
+    .replace(/[^a-z0-9]+/g, ' ').trim();
+}
+const STOPWORDS_NOME = { de:1, da:1, do:1, das:1, dos:1, com:1, e:1, o:1, a:1 };
+function tokensNome(s) { return normNome(s).split(' ').filter(t => t && !STOPWORDS_NOME[t]); }
+
+// Sugere a ficha mais parecida com o nome vindo do PDV (null se nada confiável).
+// Pontuação: similaridade de Jaccard entre os conjuntos de tokens; se TODOS os
+// tokens do lado menor estão contidos no maior (containment), garante 0.7 —
+// cobre casos como "Batata dos Deuses (cheddar e bacon)" → "Batata dos Deuses".
+function sugerirFichaId(nome, state) {
+  const alvo = tokensNome(nome);
+  if (!alvo.length) return null;
+  const alvoSet = {};
+  alvo.forEach(t => { alvoSet[t] = 1; });
+  const nAlvo = Object.keys(alvoSet).length;
+  let melhor = null, melhorScore = 0;
+  getFichaIds(state).forEach(fid => {
+    const d = fichaDef(fid, state);
+    if (!d || d.sub) return;
+    const ts = tokensNome(d.n);
+    if (!ts.length) return;
+    let inter = 0;
+    const uniao = { ...alvoSet };
+    const tsSet = {};
+    ts.forEach(t => { tsSet[t] = 1; uniao[t] = 1; });
+    Object.keys(tsSet).forEach(t => { if (alvoSet[t]) inter++; });
+    const jaccard = inter / Object.keys(uniao).length;
+    const cont = inter / Math.min(nAlvo, Object.keys(tsSet).length);
+    const score = Math.max(jaccard, cont >= 1 ? 0.7 : 0);
+    if (score > melhorScore) { melhorScore = score; melhor = fid; }
+  });
+  return melhorScore >= 0.6 ? melhor : null;
+}
+
+// Resolve o vínculo de um produto vendido: ajuste manual (map[cod]) tem precedência.
+// map[cod] === '' significa "sem vínculo" escolhido pelo usuário.
+function resolverVinculo(cod, nome, map, state) {
+  const m = (map || {})[cod];
+  if (m !== undefined) return m === '' ? null : (fichaDef(m, state) ? m : null);
+  return sugerirFichaId(nome, state);
+}
+
+// ── Agregação com filtro por meses (de/até inclusivos, formato 'AAAA-MM') ────
+function mesesOrdenados(vendasData) {
+  return Object.keys((vendasData || {}).meses || {}).sort();
+}
+function fmtMes(m) {
+  const nomes = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  const p = String(m || '').split('-');
+  return p.length === 2 ? nomes[parseInt(p[1], 10) - 1] + '/' + p[0] : String(m);
+}
+function agregarVendas(vendasData, deMes, ateMes) {
+  const meses = (vendasData || {}).meses || {};
+  const keys = Object.keys(meses).sort().filter(m => (!deMes || m >= deMes) && (!ateMes || m <= ateMes));
+  const porCod = {};
+  const porMes = [];
+  keys.forEach(m => {
+    const dados = meses[m] || {};
+    let fatM = 0, qtdM = 0;
+    (dados.rows || []).forEach(r => {
+      fatM += r.fat; qtdM += r.qtd;
+      const c = porCod[r.cod] || (porCod[r.cod] = { cod: r.cod, nome: r.nome, qtd: 0, fat: 0 });
+      c.nome = r.nome;
+      c.qtd += r.qtd; c.fat += r.fat;
+    });
+    porMes.push({ mes: m, de: dados.de, ate: dados.ate, fat: fatM, qtd: qtdM, nProd: (dados.rows || []).length });
+  });
+  const porProduto = Object.values(porCod).sort((a, b) => b.fat - a.fat);
+  const fatTotal = porProduto.reduce((s, x) => s + x.fat, 0);
+  const qtdTotal = porProduto.reduce((s, x) => s + x.qtd, 0);
+  return { meses: porMes, porProduto, fatTotal, qtdTotal };
 }
 
 // ─── EXPORT EXCEL ─────────────────────────────────────────────────────────────
@@ -806,40 +1019,48 @@ function exportExcel(state) {
 }
 
 // ─── COMPONENTE: HEADER ───────────────────────────────────────────────────────
-function Header({ tab, setTab, syncStatus, progress }) {
+function Header({ tab, setTab, syncStatus, progress, theme, onToggleTheme }) {
   const badgeStyle = {
     display:'inline-block', padding:'2px 10px', borderRadius:20, fontSize:11, fontWeight:600,
-    background: syncStatus === 'synced' ? '#d4edda' : (syncStatus === 'offline' || syncStatus === 'error') ? '#f8d7da' : syncStatus === 'saving' ? '#fff3cd' : '#e9ecef',
-    color: syncStatus === 'synced' ? '#155724' : (syncStatus === 'offline' || syncStatus === 'error') ? '#721c24' : syncStatus === 'saving' ? '#856404' : '#495057',
+    background: syncStatus === 'synced' ? 'var(--ok-bg)' : (syncStatus === 'offline' || syncStatus === 'error') ? 'var(--err-bg)' : syncStatus === 'saving' ? 'var(--warn-bg)' : 'var(--box)',
+    color: syncStatus === 'synced' ? 'var(--ok-tx)' : (syncStatus === 'offline' || syncStatus === 'error') ? 'var(--err-tx)' : syncStatus === 'saving' ? 'var(--amber)' : 'var(--tx2)',
   };
   const badgeText = { synced:'Sincronizado ✓', offline:'Offline', saving:'Salvando...', loading:'Carregando...', idle:'...', error:'Erro ao salvar ✗' }[syncStatus] || '...';
   const tabs = [
-    { id:'insumos', label:'📦 Insumos' },
-    { id:'fichas',  label:'🧾 Fichas' },
-    { id:'resumo',  label:'📊 Resumo' },
-    { id:'gestao',  label:'📈 Gestão' },
+    { id:'insumos',  label:'📦 Insumos' },
+    { id:'fichas',   label:'🧾 Fichas' },
+    { id:'resumo',   label:'📊 Resumo' },
+    { id:'vendas',   label:'💰 Vendas' },
+    { id:'graficos', label:'📉 Gráficos' },
+    { id:'gestao',   label:'📈 Gestão' },
   ];
   return (
-    <div style={{ position:'sticky', top:0, zIndex:100, background:'#fff', boxShadow:'0 2px 8px rgba(0,0,0,0.1)' }}>
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 16px 8px' }}>
-        <div style={{ fontSize:20, fontWeight:700, letterSpacing:-0.5 }}>
-          Village <span style={{ color:'#c9973a' }}>Gourmet</span>
+    <div style={{ position:'sticky', top:0, zIndex:100, background:'var(--card)', boxShadow:'0 2px 8px var(--shadow)' }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 16px 8px', gap:8 }}>
+        <div style={{ fontSize:20, fontWeight:700, letterSpacing:-0.5, whiteSpace:'nowrap' }}>
+          Village <span style={{ color:'var(--gold)' }}>Gourmet</span>
         </div>
-        <span style={badgeStyle}>{badgeText}</span>
+        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+          <span style={badgeStyle}>{badgeText}</span>
+          <button onClick={onToggleTheme} title={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'} style={{
+            background:'var(--box)', border:'1px solid var(--soft)', borderRadius:20,
+            padding:'3px 10px', fontSize:13, lineHeight:1.4,
+          }}>{theme === 'dark' ? '☀️' : '🌙'}</button>
+        </div>
       </div>
-      <div style={{ display:'flex', borderTop:'1px solid #f0ede9' }}>
+      <div style={{ display:'flex', borderTop:'1px solid var(--soft)', overflowX:'auto' }}>
         {tabs.map(t => (
           <button key={t.id} onClick={() => setTab(t.id)} style={{
             flex:1, padding:'10px 4px', fontSize:12, fontWeight:600, border:'none',
-            background:'transparent', cursor:'pointer',
-            color: tab === t.id ? '#c9973a' : '#666',
-            borderBottom: tab === t.id ? '2px solid #c9973a' : '2px solid transparent',
+            background:'transparent', cursor:'pointer', whiteSpace:'nowrap', minWidth:86,
+            color: tab === t.id ? 'var(--gold)' : 'var(--tx2)',
+            borderBottom: tab === t.id ? '2px solid var(--gold)' : '2px solid transparent',
             transition:'all .15s',
           }}>{t.label}</button>
         ))}
       </div>
-      <div style={{ height:3, background:'#f0ede9' }}>
-        <div style={{ height:'100%', background:'#c9973a', width: progress + '%', transition:'width .3s', borderRadius:2 }} />
+      <div style={{ height:3, background:'var(--soft)' }}>
+        <div style={{ height:'100%', background:'var(--gold)', width: progress + '%', transition:'width .3s', borderRadius:2 }} />
       </div>
     </div>
   );
@@ -854,19 +1075,19 @@ function Footer({ onSave, onCancel, onExport, dirty, lastSync, syncStatus }) {
       <div style={{ display:'flex', gap:8, marginBottom:6 }}>
         <button onClick={onSave} style={{
           flex:2, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:700,
-          background:'#1e8449', color:'#fff', opacity: syncStatus === 'saving' ? 0.7 : 1,
+          background:'var(--green)', color:'var(--on-accent)', opacity: syncStatus === 'saving' ? 0.7 : 1,
         }}>☁️ Salvar</button>
         <button onClick={onCancel} disabled={!dirty} style={{
           flex:1, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:600,
-          background: dirty ? '#e9e6e1' : '#f5f2ee', color: dirty ? '#333' : '#aaa',
+          background: dirty ? 'var(--soft)' : 'var(--box)', color: dirty ? 'var(--tx1)' : 'var(--tx4)',
           cursor: dirty ? 'pointer' : 'default',
         }}>✕ Cancelar</button>
         <button onClick={onExport} style={{
           flex:2, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:700,
-          background:'#c9973a', color:'#fff',
+          background:'var(--gold)', color:'var(--on-accent)',
         }}>⬇️ Excel</button>
       </div>
-      <div style={{ textAlign:'center', fontSize:11, color:'#999' }}>
+      <div style={{ textAlign:'center', fontSize:11, color:'var(--tx3)' }}>
         {lastSync ? 'Última sync: ' + fmtTime(lastSync) : 'Não sincronizado ainda'}
         {dirty ? ' • Alterações não salvas' : ''}
       </div>
@@ -888,21 +1109,21 @@ function InsumoRow({ ins, sv, updateInsumo, onEdit, onDelete }) {
   const hist = (sv.hist || []).slice(-5).reverse();
 
   const inpStyle = {
-    border:'1px solid #ddd', borderRadius:6, padding:'7px 10px', fontSize:16,
-    background:'#fafafa', width:'100%', color:'#0f0f0f',
+    border:'1px solid var(--inp-line)', borderRadius:6, padding:'7px 10px', fontSize:16,
+    background:'var(--inp-bg)', width:'100%', color:'var(--tx)',
   };
   const selStyle = { ...inpStyle, appearance:'none', WebkitAppearance:'none', paddingRight:8 };
-  const lbl = { fontSize:11, color:'#888', marginBottom:3 };
+  const lbl = { fontSize:11, color:'var(--tx3)', marginBottom:3 };
 
   return (
     <div style={{
-      padding:'12px 16px', borderBottom:'1px solid #f0ede9',
-      background: filled ? '#f0faf4' : '#fff',
+      padding:'12px 16px', borderBottom:'1px solid var(--soft)',
+      background: filled ? 'var(--filled)' : 'var(--card)',
     }}>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
-        <div style={{ fontWeight:600, fontSize:14, color:'#0f0f0f' }}>
+        <div style={{ fontWeight:600, fontSize:14, color:'var(--tx)' }}>
           {ins.n}
-          {stale && <span title="Preço desatualizado" style={{ marginLeft:6, fontSize:11, color:'#c0392b', fontWeight:600 }}>⏰ {dias}d</span>}
+          {stale && <span title="Preço desatualizado" style={{ marginLeft:6, fontSize:11, color:'var(--red)', fontWeight:600 }}>⏰ {dias}d</span>}
         </div>
         {ins.custom && (
           <span style={{ display:'flex', gap:10, flexShrink:0 }}>
@@ -933,17 +1154,17 @@ function InsumoRow({ ins, sv, updateInsumo, onEdit, onDelete }) {
           </select>
         </div>
       </div>
-      <div style={{ fontSize:12, color:'#888', marginTop:6, display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:4 }}>
+      <div style={{ fontSize:12, color:'var(--tx3)', marginTop:6, display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:4 }}>
         <span>
           1 {unid} = {cont} {ins.b}{rend < 100 ? ` · rend. ${rend}%` : ''}
-          {cu > 0 && <span> · custo/{ins.b}: <strong style={{ color:'#0f0f0f' }}>{ins.b === 'un' ? fmt2(cu) : fmt4(cu)}</strong></span>}
+          {cu > 0 && <span> · custo/{ins.b}: <strong style={{ color:'var(--tx)' }}>{ins.b === 'un' ? fmt2(cu) : fmt4(cu)}</strong></span>}
         </span>
-        <button onClick={() => setDet(d => !d)} style={{ background:'transparent', fontSize:11, color:'#c9973a', fontWeight:600 }}>
+        <button onClick={() => setDet(d => !d)} style={{ background:'transparent', fontSize:11, color:'var(--gold)', fontWeight:600 }}>
           ⚙️ ajustes {det ? '▾' : '▸'}
         </button>
       </div>
       {det && (
-        <div style={{ marginTop:8, padding:'10px 12px', background:'#faf8f5', borderRadius:8, border:'1px solid #f0ede9' }}>
+        <div style={{ marginTop:8, padding:'10px 12px', background:'var(--box)', borderRadius:8, border:'1px solid var(--soft)' }}>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
             <div>
               <div style={lbl}>Conteúdo ({ins.b} por {unid})</div>
@@ -967,15 +1188,15 @@ function InsumoRow({ ins, sv, updateInsumo, onEdit, onDelete }) {
             </div>
           </div>
           {rend < 100 && cu > 0 && (
-            <div style={{ fontSize:11, color:'#856404', marginTop:6 }}>
+            <div style={{ fontSize:11, color:'var(--amber)', marginTop:6 }}>
               Custo corrigido pela perda de {100 - rend}%: cada {ins.b} utilizável custa {ins.b === 'un' ? fmt2(cu) : fmt4(cu)}.
             </div>
           )}
-          <div style={{ fontSize:11, color:'#888', marginTop:8 }}>
+          <div style={{ fontSize:11, color:'var(--tx3)', marginTop:8 }}>
             {sv.precoAt ? `Preço atualizado em ${fmtData(sv.precoAt)}` : 'Sem registro de data do preço'}
           </div>
           {hist.length > 0 && (
-            <div style={{ fontSize:11, color:'#888', marginTop:4 }}>
+            <div style={{ fontSize:11, color:'var(--tx3)', marginTop:4 }}>
               Histórico: {hist.map(h => `${fmtData(h.d)} ${fmt2(h.p)}`).join(' · ')}
             </div>
           )}
@@ -994,17 +1215,17 @@ function InsumosGroup({ grupo, insumos, stateInsumos, updateInsumo, onEditIns, o
     <div style={{ marginBottom:2 }}>
       <button onClick={() => setOpen(o => !o)} style={{
         width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between',
-        padding:'12px 16px', background:'#f0ede9', border:'none', cursor:'pointer',
+        padding:'12px 16px', background:'var(--soft)', border:'none', cursor:'pointer',
         textAlign:'left',
       }}>
         <span style={{ fontWeight:700, fontSize:13, letterSpacing:.5 }}>
           {groupIcons[grupo] || '📦'} {grupo}
         </span>
-        <span style={{ fontSize:12, color:'#888', display:'flex', alignItems:'center', gap:8 }}>
+        <span style={{ fontSize:12, color:'var(--tx3)', display:'flex', alignItems:'center', gap:8 }}>
           <span style={{
             padding:'2px 8px', borderRadius:10,
-            background: filled === insumos.length ? '#d4edda' : '#fff',
-            color: filled === insumos.length ? '#155724' : '#666',
+            background: filled === insumos.length ? 'var(--ok-bg)' : 'var(--card)',
+            color: filled === insumos.length ? 'var(--ok-tx)' : 'var(--tx2)',
             fontWeight:600,
           }}>{filled}/{insumos.length}</span>
           <span style={{ fontSize:14, transition:'transform .2s', display:'inline-block', transform: open ? 'rotate(90deg)' : 'rotate(0)' }}>›</span>
@@ -1033,11 +1254,11 @@ function InsumoFormModal({ initial, state, onSave, onClose }) {
   const set = (k, v) => setF(prev => ({ ...prev, [k]: v }));
   const contPadrao = { kg:'1000', g:'1', L:'1000', ml:'1', duzia:'12', unidade:'1' }[f.u] || '';
   const valido = f.n.trim() && (parsePreco(f.f) > 0 || parsePreco(contPadrao) > 0);
-  const inpStyle = { border:'1px solid #ddd', borderRadius:6, padding:'8px 10px', fontSize:16, background:'#fafafa', width:'100%' };
-  const lbl = { fontSize:11, color:'#888', marginBottom:3, marginTop:10 };
+  const inpStyle = { border:'1px solid var(--inp-line)', borderRadius:6, padding:'8px 10px', fontSize:16, background:'var(--inp-bg)', width:'100%' };
+  const lbl = { fontSize:11, color:'var(--tx3)', marginBottom:3, marginTop:10 };
   return (
-    <div style={{ position:'fixed', inset:0, zIndex:999, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}>
-      <div style={{ background:'#fff', borderRadius:12, padding:20, maxWidth:400, width:'100%', maxHeight:'85vh', overflowY:'auto' }}>
+    <div style={{ position:'fixed', inset:0, zIndex:999, background:'var(--overlay)', display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}>
+      <div style={{ background:'var(--card)', borderRadius:12, padding:20, maxWidth:400, width:'100%', maxHeight:'85vh', overflowY:'auto' }}>
         <div style={{ fontWeight:700, fontSize:16, marginBottom:4 }}>{initial ? 'Editar Insumo' : 'Novo Insumo'}</div>
         <div style={lbl}>Nome</div>
         <input style={inpStyle} value={f.n} onChange={e => set('n', e.target.value)} placeholder="Ex: Molho barbecue" />
@@ -1064,14 +1285,14 @@ function InsumoFormModal({ initial, state, onSave, onClose }) {
         <div style={lbl}>Conteúdo: quantos {f.b} tem 1 {f.u}?</div>
         <input style={inpStyle} inputMode="decimal" value={f.f} onChange={e => set('f', e.target.value)} placeholder={contPadrao || 'Ex: 700'} />
         <div style={{ display:'flex', gap:10, marginTop:18 }}>
-          <button onClick={onClose} style={{ flex:1, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:600, background:'#f0ede9', color:'#333' }}>Cancelar</button>
+          <button onClick={onClose} style={{ flex:1, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:600, background:'var(--soft)', color:'var(--tx1)' }}>Cancelar</button>
           <button
             disabled={!valido}
             onClick={() => onSave({
               g: f.g, id: initial ? initial.id : genId('ci'), n: f.n.trim(), u: f.u,
               f: parsePreco(f.f) || parsePreco(contPadrao) || 1, b: f.b, custom: true,
             })}
-            style={{ flex:1, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:700, background: valido ? '#1e8449' : '#ccc', color:'#fff' }}
+            style={{ flex:1, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:700, background: valido ? 'var(--green)' : 'var(--tx4)', color:'var(--on-accent)' }}
           >{initial ? 'Salvar' : 'Cadastrar'}</button>
         </div>
       </div>
@@ -1093,18 +1314,18 @@ function InsumosTab({ state, updateInsumo, saveCustomInsumo, deleteCustomInsumo 
   });
   return (
     <div>
-      <div style={{ padding:'12px 16px', background:'#fff', borderBottom:'1px solid #f0ede9', display:'flex', gap:8 }}>
+      <div style={{ padding:'12px 16px', background:'var(--card)', borderBottom:'1px solid var(--soft)', display:'flex', gap:8 }}>
         <input
           type="search" placeholder="Buscar insumo..." value={search}
           onChange={e => setSearch(e.target.value)}
           style={{
-            flex:1, padding:'9px 14px', border:'1px solid #ddd', borderRadius:8,
-            fontSize:16, background:'#fafafa',
+            flex:1, padding:'9px 14px', border:'1px solid var(--inp-line)', borderRadius:8,
+            fontSize:16, background:'var(--inp-bg)',
           }}
         />
         <button onClick={() => setModal('novo')} style={{
           padding:'9px 14px', borderRadius:8, fontSize:13, fontWeight:700,
-          background:'#c9973a', color:'#fff', whiteSpace:'nowrap',
+          background:'var(--gold)', color:'var(--on-accent)', whiteSpace:'nowrap',
         }}>➕ Novo</button>
       </div>
       {Object.entries(grupos).map(([g, insumos]) => (
@@ -1115,7 +1336,7 @@ function InsumosTab({ state, updateInsumo, saveCustomInsumo, deleteCustomInsumo 
         />
       ))}
       {Object.keys(grupos).length === 0 && (
-        <div style={{ textAlign:'center', padding:40, color:'#aaa' }}>Nenhum insumo encontrado</div>
+        <div style={{ textAlign:'center', padding:40, color:'var(--tx4)' }}>Nenhum insumo encontrado</div>
       )}
       <div style={{ height:16 }} />
       {modal && (
@@ -1149,26 +1370,26 @@ function IngRow({ ing, ii, fid, sf, stateGlobal, updateFicha }) {
   let unidOpts = UNID_ING;
   if (insDef) unidOpts = insDef.b === 'un' ? ['un'] : ['g', 'kg', 'ml', 'L'];
   const inpStyle = {
-    border:'1px solid #ddd', borderRadius:6, padding:'6px 8px',
-    fontSize:16, background:'#fafafa', width:'100%', color:'#0f0f0f',
+    border:'1px solid var(--inp-line)', borderRadius:6, padding:'6px 8px',
+    fontSize:16, background:'var(--inp-bg)', width:'100%', color:'var(--tx)',
   };
   return (
-    <div style={{ padding:'8px 12px', borderBottom:'1px solid #f7f5f2', display:'grid', gridTemplateColumns:'1fr 60px 54px 68px', gap:5, alignItems:'start' }}>
+    <div style={{ padding:'8px 12px', borderBottom:'1px solid var(--line-soft)', display:'grid', gridTemplateColumns:'1fr 60px 54px 68px', gap:5, alignItems:'start' }}>
       <div>
         <div style={{ display:'flex', alignItems:'center', gap:5, marginBottom:4 }}>
           <span style={{
             width:7, height:7, borderRadius:'50%', display:'inline-block', flexShrink:0,
-            background: r.custo > 0 ? '#1e8449' : hasRef ? '#c9973a' : '#bbb',
+            background: r.custo > 0 ? 'var(--green)' : hasRef ? 'var(--gold)' : 'var(--tx4)',
           }} />
-          <span style={{ fontSize:13, color:'#333', fontWeight:500 }}>{ing.n}</span>
+          <span style={{ fontSize:13, color:'var(--tx1)', fontWeight:500 }}>{ing.n}</span>
         </div>
         {r.custo > 0 && (
-          <div style={{ fontSize:11, color:'#888', paddingLeft:12 }}>
+          <div style={{ fontSize:11, color:'var(--tx3)', paddingLeft:12 }}>
             Custo: {fmt2(r.custo)}{r.manual ? ' (manual)' : ''}
           </div>
         )}
         {r.custo === 0 && !hasRef && (
-          <div style={{ fontSize:10, color:'#c9973a', paddingLeft:12 }}>sem insumo — informe R$ →</div>
+          <div style={{ fontSize:10, color:'var(--gold)', paddingLeft:12 }}>sem insumo — informe R$ →</div>
         )}
       </div>
       <input
@@ -1197,7 +1418,7 @@ function IngRow({ ing, ii, fid, sf, stateGlobal, updateFicha }) {
           const v = e.target.value.replace('.', ',');
           if (v === '' || /^\d*,?\d{0,2}$/.test(v)) updateFicha(fid, 'i' + ii, { ...si, custo: v });
         }}
-        style={{ ...inpStyle, fontSize:13, background: si.custo ? '#fff8e1' : '#fafafa' }}
+        style={{ ...inpStyle, fontSize:13, background: si.custo ? 'var(--warn-bg)' : 'var(--inp-bg)' }}
       />
     </div>
   );
@@ -1215,34 +1436,34 @@ function FichaCard({ fid, ficha, state, updateFicha, onEdit, onDelete, indiceRat
   const participacao = !ficha.sub && p > 0 && somaPrecos > 0 ? p / somaPrecos : 0;
   const lucroRealRS = calculado && !ficha.sub ? p * ml - rateioRS : 0;
 
-  const mbColor = calculado ? (mb >= calc.m ? '#1e8449' : mb >= calc.m - 0.05 ? '#c9973a' : '#c0392b') : '#aaa';
+  const mbColor = calculado ? (mb >= calc.m ? 'var(--green)' : mb >= calc.m - 0.05 ? 'var(--gold)' : 'var(--red)') : 'var(--tx4)';
 
   const metricBox = (label, value, color) => (
-    <div style={{ background:'#f8f6f3', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
-      <div style={{ fontSize:10, color:'#888', marginBottom:2 }}>{label}</div>
-      <div style={{ fontSize:14, fontWeight:700, color: color || '#0f0f0f' }}>{value}</div>
+    <div style={{ background:'var(--box)', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
+      <div style={{ fontSize:10, color:'var(--tx3)', marginBottom:2 }}>{label}</div>
+      <div style={{ fontSize:14, fontWeight:700, color: color || 'var(--tx)' }}>{value}</div>
     </div>
   );
-  const inpStyle = { border:'1px solid #ddd', borderRadius:6, padding:'6px 8px', fontSize:15, background:'#fff', width:'100%', color:'#0f0f0f' };
-  const lbl = { fontSize:10, color:'#888', marginBottom:2 };
+  const inpStyle = { border:'1px solid var(--inp-line)', borderRadius:6, padding:'6px 8px', fontSize:15, background:'var(--card)', width:'100%', color:'var(--tx)' };
+  const lbl = { fontSize:10, color:'var(--tx3)', marginBottom:2 };
 
   return (
-    <div style={{ margin:'0 0 2px', background:'#fff', borderBottom:'1px solid #f0ede9' }}>
+    <div style={{ margin:'0 0 2px', background:'var(--card)', borderBottom:'1px solid var(--soft)' }}>
       <button onClick={() => setOpen(o => !o)} style={{
         width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between',
         padding:'12px 16px', background:'transparent', border:'none', cursor:'pointer', textAlign:'left',
       }}>
         <div>
-          <div style={{ fontWeight:600, fontSize:14, color:'#0f0f0f' }}>
+          <div style={{ fontWeight:600, fontSize:14, color:'var(--tx)' }}>
             {ficha.sub ? '🧪 ' : ''}{ficha.n}
           </div>
-          <div style={{ fontSize:12, color:'#888', marginTop:2 }}>
+          <div style={{ fontSize:12, color:'var(--tx3)', marginTop:2 }}>
             {ficha.sub
               ? (calculado ? `Rende ${ficha.rendQ}${ficha.rendU} • custo/${ficha.rendU}: ${fmt4(total / (parsePreco(ficha.rendQ) || 1))}` : 'Sub-receita — preencha os custos')
               : <span>Venda: {fmt2(p)}
                   {calculado && <span style={{ color: mbColor, marginLeft:8, fontWeight:600 }}>• MgB {fmtPct(mb)}</span>}
-                  {rateioRS > 0 && <span style={{ color:'#856404', marginLeft:8, fontWeight:600 }}>• Fixo {fmt2(rateioRS)}</span>}
-                  {incompleta && <span style={{ color:'#c9973a', marginLeft:8, fontWeight:600 }}>⚠️ {comCusto}/{nIng}</span>}
+                  {rateioRS > 0 && <span style={{ color:'var(--amber)', marginLeft:8, fontWeight:600 }}>• Fixo {fmt2(rateioRS)}</span>}
+                  {incompleta && <span style={{ color:'var(--gold)', marginLeft:8, fontWeight:600 }}>⚠️ {comCusto}/{nIng}</span>}
                 </span>}
           </div>
         </div>
@@ -1254,13 +1475,13 @@ function FichaCard({ fid, ficha, state, updateFicha, onEdit, onDelete, indiceRat
               <span onClick={onDelete} style={{ fontSize:14, cursor:'pointer' }} title="Excluir ficha">🗑️</span>
             </span>
           )}
-          <span style={{ fontSize:16, color:'#ccc', transition:'transform .2s', display:'inline-block', transform: open ? 'rotate(90deg)' : 'rotate(0)' }}>›</span>
+          <span style={{ fontSize:16, color:'var(--tx4)', transition:'transform .2s', display:'inline-block', transform: open ? 'rotate(90deg)' : 'rotate(0)' }}>›</span>
         </span>
       </button>
       {open && (
         <div>
           {incompleta && (
-            <div style={{ margin:'0 12px 10px', padding:'8px 12px', background:'#fff8e1', border:'1px solid #ffe082', borderRadius:8, fontSize:12, color:'#856404' }}>
+            <div style={{ margin:'0 12px 10px', padding:'8px 12px', background:'var(--warn-bg)', border:'1px solid var(--warn-line)', borderRadius:8, fontSize:12, color:'var(--amber)' }}>
               ⚠️ Ficha incompleta: {comCusto} de {nIng} ingredientes com custo. A margem real é MENOR que a exibida.
             </div>
           )}
@@ -1268,15 +1489,15 @@ function FichaCard({ fid, ficha, state, updateFicha, onEdit, onDelete, indiceRat
             <div style={{ padding:'0 12px 12px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:6 }}>
               {metricBox('Custo Total', fmt2(total))}
               {metricBox('Margem Bruta', fmtPct(mb), mbColor)}
-              {metricBox('Margem Líquida', fmtPct(ml), mb > 0 && ml > 0 ? '#1e8449' : '#c0392b')}
-              {metricBox('Preço Mín. Viável', pmin > 0 ? fmt2(pmin) : '—', pmin > p ? '#c0392b' : '#1e8449')}
-              {metricBox('Imposto (' + fmtPct(a) + ')', fmt2(impostoRS), '#856404')}
+              {metricBox('Margem Líquida', fmtPct(ml), mb > 0 && ml > 0 ? 'var(--green)' : 'var(--red)')}
+              {metricBox('Preço Mín. Viável', pmin > 0 ? fmt2(pmin) : '—', pmin > p ? 'var(--red)' : 'var(--green)')}
+              {metricBox('Imposto (' + fmtPct(a) + ')', fmt2(impostoRS), 'var(--amber)')}
               {rateioRS > 0
-                ? metricBox('Rateio Fixo/dia (' + fmtPct(participacao) + ' do cardápio)', fmt2(rateioRS), '#856404')
+                ? metricBox('Rateio Fixo/dia (' + fmtPct(participacao) + ' do cardápio)', fmt2(rateioRS), 'var(--amber)')
                 : metricBox('Rateio Fixo/dia', '—')}
               {indiceRateio > 0 && (
                 <div style={{ gridColumn:'1 / -1' }}>
-                  {metricBox('Lucro Líquido Real', fmt2(lucroRealRS), lucroRealRS >= 0 ? '#1e8449' : '#c0392b')}
+                  {metricBox('Lucro Líquido Real', fmt2(lucroRealRS), lucroRealRS >= 0 ? 'var(--green)' : 'var(--red)')}
                 </div>
               )}
             </div>
@@ -1311,8 +1532,8 @@ function FichaCard({ fid, ficha, state, updateFicha, onEdit, onDelete, indiceRat
               </div>
             </div>
           )}
-          <div style={{ background:'#fafafa', borderTop:'1px solid #f0ede9', borderBottom:'1px solid #f0ede9' }}>
-            <div style={{ padding:'8px 12px 4px', fontSize:11, color:'#aaa', fontWeight:700, letterSpacing:.5 }}>
+          <div style={{ background:'var(--inp-bg)', borderTop:'1px solid var(--soft)', borderBottom:'1px solid var(--soft)' }}>
+            <div style={{ padding:'8px 12px 4px', fontSize:11, color:'var(--tx4)', fontWeight:700, letterSpacing:.5 }}>
               INGREDIENTES — Nome | Qtd | Unid | R$ Manual
             </div>
             {ficha.i.map((ing, ii) => (
@@ -1346,14 +1567,14 @@ function FichaFormModal({ initial, state, onSave, onClose }) {
 
   const ingsValidos = f.i.filter(r => r.n.trim());
   const valido = f.n.trim() && ingsValidos.length > 0 && (f.sub ? parsePreco(f.rendQ) > 0 : parsePreco(f.p) > 0);
-  const inpStyle = { border:'1px solid #ddd', borderRadius:6, padding:'8px 10px', fontSize:15, background:'#fafafa', width:'100%' };
-  const lbl = { fontSize:11, color:'#888', marginBottom:3, marginTop:10 };
+  const inpStyle = { border:'1px solid var(--inp-line)', borderRadius:6, padding:'8px 10px', fontSize:15, background:'var(--inp-bg)', width:'100%' };
+  const lbl = { fontSize:11, color:'var(--tx3)', marginBottom:3, marginTop:10 };
 
   return (
-    <div style={{ position:'fixed', inset:0, zIndex:999, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', padding:14 }}>
-      <div style={{ background:'#fff', borderRadius:12, padding:18, maxWidth:460, width:'100%', maxHeight:'90vh', overflowY:'auto' }}>
+    <div style={{ position:'fixed', inset:0, zIndex:999, background:'var(--overlay)', display:'flex', alignItems:'center', justifyContent:'center', padding:14 }}>
+      <div style={{ background:'var(--card)', borderRadius:12, padding:18, maxWidth:460, width:'100%', maxHeight:'90vh', overflowY:'auto' }}>
         <div style={{ fontWeight:700, fontSize:16 }}>{initial ? 'Editar Ficha' : 'Nova Ficha Técnica'}</div>
-        <label style={{ display:'flex', alignItems:'center', gap:8, marginTop:10, fontSize:13, color:'#555' }}>
+        <label style={{ display:'flex', alignItems:'center', gap:8, marginTop:10, fontSize:13, color:'var(--tx2)' }}>
           <input type="checkbox" checked={f.sub} onChange={e => set('sub', e.target.checked)} />
           É sub-receita (molho, massa, maionese — usada dentro de outras fichas)
         </label>
@@ -1401,7 +1622,7 @@ function FichaFormModal({ initial, state, onSave, onClose }) {
         )}
         <div style={{ ...lbl, marginTop:14, fontWeight:700 }}>INGREDIENTES</div>
         {f.i.map((r, ix) => (
-          <div key={ix} style={{ border:'1px solid #eee', borderRadius:8, padding:8, marginBottom:8 }}>
+          <div key={ix} style={{ border:'1px solid var(--soft)', borderRadius:8, padding:8, marginBottom:8 }}>
             <div style={{ display:'flex', gap:6 }}>
               <input style={{ ...inpStyle, flex:1 }} value={r.n} onChange={e => setIng(ix, 'n', e.target.value)} placeholder="Nome do ingrediente" />
               <button onClick={() => delIng(ix)} style={{ background:'transparent', fontSize:15 }} title="Remover">🗑️</button>
@@ -1427,9 +1648,9 @@ function FichaFormModal({ initial, state, onSave, onClose }) {
             </div>
           </div>
         ))}
-        <button onClick={addIng} style={{ width:'100%', padding:'9px 0', borderRadius:8, fontSize:13, fontWeight:600, background:'#f0ede9', color:'#333' }}>➕ Adicionar ingrediente</button>
+        <button onClick={addIng} style={{ width:'100%', padding:'9px 0', borderRadius:8, fontSize:13, fontWeight:600, background:'var(--soft)', color:'var(--tx1)' }}>➕ Adicionar ingrediente</button>
         <div style={{ display:'flex', gap:10, marginTop:16 }}>
-          <button onClick={onClose} style={{ flex:1, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:600, background:'#f0ede9', color:'#333' }}>Cancelar</button>
+          <button onClick={onClose} style={{ flex:1, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:600, background:'var(--soft)', color:'var(--tx1)' }}>Cancelar</button>
           <button
             disabled={!valido}
             onClick={() => onSave({
@@ -1442,7 +1663,7 @@ function FichaFormModal({ initial, state, onSave, onClose }) {
               custom: true,
               i: ingsValidos.map(r => ({ n: r.n.trim(), r: r.r || null, q: parsePreco(r.q) || null, u: r.u })),
             })}
-            style={{ flex:1, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:700, background: valido ? '#1e8449' : '#ccc', color:'#fff' }}
+            style={{ flex:1, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:700, background: valido ? 'var(--green)' : 'var(--tx4)', color:'var(--on-accent)' }}
           >{initial ? 'Salvar' : 'Criar Ficha'}</button>
         </div>
       </div>
@@ -1486,15 +1707,15 @@ function FichasTab({ state, updateFicha, saveCustomFicha, deleteCustomFicha }) {
 
   return (
     <div>
-      <div style={{ padding:'12px 16px', background:'#fff', borderBottom:'1px solid #f0ede9', display:'flex', gap:8 }}>
+      <div style={{ padding:'12px 16px', background:'var(--card)', borderBottom:'1px solid var(--soft)', display:'flex', gap:8 }}>
         <input
           type="search" placeholder="Buscar ficha ou produto..." value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ flex:1, padding:'9px 14px', border:'1px solid #ddd', borderRadius:8, fontSize:16, background:'#fafafa' }}
+          style={{ flex:1, padding:'9px 14px', border:'1px solid var(--inp-line)', borderRadius:8, fontSize:16, background:'var(--inp-bg)' }}
         />
         <button onClick={() => setModal('novo')} style={{
           padding:'9px 14px', borderRadius:8, fontSize:13, fontWeight:700,
-          background:'#c9973a', color:'#fff', whiteSpace:'nowrap',
+          background:'var(--gold)', color:'var(--on-accent)', whiteSpace:'nowrap',
         }}>➕ Nova</button>
       </div>
       {Object.entries(grupos).map(([g, items]) => {
@@ -1503,32 +1724,36 @@ function FichasTab({ state, updateFicha, saveCustomFicha, deleteCustomFicha }) {
           <div key={g}>
             <button onClick={() => toggleGroup(g)} style={{
               width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between',
-              padding:'12px 16px', background:'#f0ede9', border:'none', cursor:'pointer', textAlign:'left',
+              padding:'12px 16px', background:'var(--soft)', border:'none', cursor:'pointer', textAlign:'left',
             }}>
               <span style={{ fontWeight:700, fontSize:13, letterSpacing:.5 }}>
                 {catIcons[g] || '📋'} {g}
               </span>
-              <span style={{ fontSize:12, color:'#888', display:'flex', alignItems:'center', gap:8 }}>
+              <span style={{ fontSize:12, color:'var(--tx3)', display:'flex', alignItems:'center', gap:8 }}>
                 <span style={{
                   padding:'2px 8px', borderRadius:10,
-                  background: calcCount === items.length ? '#d4edda' : '#fff',
-                  color: calcCount === items.length ? '#155724' : '#666', fontWeight:600,
+                  background: calcCount === items.length ? 'var(--ok-bg)' : 'var(--card)',
+                  color: calcCount === items.length ? 'var(--ok-tx)' : 'var(--tx2)', fontWeight:600,
                 }}>{calcCount}/{items.length}</span>
                 <span style={{ fontSize:14, transition:'transform .2s', display:'inline-block', transform: isOpen(g) ? 'rotate(90deg)' : 'rotate(0)' }}>›</span>
               </span>
             </button>
-            {isOpen(g) && items.map(({ f, fid }) => (
-              <FichaCard
-                key={fid} fid={fid} ficha={f} state={state} updateFicha={updateFichaIng}
-                onEdit={() => setModal(f)} onDelete={() => setConfirmDel({ f, fid })}
-                indiceRateio={indiceRateio} somaPrecos={somaPrecos}
-              />
-            ))}
+            {isOpen(g) && (
+              <div className="cards-grid">
+                {items.map(({ f, fid }) => (
+                  <FichaCard
+                    key={fid} fid={fid} ficha={f} state={state} updateFicha={updateFichaIng}
+                    onEdit={() => setModal(f)} onDelete={() => setConfirmDel({ f, fid })}
+                    indiceRateio={indiceRateio} somaPrecos={somaPrecos}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         );
       })}
       {Object.keys(grupos).length === 0 && (
-        <div style={{ textAlign:'center', padding:40, color:'#aaa' }}>Nenhuma ficha encontrada</div>
+        <div style={{ textAlign:'center', padding:40, color:'var(--tx4)' }}>Nenhuma ficha encontrada</div>
       )}
       <div style={{ height:16 }} />
       {modal && (
@@ -1565,44 +1790,46 @@ function ResumoTab({ state }) {
     const d = parsePreco(sv.preco) > 0 ? diasDesde(sv.precoAt) : null;
     return d !== null && d > STALE_DIAS;
   });
-  const catColors = {
-    CHOPP:'#e3f2fd', HAMBURGUERES:'#e8f4fd', COMBOS:'#e3f2fd', BATATAS:'#fff8e1',
-    PANQUECAS:'#fff3e0', CARNES:'#fde8e8', SOBREMESAS:'#fce4ec', PETISCOS:'#e8f5e9',
-    EXECUTIVOS:'#f3e5f5', DRINKS:'#ede7f6', CERVEJAS_600:'#e3f2fd', LONG_NECKS:'#e1f5fe',
-    SUCOS_AGUAS:'#e0f7fa', REFRIGERANTES:'#e8f5e9', ENERGETICOS:'#fff9c4',
-    DESTILADOS:'#efebe9', GUARNICOES:'#f1f8e9', ADICIONAIS:'#fafafa', SORTIDOS:'#fce4ec',
-  };
-  const catText = {
+  // Cor-base de cada categoria; fundo e texto do badge derivam dela via
+  // color-mix, então se adaptam automaticamente ao tema claro/escuro
+  const catHue = {
     CHOPP:'#1565c0', HAMBURGUERES:'#1565c0', COMBOS:'#1565c0', BATATAS:'#f57f17',
     PANQUECAS:'#e65100', CARNES:'#b71c1c', SOBREMESAS:'#880e4f', PETISCOS:'#1b5e20',
     EXECUTIVOS:'#4a148c', DRINKS:'#4a148c', CERVEJAS_600:'#0d47a1', LONG_NECKS:'#01579b',
     SUCOS_AGUAS:'#006064', REFRIGERANTES:'#1b5e20', ENERGETICOS:'#f57f17',
     DESTILADOS:'#3e2723', GUARNICOES:'#33691e', ADICIONAIS:'#424242', SORTIDOS:'#880e4f',
   };
+  const catBadge = c => {
+    const hue = catHue[c] || '#666666';
+    return {
+      background: 'color-mix(in srgb, ' + hue + ' 14%, var(--card))',
+      color: 'color-mix(in srgb, ' + hue + ' 55%, var(--tx))',
+    };
+  };
 
   return (
-    <div style={{ padding:'12px 16px' }}>
+    <div className="tab-content" style={{ padding:'12px 16px' }}>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:16 }}>
-        <div style={{ background:'#fff', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px rgba(0,0,0,0.06)' }}>
-          <div style={{ fontSize:11, color:'#888', marginBottom:4 }}>INSUMOS PREENCHIDOS</div>
-          <div style={{ fontSize:28, fontWeight:800, color:'#c9973a' }}>{insFilledCount}<span style={{ fontSize:16, color:'#bbb' }}>/{todosInsumos.length}</span></div>
-          <div style={{ marginTop:6, height:4, background:'#f0ede9', borderRadius:2 }}>
-            <div style={{ height:'100%', background:'#c9973a', width: (insFilledCount/todosInsumos.length*100) + '%', borderRadius:2 }} />
+        <div style={{ background:'var(--card)', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px var(--shadow)' }}>
+          <div style={{ fontSize:11, color:'var(--tx3)', marginBottom:4 }}>INSUMOS PREENCHIDOS</div>
+          <div style={{ fontSize:28, fontWeight:800, color:'var(--gold)' }}>{insFilledCount}<span style={{ fontSize:16, color:'var(--tx4)' }}>/{todosInsumos.length}</span></div>
+          <div style={{ marginTop:6, height:4, background:'var(--soft)', borderRadius:2 }}>
+            <div style={{ height:'100%', background:'var(--gold)', width: (insFilledCount/todosInsumos.length*100) + '%', borderRadius:2 }} />
           </div>
         </div>
-        <div style={{ background:'#fff', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px rgba(0,0,0,0.06)' }}>
-          <div style={{ fontSize:11, color:'#888', marginBottom:4 }}>FICHAS CALCULADAS</div>
-          <div style={{ fontSize:28, fontWeight:800, color:'#1e8449' }}>{calcFichas.length}<span style={{ fontSize:16, color:'#bbb' }}>/{todasFichas.length}</span></div>
-          <div style={{ marginTop:6, height:4, background:'#f0ede9', borderRadius:2 }}>
-            <div style={{ height:'100%', background:'#1e8449', width: (todasFichas.length ? calcFichas.length/todasFichas.length*100 : 0) + '%', borderRadius:2 }} />
+        <div style={{ background:'var(--card)', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px var(--shadow)' }}>
+          <div style={{ fontSize:11, color:'var(--tx3)', marginBottom:4 }}>FICHAS CALCULADAS</div>
+          <div style={{ fontSize:28, fontWeight:800, color:'var(--green)' }}>{calcFichas.length}<span style={{ fontSize:16, color:'var(--tx4)' }}>/{todasFichas.length}</span></div>
+          <div style={{ marginTop:6, height:4, background:'var(--soft)', borderRadius:2 }}>
+            <div style={{ height:'100%', background:'var(--green)', width: (todasFichas.length ? calcFichas.length/todasFichas.length*100 : 0) + '%', borderRadius:2 }} />
           </div>
         </div>
       </div>
 
       {incompletas.length > 0 && (
-        <div style={{ background:'#fff8e1', border:'1px solid #ffe082', borderRadius:10, padding:'12px 16px', marginBottom:12 }}>
-          <div style={{ fontWeight:700, fontSize:13, color:'#856404', marginBottom:4 }}>⚠️ {incompletas.length} ficha(s) incompleta(s) — margem exibida MAIOR que a real</div>
-          <div style={{ fontSize:12, color:'#856404', lineHeight:1.5 }}>
+        <div style={{ background:'var(--warn-bg)', border:'1px solid var(--warn-line)', borderRadius:10, padding:'12px 16px', marginBottom:12 }}>
+          <div style={{ fontWeight:700, fontSize:13, color:'var(--amber)', marginBottom:4 }}>⚠️ {incompletas.length} ficha(s) incompleta(s) — margem exibida MAIOR que a real</div>
+          <div style={{ fontSize:12, color:'var(--amber)', lineHeight:1.5 }}>
             {incompletas.slice(0, 8).map(x => `${x.f.n} (${x.comCusto}/${x.nIng})`).join(' · ')}
             {incompletas.length > 8 ? ` · +${incompletas.length - 8}` : ''}
           </div>
@@ -1610,9 +1837,9 @@ function ResumoTab({ state }) {
       )}
 
       {desatualizados.length > 0 && (
-        <div style={{ background:'#fdecea', border:'1px solid #f5c6cb', borderRadius:10, padding:'12px 16px', marginBottom:12 }}>
-          <div style={{ fontWeight:700, fontSize:13, color:'#721c24', marginBottom:4 }}>⏰ {desatualizados.length} insumo(s) com preço há mais de {STALE_DIAS} dias sem atualização</div>
-          <div style={{ fontSize:12, color:'#721c24', lineHeight:1.5 }}>
+        <div style={{ background:'var(--err-bg)', border:'1px solid var(--err-line)', borderRadius:10, padding:'12px 16px', marginBottom:12 }}>
+          <div style={{ fontWeight:700, fontSize:13, color:'var(--err-tx)', marginBottom:4 }}>⏰ {desatualizados.length} insumo(s) com preço há mais de {STALE_DIAS} dias sem atualização</div>
+          <div style={{ fontSize:12, color:'var(--err-tx)', lineHeight:1.5 }}>
             {desatualizados.slice(0, 8).map(i => i.n).join(' · ')}
             {desatualizados.length > 8 ? ` · +${desatualizados.length - 8}` : ''}
           </div>
@@ -1620,11 +1847,11 @@ function ResumoTab({ state }) {
       )}
 
       <div style={{
-        background:'#fff3cd', border:'1px solid #ffc107', borderRadius:10, padding:'14px 16px', marginBottom:16,
-        borderLeft:'4px solid #c0392b',
+        background:'var(--warn-bg)', border:'1px solid var(--warn-line)', borderRadius:10, padding:'14px 16px', marginBottom:16,
+        borderLeft:'4px solid var(--red)',
       }}>
-        <div style={{ fontWeight:700, fontSize:13, color:'#721c24', marginBottom:6 }}>⚠️ Segregação Tributária — Ação Urgente</div>
-        <div style={{ fontSize:12, color:'#856404', lineHeight:1.6 }}>
+        <div style={{ fontWeight:700, fontSize:13, color:'var(--err-tx)', marginBottom:6 }}>⚠️ Segregação Tributária — Ação Urgente</div>
+        <div style={{ fontSize:12, color:'var(--amber)', lineHeight:1.6 }}>
           Bebidas industrializadas (cervejas, refrigerantes, águas, energéticos) têm PIS/COFINS <strong>monofásico: 4,44%</strong> vs 8,09% padrão.
           Contador não realiza segregação automática. <strong>Economia estimada: R$ 1.022/mês.</strong>
         </div>
@@ -1632,54 +1859,56 @@ function ResumoTab({ state }) {
 
       {calcFichas.length > 0 && (
         <div>
-          <div style={{ fontSize:12, fontWeight:700, color:'#888', letterSpacing:.5, marginBottom:8 }}>PRODUTOS CALCULADOS</div>
+          <div style={{ fontSize:12, fontWeight:700, color:'var(--tx3)', letterSpacing:.5, marginBottom:8 }}>PRODUTOS CALCULADOS</div>
+          <div className="resumo-grid">
           {calcFichas.map(({ f, fid, total, mb, ml, pmin, p, m, completo, comCusto, nIng }) => {
             const mbOk = mb >= m;
             return (
               <div key={fid} style={{
-                background:'#fff', borderRadius:8, padding:'12px 14px', marginBottom:8,
-                boxShadow:'0 1px 3px rgba(0,0,0,0.06)', borderLeft:'3px solid ' + (mbOk ? '#1e8449' : '#c0392b'),
+                background:'var(--card)', borderRadius:8, padding:'12px 14px', marginBottom:8,
+                boxShadow:'0 1px 3px var(--shadow)', borderLeft:'3px solid ' + (mbOk ? 'var(--green)' : 'var(--red)'),
               }}>
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:6 }}>
                   <div>
                     <div style={{ fontWeight:600, fontSize:14 }}>{f.n}</div>
                     <span style={{
                       display:'inline-block', fontSize:10, padding:'1px 6px', borderRadius:8, marginTop:2,
-                      background: catColors[f.c] || '#eee', color: catText[f.c] || '#666', fontWeight:600,
+                      ...catBadge(f.c), fontWeight:600,
                     }}>{f.c}</span>
                   </div>
                   <div style={{ textAlign:'right' }}>
                     <div style={{ fontSize:16, fontWeight:700 }}>{fmt2(p)}</div>
-                    <div style={{ fontSize:11, color:'#aaa' }}>venda{completo < 1 ? ` · ⚠️ ${comCusto}/${nIng}` : ''}</div>
+                    <div style={{ fontSize:11, color:'var(--tx4)' }}>venda{completo < 1 ? ` · ⚠️ ${comCusto}/${nIng}` : ''}</div>
                   </div>
                 </div>
                 <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:6 }}>
                   <div style={{ textAlign:'center' }}>
-                    <div style={{ fontSize:10, color:'#aaa' }}>Custo</div>
+                    <div style={{ fontSize:10, color:'var(--tx4)' }}>Custo</div>
                     <div style={{ fontSize:13, fontWeight:600 }}>{fmt2(total)}</div>
                   </div>
                   <div style={{ textAlign:'center' }}>
-                    <div style={{ fontSize:10, color:'#aaa' }}>Mg. Bruta</div>
-                    <div style={{ fontSize:13, fontWeight:700, color: mbOk ? '#1e8449' : '#c0392b' }}>{fmtPct(mb)}</div>
+                    <div style={{ fontSize:10, color:'var(--tx4)' }}>Mg. Bruta</div>
+                    <div style={{ fontSize:13, fontWeight:700, color: mbOk ? 'var(--green)' : 'var(--red)' }}>{fmtPct(mb)}</div>
                   </div>
                   <div style={{ textAlign:'center' }}>
-                    <div style={{ fontSize:10, color:'#aaa' }}>Mg. Líq.</div>
-                    <div style={{ fontSize:13, fontWeight:600, color: ml > 0 ? '#555' : '#c0392b' }}>{fmtPct(ml)}</div>
+                    <div style={{ fontSize:10, color:'var(--tx4)' }}>Mg. Líq.</div>
+                    <div style={{ fontSize:13, fontWeight:600, color: ml > 0 ? 'var(--tx2)' : 'var(--red)' }}>{fmtPct(ml)}</div>
                   </div>
                 </div>
                 {!mbOk && (
-                  <div style={{ marginTop:6, fontSize:11, color:'#c0392b' }}>
+                  <div style={{ marginTop:6, fontSize:11, color:'var(--red)' }}>
                     Abaixo da meta {fmtPct(m)} — Preço mínimo: {pmin > 0 ? fmt2(pmin) : '—'}
                   </div>
                 )}
               </div>
             );
           })}
+          </div>
         </div>
       )}
 
       {calcFichas.length === 0 && (
-        <div style={{ textAlign:'center', padding:'30px 20px', color:'#aaa' }}>
+        <div style={{ textAlign:'center', padding:'30px 20px', color:'var(--tx4)' }}>
           <div style={{ fontSize:40, marginBottom:8 }}>📋</div>
           <div>Preencha os insumos e as quantidades das fichas para ver o resumo aqui.</div>
         </div>
@@ -1738,10 +1967,10 @@ function GestaoTab({ state, updateGestao, onImport }) {
   const pontoEquilibrio = mcPct > 0 ? custosFixos / mcPct : 0;
   const lucroLiquidoPeriodo = comRateio.reduce((s, x) => s + x.lucroTotal, 0);
 
-  const card = { background:'#fff', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px rgba(0,0,0,0.06)', marginBottom:14 };
-  const h = { fontWeight:700, fontSize:13, letterSpacing:.5, marginBottom:10, color:'#0f0f0f' };
-  const inpStyle = { border:'1px solid #ddd', borderRadius:6, padding:'7px 10px', fontSize:16, background:'#fafafa', width:'100%', color:'#0f0f0f' };
-  const lbl = { fontSize:11, color:'#888', marginBottom:3 };
+  const card = { background:'var(--card)', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px var(--shadow)', marginBottom:14 };
+  const h = { fontWeight:700, fontSize:13, letterSpacing:.5, marginBottom:10, color:'var(--tx)' };
+  const inpStyle = { border:'1px solid var(--inp-line)', borderRadius:6, padding:'7px 10px', fontSize:16, background:'var(--inp-bg)', width:'100%', color:'var(--tx)' };
+  const lbl = { fontSize:11, color:'var(--tx3)', marginBottom:3 };
   const numInput = (field, placeholder) => (
     <input type="text" inputMode="decimal" placeholder={placeholder} value={g[field] || ''}
       onChange={e => { const v = e.target.value.replace('.', ','); if (v === '' || /^\d*,?\d{0,2}$/.test(v)) updateGestao(field, v); }}
@@ -1775,7 +2004,8 @@ function GestaoTab({ state, updateGestao, onImport }) {
   const rowsFiltradas = rows.filter(x => !searchV || x.d.n.toLowerCase().includes(searchV.toLowerCase()));
 
   return (
-    <div style={{ padding:'12px 16px' }}>
+    <div className="tab-content" style={{ padding:'12px 16px' }}>
+      <div className="gestao-grid">
       {/* Custos variáveis */}
       <div style={card}>
         <div style={h}>⚙️ CUSTOS VARIÁVEIS SOBRE A VENDA</div>
@@ -1789,7 +2019,7 @@ function GestaoTab({ state, updateGestao, onImport }) {
             {numInput('outros', 'Ex: 2')}
           </div>
         </div>
-        <div style={{ fontSize:11, color:'#888', marginTop:8 }}>
+        <div style={{ fontSize:11, color:'var(--tx3)', marginTop:8 }}>
           Entram na Margem Líquida de todas as fichas, somados ao imposto de cada produto.
         </div>
       </div>
@@ -1821,26 +2051,26 @@ function GestaoTab({ state, updateGestao, onImport }) {
         </div>
         {custosFixos > 0 && (
           <div style={{ marginTop:10, display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:6 }}>
-            <div style={{ background:'#f8f6f3', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
-              <div style={{ fontSize:10, color:'#888' }}>Fixos do mês</div>
+            <div style={{ background:'var(--box)', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
+              <div style={{ fontSize:10, color:'var(--tx3)' }}>Fixos do mês</div>
               <div style={{ fontSize:15, fontWeight:700 }}>{fmt2(custosFixos)}</div>
             </div>
-            <div style={{ background:'#f8f6f3', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
-              <div style={{ fontSize:10, color:'#888' }}>Fixos por dia (÷30)</div>
+            <div style={{ background:'var(--box)', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
+              <div style={{ fontSize:10, color:'var(--tx3)' }}>Fixos por dia (÷30)</div>
               <div style={{ fontSize:15, fontWeight:700 }}>{fmt2(custosFixosDia)}</div>
             </div>
-            <div style={{ background:'#f8f6f3', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
-              <div style={{ fontSize:10, color:'#888' }}>Soma dos preços do cardápio</div>
+            <div style={{ background:'var(--box)', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
+              <div style={{ fontSize:10, color:'var(--tx3)' }}>Soma dos preços do cardápio</div>
               <div style={{ fontSize:15, fontWeight:700 }}>{somaPrecos > 0 ? fmt2(somaPrecos) : '—'}</div>
             </div>
           </div>
         )}
         {custosFixos > 0 && indiceRateio === 0 && (
-          <div style={{ fontSize:12, color:'#c0392b', marginTop:8, padding:'8px 10px', background:'#fdecea', borderRadius:6 }}>
+          <div style={{ fontSize:12, color:'var(--red)', marginTop:8, padding:'8px 10px', background:'var(--err-bg)', borderRadius:6 }}>
             ⚠️ Nenhum produto com preço de venda cadastrado — revise os preços na aba Fichas para o rateio ser calculado.
           </div>
         )}
-        <div style={{ fontSize:11, color:'#888', marginTop:8 }}>
+        <div style={{ fontSize:11, color:'var(--tx3)', marginTop:8 }}>
           Método: rateio <strong>proporcional ao cardápio</strong>, com custo fixo diário — participação = preço do produto ÷ soma dos preços de todos os produtos;
           rateio do produto = (custos fixos ÷ 30 dias) × participação. As fatias de todos os produtos somam 100% do fixo diário.
           Não depende de faturamento nem de vendas; recalculado automaticamente a cada alteração.
@@ -1852,40 +2082,40 @@ function GestaoTab({ state, updateGestao, onImport }) {
         <div style={card}>
           <div style={h}>💵 LUCRO LÍQUIDO REAL POR PRODUTO (após rateio de fixos)</div>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:6, marginBottom:10 }}>
-            <div style={{ background:'#f8f6f3', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
-              <div style={{ fontSize:10, color:'#888' }}>Ponto de equilíbrio (faturamento)</div>
+            <div style={{ background:'var(--box)', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
+              <div style={{ fontSize:10, color:'var(--tx3)' }}>Ponto de equilíbrio (faturamento)</div>
               <div style={{ fontSize:15, fontWeight:700 }}>{pontoEquilibrio > 0 ? fmt2(pontoEquilibrio) : '—'}</div>
             </div>
-            <div style={{ background:'#f8f6f3', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
-              <div style={{ fontSize:10, color:'#888' }}>Lucro líquido do período</div>
-              <div style={{ fontSize:15, fontWeight:700, color: lucroLiquidoPeriodo >= 0 ? '#1e8449' : '#c0392b' }}>{fmt2(lucroLiquidoPeriodo)}</div>
+            <div style={{ background:'var(--box)', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
+              <div style={{ fontSize:10, color:'var(--tx3)' }}>Lucro líquido do período</div>
+              <div style={{ fontSize:15, fontWeight:700, color: lucroLiquidoPeriodo >= 0 ? 'var(--green)' : 'var(--red)' }}>{fmt2(lucroLiquidoPeriodo)}</div>
             </div>
           </div>
           {faturamentoPeriodo > 0 && pontoEquilibrio > 0 && faturamentoPeriodo < pontoEquilibrio && (
-            <div style={{ fontSize:12, color:'#c0392b', marginBottom:10 }}>
+            <div style={{ fontSize:12, color:'var(--red)', marginBottom:10 }}>
               🔴 Faturamento do período ({fmt2(faturamentoPeriodo)}) está abaixo do ponto de equilíbrio — operação com prejuízo real mesmo com margem bruta positiva.
             </div>
           )}
           {vendComFicha.length === 0 && (
-            <div style={{ fontSize:11, color:'#c9973a', marginBottom:10 }}>
+            <div style={{ fontSize:11, color:'var(--gold)', marginBottom:10 }}>
               Nenhuma venda lançada ainda — o rateio por unidade já está calculado, mas o total do período e o ponto de equilíbrio ficam mais precisos lançando as vendas abaixo.
             </div>
           )}
-          <div style={{ maxHeight:280, overflowY:'auto', border:'1px solid #f0ede9', borderRadius:8 }}>
+          <div style={{ maxHeight:280, overflowY:'auto', border:'1px solid var(--soft)', borderRadius:8 }}>
             {comRateio.sort((a, b) => a.lucroUn - b.lucroUn).map(x => (
-              <div key={x.fid} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 10px', borderBottom:'1px solid #f7f5f2' }}>
+              <div key={x.fid} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 10px', borderBottom:'1px solid var(--line-soft)' }}>
                 <div style={{ flex:1, minWidth:0 }}>
                   <div style={{ fontSize:12, fontWeight:500, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{x.d.n}</div>
-                  <div style={{ fontSize:10, color:'#aaa' }}>rateio: {fmt2(x.rateioUn)} · {x.q > 0 ? x.q + '× vendido' : 'sem venda lançada'}</div>
+                  <div style={{ fontSize:10, color:'var(--tx4)' }}>rateio: {fmt2(x.rateioUn)} · {x.q > 0 ? x.q + '× vendido' : 'sem venda lançada'}</div>
                 </div>
                 <div style={{ textAlign:'right', flexShrink:0 }}>
-                  <div style={{ fontSize:13, fontWeight:700, color: x.lucroUn >= 0 ? '#1e8449' : '#c0392b' }}>{fmt2(x.lucroUn)}/un</div>
-                  {x.q > 0 && <div style={{ fontSize:10, color:'#888' }}>{fmt2(x.lucroTotal)} total</div>}
+                  <div style={{ fontSize:13, fontWeight:700, color: x.lucroUn >= 0 ? 'var(--green)' : 'var(--red)' }}>{fmt2(x.lucroUn)}/un</div>
+                  {x.q > 0 && <div style={{ fontSize:10, color:'var(--tx3)' }}>{fmt2(x.lucroTotal)} total</div>}
                 </div>
               </div>
             ))}
           </div>
-          <div style={{ fontSize:11, color:'#888', marginTop:8 }}>
+          <div style={{ fontSize:11, color:'var(--tx3)', marginTop:8 }}>
             Lucro líquido real = Margem Líquida (já descontando ingredientes, embalagem, impostos e cartão) − Rateio de custos fixos. Produtos no vermelho vendem, mas não sustentam a estrutura do bar sozinhos.
           </div>
         </div>
@@ -1900,12 +2130,12 @@ function GestaoTab({ state, updateGestao, onImport }) {
           <input type="search" placeholder="Buscar produto para lançar venda..." value={searchV}
             onChange={e => setSearchV(e.target.value)} style={inpStyle} />
         </div>
-        <div style={{ maxHeight:300, overflowY:'auto', border:'1px solid #f0ede9', borderRadius:8 }}>
+        <div style={{ maxHeight:300, overflowY:'auto', border:'1px solid var(--soft)', borderRadius:8 }}>
           {rowsFiltradas.map(x => (
-            <div key={x.fid} style={{ display:'flex', alignItems:'center', gap:8, padding:'6px 10px', borderBottom:'1px solid #f7f5f2' }}>
+            <div key={x.fid} style={{ display:'flex', alignItems:'center', gap:8, padding:'6px 10px', borderBottom:'1px solid var(--line-soft)' }}>
               <div style={{ flex:1, minWidth:0 }}>
                 <div style={{ fontSize:12, fontWeight:500, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{x.d.n}</div>
-                <div style={{ fontSize:10, color:'#aaa' }}>{fmt2(x.calc.p)}{x.calc.calculado ? ' · custo ' + fmt2(x.calc.total) : ' · sem ficha'}</div>
+                <div style={{ fontSize:10, color:'var(--tx4)' }}>{fmt2(x.calc.p)}{x.calc.calculado ? ' · custo ' + fmt2(x.calc.total) : ' · sem ficha'}</div>
               </div>
               <input type="text" inputMode="numeric" placeholder="qtd" value={vendas[x.fid] || ''}
                 onChange={e => { const v = e.target.value; if (v === '' || /^\d{0,5}$/.test(v)) updateGestao('vendas', { ...vendas, [x.fid]: v }); }}
@@ -1915,20 +2145,20 @@ function GestaoTab({ state, updateGestao, onImport }) {
         </div>
         {vend.length > 0 && (
           <div style={{ marginTop:10, display:'grid', gridTemplateColumns:'1fr 1fr', gap:6 }}>
-            <div style={{ background:'#f8f6f3', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
-              <div style={{ fontSize:10, color:'#888' }}>Faturamento teórico</div>
+            <div style={{ background:'var(--box)', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
+              <div style={{ fontSize:10, color:'var(--tx3)' }}>Faturamento teórico</div>
               <div style={{ fontSize:15, fontWeight:700 }}>{fmt2(fat)}</div>
             </div>
-            <div style={{ background:'#f8f6f3', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
-              <div style={{ fontSize:10, color:'#888' }}>CMV teórico</div>
-              <div style={{ fontSize:15, fontWeight:700, color: cmvPct > 0.38 ? '#c0392b' : '#1e8449' }}>{fmt2(cmvT)} ({fmtPct(cmvPct)})</div>
+            <div style={{ background:'var(--box)', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
+              <div style={{ fontSize:10, color:'var(--tx3)' }}>CMV teórico</div>
+              <div style={{ fontSize:15, fontWeight:700, color: cmvPct > 0.38 ? 'var(--red)' : 'var(--green)' }}>{fmt2(cmvT)} ({fmtPct(cmvPct)})</div>
             </div>
-            <div style={{ background:'#f8f6f3', borderRadius:6, padding:'8px 10px', textAlign:'center', gridColumn:'1 / -1' }}>
-              <div style={{ fontSize:10, color:'#888' }}>Margem de contribuição (fichas calculadas)</div>
-              <div style={{ fontSize:15, fontWeight:700, color:'#1e8449' }}>{fmt2(fatComFicha - cmvT)}</div>
+            <div style={{ background:'var(--box)', borderRadius:6, padding:'8px 10px', textAlign:'center', gridColumn:'1 / -1' }}>
+              <div style={{ fontSize:10, color:'var(--tx3)' }}>Margem de contribuição (fichas calculadas)</div>
+              <div style={{ fontSize:15, fontWeight:700, color:'var(--green)' }}>{fmt2(fatComFicha - cmvT)}</div>
             </div>
             {semFicha > 0 && (
-              <div style={{ gridColumn:'1 / -1', fontSize:11, color:'#c9973a' }}>
+              <div style={{ gridColumn:'1 / -1', fontSize:11, color:'var(--gold)' }}>
                 ⚠️ {semFicha} produto(s) vendido(s) sem ficha calculada — fora do CMV teórico.
               </div>
             )}
@@ -1946,8 +2176,8 @@ function GestaoTab({ state, updateGestao, onImport }) {
             return (
               <div key={cls} style={{ marginBottom:10 }}>
                 <div style={{ fontSize:12, fontWeight:700, marginBottom:2 }}>{cls} ({items.length})</div>
-                <div style={{ fontSize:11, color:'#888', marginBottom:4 }}>{DICA_CLS[cls]}</div>
-                <div style={{ fontSize:12, color:'#333', lineHeight:1.6 }}>
+                <div style={{ fontSize:11, color:'var(--tx3)', marginBottom:4 }}>{DICA_CLS[cls]}</div>
+                <div style={{ fontSize:12, color:'var(--tx1)', lineHeight:1.6 }}>
                   {items.sort((a, b) => b.q - a.q).map(x => `${x.d.n} (${x.q}× · MgB ${fmtPct(x.calc.mb)})`).join(' · ')}
                 </div>
               </div>
@@ -1971,20 +2201,20 @@ function GestaoTab({ state, updateGestao, onImport }) {
         </div>
         {fatReal > 0 && compras > 0 && (
           <div style={{ marginTop:10, fontSize:13, lineHeight:1.7 }}>
-            <div>CMV real: <strong style={{ color: cmvRealPct > 0.38 ? '#c0392b' : '#1e8449' }}>{fmtPct(cmvRealPct)}</strong>
+            <div>CMV real: <strong style={{ color: cmvRealPct > 0.38 ? 'var(--red)' : 'var(--green)' }}>{fmtPct(cmvRealPct)}</strong>
               {cmvPct > 0 && <span> · CMV teórico: <strong>{fmtPct(cmvPct)}</strong></span>}
             </div>
             {cmvPct > 0 && cmvRealPct - cmvPct > 0.03 && (
-              <div style={{ fontSize:12, color:'#c0392b', marginTop:4 }}>
+              <div style={{ fontSize:12, color:'var(--red)', marginTop:4 }}>
                 🔴 CMV real {fmtPct(cmvRealPct - cmvPct)} acima do teórico — investigue perdas, porções fora do padrão, desvios ou compras em excesso (estoque parado).
               </div>
             )}
             {cmvPct > 0 && cmvRealPct - cmvPct <= 0.03 && cmvRealPct - cmvPct >= -0.03 && (
-              <div style={{ fontSize:12, color:'#1e8449', marginTop:4 }}>✅ CMV real alinhado ao teórico — operação sob controle.</div>
+              <div style={{ fontSize:12, color:'var(--green)', marginTop:4 }}>✅ CMV real alinhado ao teórico — operação sob controle.</div>
             )}
           </div>
         )}
-        <div style={{ fontSize:11, color:'#888', marginTop:8 }}>
+        <div style={{ fontSize:11, color:'var(--tx3)', marginTop:8 }}>
           Referência para bares: CMV saudável entre 28% e 38%. A diferença entre real e teórico revela perdas invisíveis.
         </div>
       </div>
@@ -1993,13 +2223,14 @@ function GestaoTab({ state, updateGestao, onImport }) {
       <div style={card}>
         <div style={h}>💾 BACKUP DOS DADOS</div>
         <div style={{ display:'flex', gap:8 }}>
-          <button onClick={exportBackup} style={{ flex:1, padding:'10px 0', borderRadius:8, fontSize:13, fontWeight:700, background:'#1e8449', color:'#fff' }}>⬇️ Exportar JSON</button>
-          <button onClick={() => fileRef.current && fileRef.current.click()} style={{ flex:1, padding:'10px 0', borderRadius:8, fontSize:13, fontWeight:700, background:'#c9973a', color:'#fff' }}>⬆️ Importar JSON</button>
+          <button onClick={exportBackup} style={{ flex:1, padding:'10px 0', borderRadius:8, fontSize:13, fontWeight:700, background:'var(--green)', color:'var(--on-accent)' }}>⬇️ Exportar JSON</button>
+          <button onClick={() => fileRef.current && fileRef.current.click()} style={{ flex:1, padding:'10px 0', borderRadius:8, fontSize:13, fontWeight:700, background:'var(--gold)', color:'var(--on-accent)' }}>⬆️ Importar JSON</button>
           <input ref={fileRef} type="file" accept=".json,application/json" style={{ display:'none' }} onChange={handleFile} />
         </div>
-        <div style={{ fontSize:11, color:'#888', marginTop:8 }}>
+        <div style={{ fontSize:11, color:'var(--tx3)', marginTop:8 }}>
           Exporte um backup antes de mudanças grandes. A importação substitui TODOS os dados atuais (exige ☁️ Salvar depois).
         </div>
+      </div>
       </div>
       <div style={{ height:16 }} />
       {confirmImport && (
@@ -2014,23 +2245,476 @@ function GestaoTab({ state, updateGestao, onImport }) {
   );
 }
 
+// ─── COMPONENTE: FILTRO DE MESES (compartilhado entre Vendas e Gráficos) ──────
+function FiltroMeses({ vendas, filtro, setFiltro }) {
+  const meses = mesesOrdenados(vendas);
+  if (!meses.length) return null;
+  const selStyle = {
+    border:'1px solid var(--inp-line)', borderRadius:6, padding:'7px 10px', fontSize:14,
+    background:'var(--inp-bg)', color:'var(--tx)', appearance:'none', WebkitAppearance:'none',
+  };
+  return (
+    <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
+      <span style={{ fontSize:12, color:'var(--tx3)', fontWeight:600 }}>Período:</span>
+      <select style={selStyle} value={filtro.de || ''} onChange={e => setFiltro({ ...filtro, de: e.target.value })}>
+        <option value="">Desde o início</option>
+        {meses.map(m => <option key={m} value={m}>{fmtMes(m)}</option>)}
+      </select>
+      <span style={{ fontSize:12, color:'var(--tx3)' }}>até</span>
+      <select style={selStyle} value={filtro.ate || ''} onChange={e => setFiltro({ ...filtro, ate: e.target.value })}>
+        <option value="">Mais recente</option>
+        {meses.map(m => <option key={m} value={m}>{fmtMes(m)}</option>)}
+      </select>
+      {(filtro.de || filtro.ate) && (
+        <button onClick={() => setFiltro({ de:'', ate:'' })} style={{
+          background:'var(--soft)', color:'var(--tx1)', borderRadius:6, padding:'7px 12px', fontSize:12, fontWeight:600,
+        }}>✕ Limpar</button>
+      )}
+    </div>
+  );
+}
+
+// ─── COMPONENTE: VENDAS TAB ───────────────────────────────────────────────────
+function VendasTab({ vendas, vendasStatus, state, filtro, setFiltro, onImportMes, onDeleteMes, onSetVinculo }) {
+  const fileRef = useRef(null);
+  const [erro, setErro] = useState('');
+  const [confirmSubst, setConfirmSubst] = useState(null);  // parsed aguardando confirmação
+  const [confirmDel, setConfirmDel] = useState(null);      // mes aguardando exclusão
+  const [search, setSearch] = useState('');
+  const [sort, setSort] = useState({ k:'fat', asc:false });
+  const [editCod, setEditCod] = useState(null);            // linha com select de vínculo aberto
+
+  const agg = agregarVendas(vendas, filtro.de, filtro.ate);
+  const map = vendas.map || {};
+  const temMeses = mesesOrdenados(vendas).length > 0;
+
+  // Opções de ficha para o vínculo manual (só produtos finais, não sub-receitas)
+  const fichasOpcoes = getFichaIds(state)
+    .map(fid => ({ fid, d: fichaDef(fid, state) }))
+    .filter(x => x.d && !x.d.sub)
+    .map(x => ({ fid: x.fid, n: x.d.n }))
+    .sort((a, b) => a.n.localeCompare(b.n, 'pt-BR'));
+
+  // Linhas da tabela com vínculo e CMV real
+  const linhas = agg.porProduto.map(pr => {
+    const fid = resolverVinculo(pr.cod, pr.nome, map, state);
+    const calc = fid ? calcFicha(fid, state) : null;
+    const temCusto = calc && calc.calculado;
+    const cmv = temCusto ? pr.qtd * calc.total : null;
+    return {
+      ...pr, fid,
+      fichaNome: fid ? (fichaDef(fid, state) || {}).n : null,
+      manual: map[pr.cod] !== undefined,
+      cmv, margem: cmv != null ? pr.fat - cmv : null,
+      part: agg.fatTotal > 0 ? pr.fat / agg.fatTotal : 0,
+    };
+  }).filter(l => !search || l.nome.toLowerCase().includes(search.toLowerCase()));
+
+  const dir = sort.asc ? 1 : -1;
+  linhas.sort((a, b) => {
+    if (sort.k === 'nome') return a.nome.localeCompare(b.nome, 'pt-BR') * dir;
+    return ((a[sort.k] || 0) - (b[sort.k] || 0)) * dir;
+  });
+  const setSortK = k => setSort(s => s.k === k ? { k, asc: !s.asc } : { k, asc: k === 'nome' });
+
+  const comCmv = linhas.filter(l => l.cmv != null);
+  const cmvTotal = comCmv.reduce((s, l) => s + l.cmv, 0);
+  const fatComCmv = comCmv.reduce((s, l) => s + l.fat, 0);
+  const semVinculo = linhas.filter(l => !l.fid).length;
+
+  const handleFile = e => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    setErro('');
+    const reader = new FileReader();
+    reader.onload = () => {
+      const parsed = parseRelatorioVendas(reader.result);
+      if (!parsed.ok) { setErro(parsed.erro); return; }
+      if ((vendas.meses || {})[parsed.mes]) setConfirmSubst(parsed);
+      else onImportMes(parsed);
+    };
+    reader.onerror = () => setErro('Não foi possível ler o arquivo.');
+    reader.readAsText(file, 'utf-8');
+  };
+
+  const card = { background:'var(--card)', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px var(--shadow)', marginBottom:14 };
+  const h = { fontWeight:700, fontSize:13, letterSpacing:.5, marginBottom:10, color:'var(--tx)' };
+  const kpi = (label, value, sub) => (
+    <div style={{ background:'var(--card)', borderRadius:10, padding:'12px 14px', boxShadow:'0 1px 4px var(--shadow)' }}>
+      <div style={{ fontSize:11, color:'var(--tx3)', marginBottom:4 }}>{label}</div>
+      <div style={{ fontSize:22, fontWeight:800, color:'var(--tx)' }}>{value}</div>
+      {sub && <div style={{ fontSize:11, color:'var(--tx3)', marginTop:2 }}>{sub}</div>}
+    </div>
+  );
+  const th = (label, k, right) => (
+    <th onClick={() => setSortK(k)} style={{
+      padding:'8px 10px', fontSize:11, color:'var(--tx3)', fontWeight:700, cursor:'pointer',
+      textAlign: right ? 'right' : 'left', whiteSpace:'nowrap', userSelect:'none',
+      borderBottom:'1px solid var(--soft)', position:'sticky', top:0, background:'var(--card)',
+    }}>{label}{sort.k === k ? (sort.asc ? ' ▲' : ' ▼') : ''}</th>
+  );
+  const statusBadge = {
+    synced:  { t:'Vendas sincronizadas ✓', b:'var(--ok-bg)', c:'var(--ok-tx)' },
+    saving:  { t:'Salvando vendas...', b:'var(--warn-bg)', c:'var(--amber)' },
+    error:   { t:'Erro ao salvar vendas ✗', b:'var(--err-bg)', c:'var(--err-tx)' },
+    offline: { t:'Offline — dados locais', b:'var(--err-bg)', c:'var(--err-tx)' },
+    loading: { t:'Carregando vendas...', b:'var(--box)', c:'var(--tx2)' },
+    idle:    { t:'', b:'transparent', c:'var(--tx3)' },
+  }[vendasStatus] || { t:'', b:'transparent', c:'var(--tx3)' };
+
+  return (
+    <div className="tab-content" style={{ padding:'12px 16px' }}>
+      {/* Importação */}
+      <div style={card}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:8 }}>
+          <div style={h}>📥 IMPORTAR RELATÓRIO DE VENDAS</div>
+          {statusBadge.t && (
+            <span style={{ fontSize:11, fontWeight:600, padding:'2px 10px', borderRadius:20, background:statusBadge.b, color:statusBadge.c }}>
+              {statusBadge.t}
+            </span>
+          )}
+        </div>
+        <div style={{ display:'flex', gap:8, alignItems:'center', flexWrap:'wrap' }}>
+          <button onClick={() => fileRef.current && fileRef.current.click()} style={{
+            padding:'10px 18px', borderRadius:8, fontSize:14, fontWeight:700,
+            background:'var(--gold)', color:'var(--on-accent)',
+          }}>📥 Selecionar arquivo (.xls)</button>
+          <input ref={fileRef} type="file" accept=".xls,.html,.htm" style={{ display:'none' }} onChange={handleFile} />
+          <span style={{ fontSize:12, color:'var(--tx3)' }}>
+            Relatório "Vendas por Produto" exportado pelo sistema. O mês é detectado automaticamente pelo período do título.
+          </span>
+        </div>
+        {erro && (
+          <div style={{ marginTop:10, padding:'8px 12px', background:'var(--err-bg)', border:'1px solid var(--err-line)', borderRadius:8, fontSize:12, color:'var(--err-tx)' }}>
+            ⚠️ {erro}
+          </div>
+        )}
+        {temMeses && (
+          <div style={{ marginTop:12, border:'1px solid var(--soft)', borderRadius:8, overflow:'hidden' }}>
+            {mesesOrdenados(vendas).slice().reverse().map(m => {
+              const d = vendas.meses[m];
+              const fatM = (d.rows || []).reduce((s, r) => s + r.fat, 0);
+              return (
+                <div key={m} style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 12px', borderBottom:'1px solid var(--line-soft)' }}>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <span style={{ fontSize:13, fontWeight:700, color:'var(--tx)' }}>{fmtMes(m)}</span>
+                    <span style={{ fontSize:11, color:'var(--tx3)', marginLeft:8 }}>
+                      {fmtData(d.de)} a {fmtData(d.ate)} · {(d.rows || []).length} produtos
+                    </span>
+                  </div>
+                  <span style={{ fontSize:13, fontWeight:700, color:'var(--green)' }}>{fmt2(fatM)}</span>
+                  <button onClick={() => setConfirmDel(m)} title="Excluir este mês" style={{ background:'transparent', fontSize:14 }}>🗑️</button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {!temMeses && (
+        <div style={{ textAlign:'center', padding:'40px 20px', color:'var(--tx4)' }}>
+          <div style={{ fontSize:40, marginBottom:8 }}>💰</div>
+          <div>Nenhuma venda importada ainda. Importe o relatório mensal do sistema acima.</div>
+        </div>
+      )}
+
+      {temMeses && (
+        <div>
+          {/* Filtro + KPIs */}
+          <div style={{ ...card, display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:10 }}>
+            <FiltroMeses vendas={vendas} filtro={filtro} setFiltro={setFiltro} />
+            <span style={{ fontSize:12, color:'var(--tx3)' }}>{agg.meses.length} mês(es) no período</span>
+          </div>
+          <div className="kpi-row" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:14 }}>
+            {kpi('FATURAMENTO', fmt2(agg.fatTotal))}
+            {kpi('ITENS VENDIDOS', agg.qtdTotal.toLocaleString('pt-BR'))}
+            {kpi('PRODUTOS DISTINTOS', agg.porProduto.length)}
+            {kpi('TICKET MÉDIO / ITEM', agg.qtdTotal > 0 ? fmt2(agg.fatTotal / agg.qtdTotal) : '—')}
+          </div>
+
+          {/* CMV real do período (produtos vinculados a fichas) */}
+          {comCmv.length > 0 && (
+            <div style={card}>
+              <div style={h}>🧾 CMV REAL DO PERÍODO (vendas × custo das fichas)</div>
+              <div className="kpi-row" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+                {kpi('CMV (insumos)', fmt2(cmvTotal), comCmv.length + ' produtos com ficha')}
+                {kpi('CMV %', fatComCmv > 0 ? fmtPct(cmvTotal / fatComCmv) : '—', 'sobre o faturamento vinculado')}
+                {kpi('MARGEM S/ INSUMOS', fmt2(fatComCmv - cmvTotal))}
+                {kpi('COBERTURA', agg.fatTotal > 0 ? fmtPct(fatComCmv / agg.fatTotal) : '—', 'do faturamento com ficha vinculada')}
+              </div>
+              {semVinculo > 0 && (
+                <div style={{ fontSize:11, color:'var(--gold)', marginTop:8 }}>
+                  ⚠️ {semVinculo} produto(s) sem vínculo com ficha — clique na coluna "Ficha" para vincular.
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Tabela de produtos */}
+          <div style={card}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:8, marginBottom:10 }}>
+              <div style={{ ...h, marginBottom:0 }}>📋 VENDAS POR PRODUTO</div>
+              <input type="search" placeholder="Buscar produto..." value={search} onChange={e => setSearch(e.target.value)}
+                style={{ padding:'7px 12px', border:'1px solid var(--inp-line)', borderRadius:8, fontSize:14, background:'var(--inp-bg)', color:'var(--tx)', minWidth:200 }} />
+            </div>
+            <div style={{ overflowX:'auto', maxHeight:520, overflowY:'auto', border:'1px solid var(--soft)', borderRadius:8 }}>
+              <table style={{ width:'100%', borderCollapse:'collapse', minWidth:760 }}>
+                <thead>
+                  <tr>
+                    {th('Produto', 'nome')}
+                    {th('Qtd', 'qtd', true)}
+                    {th('Faturado', 'fat', true)}
+                    {th('% Fat.', 'part', true)}
+                    {th('CMV real', 'cmv', true)}
+                    {th('Margem', 'margem', true)}
+                    <th style={{ padding:'8px 10px', fontSize:11, color:'var(--tx3)', fontWeight:700, textAlign:'left', borderBottom:'1px solid var(--soft)', position:'sticky', top:0, background:'var(--card)' }}>Ficha vinculada</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {linhas.map(l => (
+                    <tr key={l.cod} style={{ borderBottom:'1px solid var(--line-soft)' }}>
+                      <td style={{ padding:'7px 10px', fontSize:12, fontWeight:500, color:'var(--tx)' }}>{l.nome}</td>
+                      <td style={{ padding:'7px 10px', fontSize:12, textAlign:'right', color:'var(--tx1)', fontVariantNumeric:'tabular-nums' }}>{l.qtd.toLocaleString('pt-BR')}</td>
+                      <td style={{ padding:'7px 10px', fontSize:12, textAlign:'right', fontWeight:700, color:'var(--tx)', fontVariantNumeric:'tabular-nums' }}>{fmt2(l.fat)}</td>
+                      <td style={{ padding:'7px 10px', fontSize:12, textAlign:'right', color:'var(--tx3)', fontVariantNumeric:'tabular-nums' }}>{fmtPct(l.part)}</td>
+                      <td style={{ padding:'7px 10px', fontSize:12, textAlign:'right', color:'var(--tx1)', fontVariantNumeric:'tabular-nums' }}>{l.cmv != null ? fmt2(l.cmv) : '—'}</td>
+                      <td style={{ padding:'7px 10px', fontSize:12, textAlign:'right', fontWeight:600, fontVariantNumeric:'tabular-nums', color: l.margem == null ? 'var(--tx4)' : l.margem >= 0 ? 'var(--green)' : 'var(--red)' }}>{l.margem != null ? fmt2(l.margem) : '—'}</td>
+                      <td style={{ padding:'7px 10px', fontSize:12 }}>
+                        {editCod === l.cod ? (
+                          <select autoFocus value={l.fid || ''}
+                            onBlur={() => setEditCod(null)}
+                            onChange={e => { onSetVinculo(l.cod, e.target.value); setEditCod(null); }}
+                            style={{ border:'1px solid var(--inp-line)', borderRadius:6, padding:'4px 6px', fontSize:12, background:'var(--inp-bg)', color:'var(--tx)', maxWidth:220 }}>
+                            <option value="">— sem vínculo —</option>
+                            {fichasOpcoes.map(o => <option key={o.fid} value={o.fid}>{o.n}</option>)}
+                          </select>
+                        ) : (
+                          <button onClick={() => setEditCod(l.cod)} title="Clique para alterar o vínculo" style={{
+                            background:'transparent', fontSize:12, textAlign:'left', padding:0,
+                            color: l.fid ? 'var(--tx2)' : 'var(--gold)', textDecoration:'underline', textDecorationStyle:'dotted',
+                          }}>
+                            {l.fid ? (l.fichaNome + (l.manual ? '' : ' (auto)')) : '➕ vincular'}
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div style={{ fontSize:11, color:'var(--tx3)', marginTop:8 }}>
+              CMV real = quantidade vendida × custo atual da ficha vinculada. A coluna Custo do relatório do sistema é ignorada.
+              Vínculos automáticos (auto) são sugeridos pelo nome; clique para corrigir — o ajuste fica salvo para as próximas importações.
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmSubst && (
+        <ConfirmModal
+          message={'O mês ' + fmtMes(confirmSubst.mes) + ' já foi importado. Substituir pelos dados deste arquivo?'}
+          okLabel="Substituir"
+          onConfirm={() => { onImportMes(confirmSubst); setConfirmSubst(null); }}
+          onCancel={() => setConfirmSubst(null)}
+        />
+      )}
+      {confirmDel && (
+        <ConfirmModal
+          message={'Excluir as vendas de ' + fmtMes(confirmDel) + '? Esta ação não pode ser desfeita (reimporte o relatório se precisar).'}
+          okLabel="Excluir"
+          onConfirm={() => { onDeleteMes(confirmDel); setConfirmDel(null); }}
+          onCancel={() => setConfirmDel(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ─── COMPONENTE: GRÁFICOS TAB ─────────────────────────────────────────────────
+function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function fmtMoneyTick(v) {
+  if (Math.abs(v) >= 1000) return 'R$ ' + (v / 1000).toLocaleString('pt-BR', { maximumFractionDigits:1 }) + ' mil';
+  return 'R$ ' + v.toLocaleString('pt-BR', { maximumFractionDigits:0 });
+}
+function truncar(s, n) { s = String(s); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
+
+function ChartCard({ title, subtitle, build, deps, height }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!ref.current || typeof Chart === 'undefined') return;
+    const chart = new Chart(ref.current.getContext('2d'), build());
+    return () => chart.destroy();
+  }, deps);
+  return (
+    <div style={{ background:'var(--card)', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px var(--shadow)', marginBottom:14 }}>
+      <div style={{ fontWeight:700, fontSize:13, letterSpacing:.5, color:'var(--tx)' }}>{title}</div>
+      {subtitle && <div style={{ fontSize:11, color:'var(--tx3)', marginTop:2 }}>{subtitle}</div>}
+      <div style={{ height: height || 280, position:'relative', marginTop:10 }}>
+        <canvas ref={ref} />
+      </div>
+    </div>
+  );
+}
+
+function GraficosTab({ vendas, state, filtro, setFiltro, theme }) {
+  const temMeses = mesesOrdenados(vendas).length > 0;
+  const agg = agregarVendas(vendas, filtro.de, filtro.ate);
+  const map = vendas.map || {};
+  const aggKey = JSON.stringify([filtro.de, filtro.ate, (vendas.updatedAt || ''), theme]);
+
+  const card = { background:'var(--card)', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px var(--shadow)', marginBottom:14 };
+
+  if (!temMeses) {
+    return (
+      <div className="tab-content" style={{ padding:'12px 16px' }}>
+        <div style={{ textAlign:'center', padding:'50px 20px', color:'var(--tx4)' }}>
+          <div style={{ fontSize:40, marginBottom:8 }}>📉</div>
+          <div>Sem dados para os gráficos. Importe os relatórios mensais na aba 💰 Vendas.</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Base comum dos gráficos (cores lidas das variáveis do tema no momento do build)
+  const base = () => {
+    const grid = cssVar('--ch-grid'), tick = cssVar('--ch-tick');
+    return {
+      responsive: true, maintainAspectRatio: false, animation: { duration: 300 },
+      plugins: { legend: { display:false } },
+      scales: {
+        x: { grid: { color: grid }, ticks: { color: tick, font: { size: 11 } }, border: { color: grid } },
+        y: { grid: { color: grid }, ticks: { color: tick, font: { size: 11 } }, border: { color: grid } },
+      },
+    };
+  };
+
+  // 1) Evolução mensal do faturamento
+  const buildMensal = () => {
+    const o = base();
+    o.scales.y.ticks.callback = fmtMoneyTick;
+    o.plugins.tooltip = { callbacks: { label: ctx => 'Faturamento: ' + fmt2(ctx.parsed.y) } };
+    return {
+      type: 'bar',
+      data: {
+        labels: agg.meses.map(m => fmtMes(m.mes)),
+        datasets: [{ data: agg.meses.map(m => m.fat), backgroundColor: cssVar('--s1'), borderRadius: 4, maxBarThickness: 46 }],
+      },
+      options: o,
+    };
+  };
+
+  // 2) Top 10 produtos por faturamento
+  const top10 = agg.porProduto.slice(0, 10);
+  const buildTop10 = () => {
+    const o = base();
+    o.indexAxis = 'y';
+    o.scales.x.ticks.callback = fmtMoneyTick;
+    o.plugins.tooltip = { callbacks: {
+      title: items => top10[items[0].dataIndex].nome,
+      label: ctx => 'Faturado: ' + fmt2(ctx.parsed.x) + ' · ' + top10[ctx.dataIndex].qtd.toLocaleString('pt-BR') + ' un',
+    } };
+    return {
+      type: 'bar',
+      data: {
+        labels: top10.map(p => truncar(p.nome, 24)),
+        datasets: [{ data: top10.map(p => p.fat), backgroundColor: cssVar('--s1'), borderRadius: 4, maxBarThickness: 22 }],
+      },
+      options: o,
+    };
+  };
+
+  // 3) Curva ABC — participação individual (barras) × acumulada (linha), eixo único em %
+  const abcN = Math.min(agg.porProduto.length, 15);
+  const abc = agg.porProduto.slice(0, abcN);
+  let acum = 0;
+  const abcAcum = abc.map(p => { acum += p.fat; return agg.fatTotal > 0 ? acum / agg.fatTotal * 100 : 0; });
+  const buildABC = () => {
+    const o = base();
+    o.scales.y.max = 100;
+    o.scales.y.ticks.callback = v => v + '%';
+    o.scales.x.ticks.maxRotation = 60; o.scales.x.ticks.minRotation = 45;
+    o.plugins.legend = { display:true, labels: { color: cssVar('--ch-tick'), boxWidth: 12, font: { size: 11 } } };
+    o.plugins.tooltip = { callbacks: {
+      title: items => abc[items[0].dataIndex].nome,
+      label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%',
+    } };
+    return {
+      type: 'bar',
+      data: {
+        labels: abc.map(p => truncar(p.nome, 14)),
+        datasets: [
+          { label: 'Participação', data: abc.map(p => agg.fatTotal > 0 ? p.fat / agg.fatTotal * 100 : 0), backgroundColor: cssVar('--s1'), borderRadius: 4, maxBarThickness: 26, order: 2 },
+          { label: 'Acumulado', data: abcAcum, type: 'line', borderColor: cssVar('--s2'), backgroundColor: cssVar('--s2'), borderWidth: 2, pointRadius: 3, tension: 0.2, order: 1 },
+        ],
+      },
+      options: o,
+    };
+  };
+
+  // 4) Faturamento por categoria (via ficha vinculada)
+  const porCat = {};
+  agg.porProduto.forEach(pr => {
+    const fid = resolverVinculo(pr.cod, pr.nome, map, state);
+    const d = fid ? fichaDef(fid, state) : null;
+    const cat = d ? d.c : '— SEM VÍNCULO —';
+    porCat[cat] = (porCat[cat] || 0) + pr.fat;
+  });
+  const cats = Object.entries(porCat).sort((a, b) => b[1] - a[1]);
+  const buildCats = () => {
+    const o = base();
+    o.indexAxis = 'y';
+    o.scales.x.ticks.callback = fmtMoneyTick;
+    o.plugins.tooltip = { callbacks: { label: ctx => fmt2(ctx.parsed.x) + (agg.fatTotal > 0 ? ' (' + (cats[ctx.dataIndex][1] / agg.fatTotal * 100).toFixed(1) + '%)' : '') } };
+    return {
+      type: 'bar',
+      data: {
+        labels: cats.map(c => c[0]),
+        datasets: [{ data: cats.map(c => c[1]), backgroundColor: cssVar('--s1'), borderRadius: 4, maxBarThickness: 22 }],
+      },
+      options: o,
+    };
+  };
+
+  return (
+    <div className="tab-content" style={{ padding:'12px 16px' }}>
+      <div style={{ ...card, display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:10 }}>
+        <FiltroMeses vendas={vendas} filtro={filtro} setFiltro={setFiltro} />
+        <span style={{ fontSize:12, color:'var(--tx3)' }}>
+          {agg.meses.length} mês(es) · {fmt2(agg.fatTotal)} faturados
+        </span>
+      </div>
+      <div className="charts-grid">
+        <ChartCard title="📆 FATURAMENTO POR MÊS" subtitle="Total faturado em cada mês importado"
+          build={buildMensal} deps={[aggKey]} height={260} />
+        <ChartCard title="🏆 TOP 10 PRODUTOS" subtitle="Maiores faturamentos do período"
+          build={buildTop10} deps={[aggKey]} height={300} />
+        <ChartCard title="📊 CURVA ABC" subtitle="Participação no faturamento — barras individuais, linha acumulada"
+          build={buildABC} deps={[aggKey]} height={300} />
+        <ChartCard title="🍽️ FATURAMENTO POR CATEGORIA" subtitle="Categorias das fichas vinculadas às vendas"
+          build={buildCats} deps={[aggKey]} height={300} />
+      </div>
+    </div>
+  );
+}
+
 // ─── MODAL DE CONFIRMAÇÃO ─────────────────────────────────────────────────────
 function ConfirmModal({ message, onConfirm, onCancel, okLabel }) {
   return (
     <div style={{
-      position:'fixed', inset:0, zIndex:999, background:'rgba(0,0,0,0.5)',
+      position:'fixed', inset:0, zIndex:999, background:'var(--overlay)',
       display:'flex', alignItems:'center', justifyContent:'center', padding:24,
     }}>
-      <div style={{ background:'#fff', borderRadius:12, padding:24, maxWidth:320, width:'100%', boxShadow:'0 8px 32px rgba(0,0,0,0.2)' }}>
-        <div style={{ fontSize:15, color:'#0f0f0f', marginBottom:20, lineHeight:1.5 }}>{message}</div>
+      <div style={{ background:'var(--card)', borderRadius:12, padding:24, maxWidth:320, width:'100%', boxShadow:'0 8px 32px rgba(0,0,0,0.2)' }}>
+        <div style={{ fontSize:15, color:'var(--tx)', marginBottom:20, lineHeight:1.5 }}>{message}</div>
         <div style={{ display:'flex', gap:10 }}>
           <button onClick={onCancel} style={{
             flex:1, padding:'12px 0', borderRadius:8, fontSize:14, fontWeight:600,
-            background:'#f0ede9', color:'#333', border:'none', cursor:'pointer',
+            background:'var(--soft)', color:'var(--tx1)', border:'none', cursor:'pointer',
           }}>Não</button>
           <button onClick={onConfirm} style={{
             flex:1, padding:'12px 0', borderRadius:8, fontSize:14, fontWeight:700,
-            background:'#c0392b', color:'#fff', border:'none', cursor:'pointer',
+            background:'var(--red)', color:'var(--on-accent)', border:'none', cursor:'pointer',
           }}>{okLabel || 'Descartar'}</button>
         </div>
       </div>
@@ -2066,30 +2750,30 @@ function PinScreen({ onUnlock }) {
 
   return (
     <div style={{
-      minHeight:'100vh', background:'#f5f2ee', display:'flex', flexDirection:'column',
+      minHeight:'100vh', background:'var(--shell)', display:'flex', flexDirection:'column',
       alignItems:'center', justifyContent:'center', padding:24,
     }}>
       <div style={{ marginBottom:40, textAlign:'center' }}>
         <div style={{ fontSize:28, fontWeight:700, letterSpacing:-0.5 }}>
-          Village <span style={{ color:'#c9973a' }}>Gourmet</span>
+          Village <span style={{ color:'var(--gold)' }}>Gourmet</span>
         </div>
-        <div style={{ fontSize:13, color:'#888', marginTop:6 }}>Controle de Custos</div>
+        <div style={{ fontSize:13, color:'var(--tx3)', marginTop:6 }}>Controle de Custos</div>
       </div>
 
-      <div style={{ marginBottom:8, fontSize:13, color:'#888', fontWeight:500 }}>Digite o PIN</div>
+      <div style={{ marginBottom:8, fontSize:13, color:'var(--tx3)', fontWeight:500 }}>Digite o PIN</div>
 
       <div style={{ display:'flex', gap:18, marginBottom:10 }}>
         {[0,1,2,3].map(i => (
           <div key={i} style={{
             width:14, height:14, borderRadius:'50%',
-            background: digits.length > i ? (error ? '#c0392b' : '#c9973a') : '#ddd',
+            background: digits.length > i ? (error ? 'var(--red)' : 'var(--gold)') : 'var(--inp-line)',
             transition:'background .15s',
           }} />
         ))}
       </div>
 
       <div style={{ height:20, marginBottom:16, textAlign:'center' }}>
-        {error && <span style={{ fontSize:13, color:'#c0392b', fontWeight:600 }}>PIN incorreto</span>}
+        {error && <span style={{ fontSize:13, color:'var(--red)', fontWeight:600 }}>PIN incorreto</span>}
       </div>
 
       <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 76px)', gap:12 }}>
@@ -2099,9 +2783,9 @@ function PinScreen({ onUnlock }) {
           return (
             <button key={i} onClick={() => isDel ? del() : addDigit(String(k))} style={{
               height:76, borderRadius:38, fontSize: isDel ? 22 : 26, fontWeight:600,
-              background: isDel ? 'transparent' : '#fff',
-              color: isDel ? '#888' : '#0f0f0f',
-              border: isDel ? 'none' : '1px solid #e9e6e1',
+              background: isDel ? 'transparent' : 'var(--card)',
+              color: isDel ? 'var(--tx3)' : 'var(--tx)',
+              border: isDel ? 'none' : '1px solid var(--soft)',
               boxShadow: isDel ? 'none' : '0 2px 8px rgba(0,0,0,0.07)',
               cursor:'pointer', WebkitTapHighlightColor:'transparent',
             }}>{k}</button>
@@ -2124,6 +2808,74 @@ function App() {
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [conflito, setConflito] = useState(null);   // payload aguardando decisão de conflito
   const baselineRef = useRef(null);                 // updatedAt do remoto quando carregamos
+  const [theme, setTheme] = useState(() => document.documentElement.getAttribute('data-theme') || 'light');
+  const [vendasData, setVendasData] = useState(() => loadVendasLS() || emptyVendas());
+  const [vendasStatus, setVendasStatus] = useState('idle');
+  const [filtroVendas, setFiltroVendas] = useState({ de:'', ate:'' });
+
+  const toggleTheme = useCallback(() => {
+    setTheme(t => {
+      const next = t === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(LS_THEME, next); } catch {}
+      return next;
+    });
+  }, []);
+
+  // Carrega as vendas importadas do bin próprio (separado dos dados das fichas).
+  // Se o local for mais novo que o remoto (um salvamento falhou antes), reenvia o local.
+  useEffect(() => {
+    setVendasStatus('loading');
+    fetch(VENDAS_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } })
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(data => {
+        const remote = data && data.record && data.record.vendas;
+        const local = loadVendasLS();
+        if (local && local.updatedAt && (!remote || !remote.updatedAt || local.updatedAt > remote.updatedAt)) {
+          saveVendas(local);
+        } else if (remote && remote.meses) {
+          setVendasData(remote);
+          saveVendasLS(remote);
+          setVendasStatus('synced');
+        } else {
+          setVendasStatus('idle');
+        }
+      })
+      .catch(() => setVendasStatus('offline'));
+  }, []);
+
+  // Toda mutação de vendas salva imediatamente no bin (localStorage como fallback)
+  const saveVendas = useCallback(next => {
+    const payload = { ...next, updatedAt: new Date().toISOString() };
+    setVendasData(payload);
+    saveVendasLS(payload);
+    setVendasStatus('saving');
+    fetch(VENDAS_URL, {
+      method: 'PUT',
+      headers: { 'X-Master-Key': API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ vendas: payload }),
+    })
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(() => setVendasStatus('synced'))
+      .catch(() => setVendasStatus('error'));
+  }, []);
+
+  const importarMesVendas = useCallback(parsed => {
+    saveVendas({
+      ...vendasData,
+      meses: { ...(vendasData.meses || {}), [parsed.mes]: { de: parsed.de, ate: parsed.ate, importadoEm: new Date().toISOString(), rows: parsed.rows } },
+    });
+  }, [vendasData, saveVendas]);
+
+  const excluirMesVendas = useCallback(mes => {
+    const meses = { ...(vendasData.meses || {}) };
+    delete meses[mes];
+    saveVendas({ ...vendasData, meses });
+  }, [vendasData, saveVendas]);
+
+  const setVinculoVenda = useCallback((cod, fid) => {
+    saveVendas({ ...vendasData, map: { ...(vendasData.map || {}), [cod]: fid } });
+  }, [vendasData, saveVendas]);
 
   // Carregar do JSONBin na inicialização — sem sobrescrever edições locais não salvas
   useEffect(() => {
@@ -2322,7 +3074,7 @@ function App() {
 
   return (
     <div className="app-shell">
-      <Header tab={tab} setTab={setTab} syncStatus={syncStatus} progress={progress} />
+      <Header tab={tab} setTab={setTab} syncStatus={syncStatus} progress={progress} theme={theme} onToggleTheme={toggleTheme} />
       <main style={{ flex:1, paddingBottom:90 }}>
         {tab === 'insumos' && (
           <InsumosTab
@@ -2337,6 +3089,19 @@ function App() {
           />
         )}
         {tab === 'resumo' && <ResumoTab state={state} />}
+        {tab === 'vendas' && (
+          <VendasTab
+            vendas={vendasData} vendasStatus={vendasStatus} state={state}
+            filtro={filtroVendas} setFiltro={setFiltroVendas}
+            onImportMes={importarMesVendas} onDeleteMes={excluirMesVendas} onSetVinculo={setVinculoVenda}
+          />
+        )}
+        {tab === 'graficos' && (
+          <GraficosTab
+            vendas={vendasData} state={state}
+            filtro={filtroVendas} setFiltro={setFiltroVendas} theme={theme}
+          />
+        )}
         {tab === 'gestao' && <GestaoTab state={state} updateGestao={updateGestao} onImport={handleImport} />}
       </main>
       <Footer
