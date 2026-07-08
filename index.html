@@ -132,13 +132,18 @@ const INSUMOS = [
   {g:'DRINKS',id:'abacaxi',  n:'Abacaxi',                          u:'unidade', f:1,   b:'un'},
   {g:'DRINKS',id:'cocoral',  n:'Coco Ralado',                      u:'kg',      f:1000,b:'g'},
   {g:'DRINKS',id:'suco_lj',  n:'Suco de Laranja Natural',          u:'kg',      f:1000,b:'g'},
+  // ── CHOPP (BARRIL) ───────────────────────────────────
+  {g:'CHOPP_INS',id:'chopp',   n:'Chopp Brahma (barril 50L)',       u:'barril',  f:50000,b:'ml'},
+  // ── SORTIDOS ─────────────────────────────────────────
+  {g:'SORTIDOS_INS',id:'trident',n:'Trident (caixa 21 un)',         u:'caixa',   f:21,  b:'un'},
+  {g:'SORTIDOS_INS',id:'halls',  n:'Halls (caixa 21 un)',           u:'caixa',   f:21,  b:'un'},
 ];
 
 const FIC = [
   // ── CHOPP ────────────────────────────────────────────
-  {c:'CHOPP',n:'Chopp Brahma Copo 300ml',  p:10,  m:.65,a:.0809,i:[{n:'Chopp (custo por ml)',r:null,q:300, u:'ml'}]},
-  {c:'CHOPP',n:'Chopp Brahma Caneca 350ml',p:13,  m:.65,a:.0809,i:[{n:'Chopp (custo por ml)',r:null,q:350, u:'ml'}]},
-  {c:'CHOPP',n:'Torre Chopp 2,5 Litros',   p:89,  m:.65,a:.0809,i:[{n:'Chopp (custo por ml)',r:null,q:2500,u:'ml'}]},
+  {c:'CHOPP',n:'Chopp Brahma Copo 300ml',  p:10,  m:.65,a:.0444,i:[{n:'Chopp (barril)',r:'chopp',q:300, u:'ml'}]},
+  {c:'CHOPP',n:'Chopp Brahma Caneca 350ml',p:13,  m:.65,a:.0444,i:[{n:'Chopp (barril)',r:'chopp',q:350, u:'ml'}]},
+  {c:'CHOPP',n:'Torre Chopp 2,5 Litros',   p:89,  m:.65,a:.0444,i:[{n:'Chopp (barril)',r:'chopp',q:2500,u:'ml'}]},
   // ── HAMBÚRGUERES ─────────────────────────────────────
   {c:'HAMBURGUERES',n:'Village Burguer',p:39,m:.65,a:.0809,i:[
     {n:'Acem Moido 150g',r:'acem',q:150,u:'g'},{n:'Pao Brioche Gergelim',r:'pb_ger',q:1,u:'un'},
@@ -372,61 +377,224 @@ const FIC = [
   {c:'ADICIONAIS',n:'Adicional de Bacon',            p:5, m:.70,a:.0809,i:[{n:'Bacon',                       r:'bacon', q:null,u:'g'}]},
   {c:'ADICIONAIS',n:'Adicional de Batata Frita 100g',p:5, m:.70,a:.0809,i:[{n:'Batata Palito Congelada 100g',r:'batata',q:100, u:'g'}]},
   // ── SORTIDOS ─────────────────────────────────────────
-  {c:'SORTIDOS',n:'Trident',   p:4,m:.60,a:.0809,i:[{n:'Trident (unidade)', r:null,q:1,u:'un'}]},
-  {c:'SORTIDOS',n:'Bala Halls',p:4,m:.60,a:.0809,i:[{n:'Halls (unidade)',   r:null,q:1,u:'un'}]},
+  {c:'SORTIDOS',n:'Trident',   p:4,m:.60,a:.0809,i:[{n:'Trident (unidade)', r:'trident',q:1,u:'un'}]},
+  {c:'SORTIDOS',n:'Bala Halls',p:4,m:.60,a:.0809,i:[{n:'Halls (unidade)',   r:'halls',q:1,u:'un'}]},
 ];
 
 // ─── CONSTANTES ───────────────────────────────────────────────────────────────
 const LS_KEY = 'vg5';
+const LS_DIRTY = 'vg5_dirty';
 const BIN_ID = '69e92ba8856a68218960a41b';
 const API_KEY = '$2a$10$jBpvmE1mUNUbJcvHjevmkux7wMBaerquOgxEJ/xveOYNgOGn/Ig7.';
 const API_URL = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
 
-const UNID_COMPRA = ['kg','g','garrafa','lata','caixa','unidade','fardo','pacote','L','ml','duzia'];
-const UNID_ING = ['g','kg','ml','L','un','cx','dose','fatia','colher','pitada','fio'];
+const UNID_COMPRA = ['kg','g','garrafa','lata','caixa','unidade','fardo','pacote','L','ml','duzia','barril'];
+const UNID_ING = ['g','kg','ml','L','un'];
+const ALIQUOTAS = [
+  { v: 0.0809, n: 'Padrão 8,09%' },
+  { v: 0.0444, n: 'Monofásico 4,44%' },
+];
+// Conversão de unidades → unidade-base do insumo (g, ml ou un)
+const CONV = { g:{b:'g',f:1}, kg:{b:'g',f:1000}, ml:{b:'ml',f:1}, L:{b:'ml',f:1000}, un:{b:'un',f:1} };
+const STALE_DIAS = 30;
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 function loadLS() {
   try { const v = localStorage.getItem(LS_KEY); return v ? JSON.parse(v) : null; } catch { return null; }
 }
 function saveLS(d) { try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch {} }
-function emptyState() { return { insumos: {}, fichas: {} }; }
+function markDirtyLS() { try { localStorage.setItem(LS_DIRTY, '1'); } catch {} }
+function clearDirtyLS() { try { localStorage.removeItem(LS_DIRTY); } catch {} }
+function isDirtyLS() { try { return localStorage.getItem(LS_DIRTY) === '1'; } catch { return false; } }
 
-function custoBase(id, state) {
-  const ins = INSUMOS.find(i => i.id === id);
-  if (!ins) return 0;
-  const sv = (state.insumos || {})[id] || {};
-  const preco = parsePreco(sv.preco);
-  if (!preco) return 0;
-  const unid = sv.unid || ins.u;
-  const fator = unid === 'caixa' ? (parseInt(sv.qtd_caixa) || ins.f) : ins.f;
-  return fator > 0 ? preco / fator : 0;
+function emptyState() { return { v:2, insumos:{}, fichas:{}, custom:{ insumos:[], fichas:[] }, gestao:{} }; }
+
+// Migra dados v1 (fichas indexadas por número) para v2 (ids estáveis 'b<idx>')
+function migrate(s) {
+  if (!s) return emptyState();
+  const out = { v:2, insumos: s.insumos || {}, fichas: {}, custom: s.custom || { insumos:[], fichas:[] }, gestao: s.gestao || {}, updatedAt: s.updatedAt };
+  Object.entries(s.fichas || {}).forEach(([k, v]) => { out.fichas[/^\d+$/.test(k) ? 'b' + k : k] = v; });
+  if (!out.custom.insumos) out.custom.insumos = [];
+  if (!out.custom.fichas) out.custom.fichas = [];
+  return out;
 }
 
-function calcFicha(fid, state) {
-  const ficha = FIC[fid];
-  const sf = (state.fichas || {})[fid] || {};
-  let total = 0, temQtd = false;
-  ficha.i.forEach((ing, ii) => {
-    const si = sf['i' + ii] || {};
-    const rawQ = si.qtd !== undefined ? si.qtd : (ing.q !== null ? String(ing.q) : '');
-    const q = parseFloat(rawQ) || 0;
-    if (q > 0) temQtd = true;
-    if (ing.r && q > 0) total += q * custoBase(ing.r, state);
-  });
-  if (!temQtd || total === 0) return { total: 0, mb: 0, ml: 0, pmin: 0, pdes: 0, calculado: false };
-  const mb = (ficha.p - total) / ficha.p;
-  const ml = (ficha.p - total - ficha.p * ficha.a) / ficha.p;
-  const pmin = total / (1 - ficha.m - ficha.a);
-  const pdes = total / (1 - (ficha.m + 0.05) - ficha.a);
-  return { total, mb, ml, pmin, pdes, calculado: true };
-}
-
-function parsePreco(v) { return parseFloat(String(v || '').replace(',', '.')) || 0; }
+function parsePreco(v) { return parseFloat(String(v == null ? '' : v).replace(',', '.')) || 0; }
 function fmt2(v) { return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 function fmt4(v) { return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 }); }
 function fmtPct(v) { return (v * 100).toFixed(1) + '%'; }
 function fmtTime(d) { return d ? d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }) : '--:--'; }
+function hoje() { return new Date().toISOString().slice(0, 10); }
+function fmtData(d) { if (!d) return ''; const p = String(d).slice(0,10).split('-'); return p.length === 3 ? p[2]+'/'+p[1]+'/'+p[0] : String(d); }
+function diasDesde(d) { if (!d) return null; const t = new Date(String(d).slice(0,10) + 'T12:00:00').getTime(); return isNaN(t) ? null : Math.floor((Date.now() - t) / 86400000); }
+function genId(p) { return p + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+// ─── RESOLUÇÃO DE INSUMOS E FICHAS (fixos + cadastrados pelo usuário) ─────────
+function getInsumos(state) { return INSUMOS.concat((state.custom && state.custom.insumos) || []); }
+function getInsumoDef(id, state) { return getInsumos(state).find(i => i.id === id) || null; }
+function getFichaIds(state) {
+  return FIC.map((f, i) => 'b' + i).concat(((state.custom && state.custom.fichas) || []).map(f => f.id));
+}
+function fichaDef(fid, state) {
+  const s = String(fid == null ? '' : fid);
+  if (s[0] === 'b' && /^\d+$/.test(s.slice(1))) return FIC[parseInt(s.slice(1))] || null;
+  return ((state.custom && state.custom.fichas) || []).find(f => f.id === fid) || null;
+}
+
+// ─── CONVERSÃO DE UNIDADES E CUSTO-BASE ───────────────────────────────────────
+function qtyToBase(q, unid, base) {
+  const c = CONV[unid];
+  if (!c || !base) return q;
+  if (c.b === base) return q * c.f;
+  if ((c.b === 'g' && base === 'ml') || (c.b === 'ml' && base === 'g')) return q * c.f; // densidade ≈ 1
+  return q; // un ↔ massa/volume: sem conversão possível
+}
+function conteudoPadrao(ins, unid) {
+  if (unid === ins.u) return ins.f;
+  if (ins.b === 'g' && unid === 'kg') return 1000;
+  if (ins.b === 'g' && unid === 'g') return 1;
+  if (ins.b === 'ml' && unid === 'L') return 1000;
+  if (ins.b === 'ml' && unid === 'ml') return 1;
+  if (unid === 'duzia') return 12;
+  if (unid === 'unidade') return 1;
+  return ins.f;
+}
+function conteudoEfetivo(ins, sv) {
+  const unid = sv.unid || ins.u;
+  let cont = parsePreco(sv.conteudo);
+  if (!cont && unid === 'caixa') cont = parseInt(sv.qtd_caixa) || 0;
+  return cont > 0 ? cont : conteudoPadrao(ins, unid);
+}
+function rendEfetivo(sv) {
+  const r = parsePreco(sv.rend);
+  return r > 0 && r <= 100 ? r : 100;
+}
+
+// Custo por unidade-base (g/ml/un) considerando conteúdo da embalagem e rendimento (fator de correção)
+function custoBase(id, state) {
+  const ins = getInsumoDef(id, state);
+  if (!ins) return 0;
+  const sv = (state.insumos || {})[id] || {};
+  const preco = parsePreco(sv.preco);
+  if (!preco) return 0;
+  const cont = conteudoEfetivo(ins, sv);
+  if (cont <= 0) return 0;
+  return (preco / cont) / (rendEfetivo(sv) / 100);
+}
+
+// Custo de uma sub-receita por unidade-base do seu rendimento
+function custoSubReceita(fid, state, depth) {
+  const f = fichaDef(fid, state);
+  if (!f || !f.sub) return 0;
+  const rq = parsePreco(f.rendQ);
+  if (rq <= 0) return 0;
+  const r = calcFicha(fid, state, (depth || 0) + 1);
+  return r.calculado ? r.total / rq : 0;
+}
+
+// Custo de um ingrediente: custo manual > sub-receita > insumo referenciado
+function calcIng(fid, ii, state, depth) {
+  const ficha = fichaDef(fid, state);
+  if (!ficha || !ficha.i[ii]) return { q: 0, unid: '', custo: 0, manual: false };
+  const ing = ficha.i[ii];
+  const si = ((state.fichas || {})[fid] || {})['i' + ii] || {};
+  const rawQ = si.qtd !== undefined ? si.qtd : (ing.q != null ? String(ing.q) : '');
+  const q = parsePreco(rawQ);
+  const unid = si.unid || ing.u;
+  const manual = parsePreco(si.custo);
+  if (manual > 0) return { q, unid, custo: manual, manual: true };
+  if (!ing.r || q <= 0) return { q, unid, custo: 0, manual: false };
+  if (String(ing.r).slice(0, 2) === 'f:') {
+    if ((depth || 0) >= 3) return { q, unid, custo: 0, manual: false };
+    const sid = String(ing.r).slice(2);
+    const sdef = fichaDef(sid, state);
+    const cb = custoSubReceita(sid, state, depth);
+    return { q, unid, custo: qtyToBase(q, unid, sdef ? sdef.rendU : null) * cb, manual: false };
+  }
+  const ins = getInsumoDef(ing.r, state);
+  return { q, unid, custo: qtyToBase(q, unid, ins ? ins.b : null) * custoBase(ing.r, state), manual: false };
+}
+
+function calcFicha(fid, state, depth) {
+  const vazio = { total:0, custoIns:0, mb:0, ml:0, pmin:0, pdes:0, calculado:false, completo:0, nIng:0, comCusto:0, p:0, m:0, a:0, emb:0 };
+  const ficha = fichaDef(fid, state);
+  if (!ficha) return vazio;
+  const sf = (state.fichas || {})[fid] || {};
+  let custoIns = 0, comCusto = 0;
+  ficha.i.forEach((ing, ii) => {
+    const r = calcIng(fid, ii, state, depth);
+    if (r.custo > 0) comCusto++;
+    custoIns += r.custo;
+  });
+  const p = parsePreco(sf.p) || ficha.p || 0;
+  const m = parsePreco(sf.m) > 0 ? parsePreco(sf.m) / 100 : (ficha.m || 0);
+  const a = sf.a !== undefined && sf.a !== '' ? parseFloat(sf.a) : (ficha.a || 0);
+  const emb = parsePreco(sf.emb);
+  const g = state.gestao || {};
+  const varPct = a + parsePreco(g.cartao) / 100 + parsePreco(g.outros) / 100;
+  const total = custoIns + emb;
+  const nIng = ficha.i.length;
+  const completo = nIng ? comCusto / nIng : 0;
+  const calculado = comCusto > 0 && total > 0;
+  if (!calculado) return { ...vazio, p, m, a, emb, nIng };
+  if (ficha.sub || p <= 0) return { total, custoIns, mb:0, ml:0, pmin:0, pdes:0, calculado, completo, nIng, comCusto, p, m, a, emb };
+  const mb = (p - total) / p;
+  const ml = (p - total - p * varPct) / p;
+  const dmin = 1 - m - varPct, ddes = 1 - (m + 0.05) - varPct;
+  return { total, custoIns, mb, ml, pmin: dmin > 0.02 ? total / dmin : 0, pdes: ddes > 0.02 ? total / ddes : 0, calculado, completo, nIng, comCusto, p, m, a, emb };
+}
+
+// Resumo agregado das vendas lançadas no período (usado no rateio e na aba Gestão)
+function calcVendasResumo(state) {
+  const g = state.gestao || {};
+  const vendas = g.vendas || {};
+  const rows = getFichaIds(state)
+    .map(fid => ({ fid, d: fichaDef(fid, state) }))
+    .filter(x => x.d && !x.d.sub)
+    .map(x => ({ ...x, calc: calcFicha(x.fid, state), q: parsePreco(vendas[x.fid]) }));
+  const vend = rows.filter(x => x.q > 0);
+  const fat = vend.reduce((s, x) => s + x.q * x.calc.p, 0);
+  const vendComFicha = vend.filter(x => x.calc.calculado);
+  const cmvT = vendComFicha.reduce((s, x) => s + x.q * x.calc.total, 0);
+  const fatComFicha = vendComFicha.reduce((s, x) => s + x.q * x.calc.p, 0);
+  const cmvPct = fatComFicha > 0 ? cmvT / fatComFicha : 0;
+  const semFicha = vend.length - vendComFicha.length;
+  return { rows, vend, fat, vendComFicha, cmvT, fatComFicha, cmvPct, semFicha };
+}
+
+// Rateio dos custos indiretos (fixos) proporcional ao CARDÁPIO (decisão do usuário),
+// usando o custo fixo DIÁRIO (mensal ÷ 30):
+//   participação = preço_do_produto ÷ soma dos preços de todos os produtos
+//   rateio_do_produto = (custos_fixos ÷ 30) × participação  (= preço × índice)
+//   índice = (custos_fixos ÷ 30) ÷ soma dos preços do cardápio
+// Não depende de faturamento nem de vendas — as fatias somam 100% do fixo diário.
+function calcRateioFixo(state) {
+  const g = state.gestao || {};
+  const custosFixos = ['aluguel', 'energia', 'deprec', 'folha', 'outrosFixos']
+    .reduce((s, k) => s + parsePreco(g[k]), 0);
+  const custosFixosDia = custosFixos / 30;
+  const somaPrecos = getFichaIds(state)
+    .map(fid => ({ def: fichaDef(fid, state), calc: calcFicha(fid, state) }))
+    .filter(x => x.def && !x.def.sub && x.calc.p > 0)
+    .reduce((s, x) => s + x.calc.p, 0);
+  const indiceRateio = somaPrecos > 0 ? custosFixosDia / somaPrecos : 0;
+  return { custosFixos, custosFixosDia, somaPrecos, indiceRateio };
+}
+
+// Acrescenta ao histórico os insumos cujo preço mudou desde o último registro
+function withHist(s) {
+  const insumos = { ...s.insumos };
+  Object.keys(insumos).forEach(id => {
+    const sv = insumos[id] || {};
+    const p = parsePreco(sv.preco);
+    if (p > 0) {
+      const hist = sv.hist || [];
+      const last = hist[hist.length - 1];
+      if (!last || Math.abs(last.p - p) > 0.0001) insumos[id] = { ...sv, hist: [...hist, { d: hoje(), p }].slice(-20) };
+    }
+  });
+  return { ...s, insumos };
+}
 
 // ─── EXPORT EXCEL ─────────────────────────────────────────────────────────────
 function exportExcel(state) {
@@ -459,9 +627,8 @@ function exportExcel(state) {
     lcoco:'Leite de Coco (lata 400ml)', lcond:'Leite Condensado (lata 395g)', gmor:'Geleia de Morango',
     xarope:'Xarope Soda Italiana', limao:'Limão (kg)', marac:'Maracujá (kg)',
     abacaxi:'Abacaxi (unidade)', cocoral:'Coco Ralado', suco_lj:'Suco de Laranja Natural (kg)',
+    chopp:'Chopp Brahma (barril 50L)', trident:'Trident (caixa 21 un)', halls:'Halls (caixa 21 un)',
   };
-
-  const NOME_FIC = FIC.map(f => f.n);
 
   const CAT_LABEL = {
     CHOPP:'  CHOPP', HAMBURGUERES:'  HAMBÚRGUERES', COMBOS:'  COMBOS',
@@ -471,11 +638,13 @@ function exportExcel(state) {
     SUCOS_AGUAS:'  SUCOS E ÁGUAS', REFRIGERANTES:'  REFRIGERANTES',
     ENERGETICOS:'  ENERGÉTICOS', DESTILADOS:'  DESTILADOS',
     GUARNICOES:'  GUARNIÇÕES', ADICIONAIS:'  ADICIONAIS', SORTIDOS:'  SORTIDOS',
+    SUB_RECEITAS:'  SUB-RECEITAS',
   };
   const GRP_LABEL = {
     CARNES:'  CARNES', PAES:'  PÃES', LATICINIOS:'  LATICÍNIOS',
     OUTROS:'  OUTROS', CERVEJAS_600:'  CERVEJAS 600ML', LONG_NECKS:'  LONG NECKS',
     NAO_ALCOOLICOS:'  REFRIG. / ÁGUA', DRINKS:'  DESTILADOS / DRINKS',
+    CHOPP_INS:'  CHOPP (BARRIL)', SORTIDOS_INS:'  SORTIDOS',
   };
 
   function unidDesc(ins) {
@@ -502,7 +671,7 @@ function exportExcel(state) {
     ['#', 'Insumo', 'Unid. Compra', 'Preço de Compra (R$)', 'Custo Unitário Base', 'Observação'],
   ];
   let insNum = 1, curGrp = null;
-  INSUMOS.forEach(ins => {
+  getInsumos(state).forEach(ins => {
     if (ins.g !== curGrp) {
       curGrp = ins.g;
       aoa1.push([GRP_LABEL[ins.g] || ins.g]);
@@ -530,38 +699,44 @@ function exportExcel(state) {
     ['#', 'Produto / Ingrediente', 'Insumo Base', 'Peso/Qtd', 'Unidade', 'Custo Unit. Base', 'Custo Ingrediente', 'Preço Venda', 'Margem %'],
   ];
   let ficNum = 1, curCat2 = null;
-  FIC.forEach((ficha, fid) => {
+  getFichaIds(state).forEach(fid => {
+    const ficha = fichaDef(fid, state);
+    if (!ficha) return;
     if (ficha.c !== curCat2) {
       curCat2 = ficha.c;
       aoa2.push([CAT_LABEL[ficha.c] || ficha.c]);
     }
-    const sf = (state.fichas || {})[fid] || {};
-    const { total, mb, calculado } = calcFicha(fid, state);
-    const nomeProd = NOME_FIC[fid] || ficha.n;
+    const calc = calcFicha(fid, state);
     // Linha cabeçalho do produto
-    aoa2.push([String(ficNum++), '  ' + nomeProd, null, null, null, null, null, ficha.p, `Meta: ${Math.round(ficha.m * 100)}%`]);
+    aoa2.push([String(ficNum++), '  ' + ficha.n, null, null, null, null, null, calc.p || '', `Meta: ${Math.round((calc.m || 0) * 100)}%`]);
     // Linhas de ingredientes
     ficha.i.forEach((ing, ii) => {
-      const si = sf['i' + ii] || {};
-      const rawQ = si.qtd !== undefined ? si.qtd : (ing.q !== null ? String(ing.q) : '');
-      const q = parseFloat(rawQ) || null;
-      const insumoNome = ing.r ? (NOME_INS[ing.r] || ing.r) : '— sem rateio automático';
-      const cu = ing.r ? custoBase(ing.r, state) : null;
-      const cuIng = (q && cu) ? q * cu : null;
+      const rIng = calcIng(fid, ii, state);
+      let insumoNome = '— custo manual / sem rateio';
+      let cu = null;
+      if (ing.r && String(ing.r).slice(0, 2) === 'f:') {
+        const sdef = fichaDef(String(ing.r).slice(2), state);
+        insumoNome = sdef ? 'Sub-receita: ' + sdef.n : ing.r;
+        cu = custoSubReceita(String(ing.r).slice(2), state) || null;
+      } else if (ing.r) {
+        const idef = getInsumoDef(ing.r, state);
+        insumoNome = NOME_INS[ing.r] || (idef ? idef.n : ing.r);
+        cu = custoBase(ing.r, state) || null;
+      }
       aoa2.push([
         null,
         '    ↳ ' + ing.n,
         insumoNome,
-        rawQ !== '' ? (parseFloat(rawQ) || '') : '',
-        si.unid || ing.u,
+        rIng.q || '',
+        rIng.unid,
         cu || '',
-        cuIng || '',
+        rIng.custo || '',
         null,
         null,
       ]);
     });
-    // Linha custo total
-    aoa2.push([null, 'CUSTO TOTAL DO PRATO', null, null, null, null, calculado ? total : '', ficha.p, calculado ? mb : '']);
+    // Linha custo total (inclui embalagem, se informada)
+    aoa2.push([null, 'CUSTO TOTAL DO PRATO', null, null, null, null, calc.calculado ? calc.total : '', calc.p || '', calc.calculado && !ficha.sub ? calc.mb : '']);
   });
   const ws2 = XLSX.utils.aoa_to_sheet(aoa2);
   ws2['!cols'] = [{wch:4},{wch:42},{wch:40},{wch:10},{wch:8},{wch:16},{wch:18},{wch:12},{wch:10}];
@@ -571,27 +746,61 @@ function exportExcel(state) {
   const aoa3 = [
     ['VILLAGE GOURMET — RESUMO DE MARGENS POR PRODUTO'],
     ['Calculado automaticamente com base nas Fichas Técnicas. Preencha os custos na aba Insumos Base e os pesos na aba Fichas Técnicas.'],
-    ['#', 'Produto', 'Preço Venda', 'Custo Total', 'Margem R$', 'Margem %', 'Meta %', 'Situação'],
+    ['#', 'Produto', 'Preço Venda', 'Custo Total', 'Margem R$', 'Margem %', 'Meta %', 'Ficha', 'Situação'],
   ];
   let resNum = 1, curCat3 = null;
-  FIC.forEach((ficha, fid) => {
+  getFichaIds(state).forEach(fid => {
+    const ficha = fichaDef(fid, state);
+    if (!ficha || ficha.sub) return;
     if (ficha.c !== curCat3) {
       curCat3 = ficha.c;
       aoa3.push([CAT_LABEL[ficha.c] || ficha.c]);
     }
-    const { total, mb, calculado } = calcFicha(fid, state);
-    const nomeProd = NOME_FIC[fid] || ficha.n;
-    const margRs = calculado ? ficha.p - total : '';
+    const calc = calcFicha(fid, state);
+    const { total, mb, calculado, p, m } = calc;
+    const margRs = calculado ? p - total : '';
     const margPct = calculado ? mb : '';
+    const fichaCol = calc.nIng ? `${calc.comCusto}/${calc.nIng}` : '';
     const sit = !calculado ? '⬛ Preencher'
-      : mb >= ficha.m ? '✅ OK'
-      : mb >= ficha.m - 0.1 ? '⚠️ Atenção'
+      : calc.completo < 1 ? '🟡 Incompleta'
+      : mb >= m ? '✅ OK'
+      : mb >= m - 0.1 ? '⚠️ Atenção'
       : '🔴 Abaixo';
-    aoa3.push([String(resNum++), nomeProd, ficha.p, calculado ? total : '', margRs, margPct, ficha.m, sit]);
+    aoa3.push([String(resNum++), ficha.n, p, calculado ? total : '', margRs, margPct, m, fichaCol, sit]);
   });
   const ws3 = XLSX.utils.aoa_to_sheet(aoa3);
-  ws3['!cols'] = [{wch:4},{wch:42},{wch:12},{wch:12},{wch:12},{wch:10},{wch:8},{wch:14}];
+  ws3['!cols'] = [{wch:4},{wch:42},{wch:12},{wch:12},{wch:12},{wch:10},{wch:8},{wch:8},{wch:14}];
   XLSX.utils.book_append_sheet(wb, ws3, '📊 Resumo Margens');
+
+  // ── ABA 4: Vendas & CMV (se houver vendas lançadas) ─────────────────────────
+  const vendas = (state.gestao || {}).vendas || {};
+  const temVendas = Object.values(vendas).some(v => parsePreco(v) > 0);
+  if (temVendas) {
+    const aoa4 = [
+      ['VILLAGE GOURMET — VENDAS DO PERÍODO E CMV TEÓRICO'],
+      ['Período: ' + ((state.gestao || {}).periodo || '—')],
+      ['#', 'Produto', 'Qtd Vendida', 'Preço Venda', 'Faturamento', 'Custo Unit.', 'CMV Teórico', 'Margem Contribuição'],
+    ];
+    let vNum = 1, fatT = 0, cmvT = 0;
+    getFichaIds(state).forEach(fid => {
+      const ficha = fichaDef(fid, state);
+      if (!ficha || ficha.sub) return;
+      const q = parsePreco(vendas[fid]);
+      if (q <= 0) return;
+      const calc = calcFicha(fid, state);
+      const fat = q * calc.p;
+      const cmv = calc.calculado ? q * calc.total : null;
+      fatT += fat;
+      if (cmv != null) cmvT += cmv;
+      aoa4.push([String(vNum++), ficha.n, q, calc.p, fat, calc.calculado ? calc.total : '', cmv != null ? cmv : 'sem ficha', cmv != null ? fat - cmv : '']);
+    });
+    aoa4.push([]);
+    aoa4.push([null, 'TOTAIS', null, null, fatT, null, cmvT, fatT - cmvT]);
+    aoa4.push([null, 'CMV TEÓRICO %', null, null, fatT > 0 ? cmvT / fatT : '', null, null, null]);
+    const ws4 = XLSX.utils.aoa_to_sheet(aoa4);
+    ws4['!cols'] = [{wch:4},{wch:42},{wch:12},{wch:12},{wch:14},{wch:12},{wch:14},{wch:18}];
+    XLSX.utils.book_append_sheet(wb, ws4, '📈 Vendas CMV');
+  }
 
   XLSX.writeFile(wb, 'village-gourmet-custos.xlsx');
 }
@@ -600,14 +809,15 @@ function exportExcel(state) {
 function Header({ tab, setTab, syncStatus, progress }) {
   const badgeStyle = {
     display:'inline-block', padding:'2px 10px', borderRadius:20, fontSize:11, fontWeight:600,
-    background: syncStatus === 'synced' ? '#d4edda' : syncStatus === 'offline' ? '#f8d7da' : syncStatus === 'saving' ? '#fff3cd' : '#e9ecef',
-    color: syncStatus === 'synced' ? '#155724' : syncStatus === 'offline' ? '#721c24' : syncStatus === 'saving' ? '#856404' : '#495057',
+    background: syncStatus === 'synced' ? '#d4edda' : (syncStatus === 'offline' || syncStatus === 'error') ? '#f8d7da' : syncStatus === 'saving' ? '#fff3cd' : '#e9ecef',
+    color: syncStatus === 'synced' ? '#155724' : (syncStatus === 'offline' || syncStatus === 'error') ? '#721c24' : syncStatus === 'saving' ? '#856404' : '#495057',
   };
-  const badgeText = { synced:'Sincronizado ✓', offline:'Offline', saving:'Salvando...', loading:'Carregando...', idle:'...', error:'Erro' }[syncStatus] || '...';
+  const badgeText = { synced:'Sincronizado ✓', offline:'Offline', saving:'Salvando...', loading:'Carregando...', idle:'...', error:'Erro ao salvar ✗' }[syncStatus] || '...';
   const tabs = [
     { id:'insumos', label:'📦 Insumos' },
     { id:'fichas',  label:'🧾 Fichas' },
     { id:'resumo',  label:'📊 Resumo' },
+    { id:'gestao',  label:'📈 Gestão' },
   ];
   return (
     <div style={{ position:'sticky', top:0, zIndex:100, background:'#fff', boxShadow:'0 2px 8px rgba(0,0,0,0.1)' }}>
@@ -665,30 +875,45 @@ function Footer({ onSave, onCancel, onExport, dirty, lastSync, syncStatus }) {
 }
 
 // ─── COMPONENTE: INSUMO ROW ───────────────────────────────────────────────────
-function InsumoRow({ ins, sv, updateInsumo }) {
+function InsumoRow({ ins, sv, updateInsumo, onEdit, onDelete }) {
+  const [det, setDet] = useState(false);
   const preco = parsePreco(sv.preco);
   const unid = sv.unid || ins.u;
-  const isCaixa = unid === 'caixa';
-  const qtdCx = parseInt(sv.qtd_caixa) || 0;
-  const fator = isCaixa ? (qtdCx || ins.f) : ins.f;
-  const cu = preco > 0 && fator > 0 ? preco / fator : 0;
+  const cont = conteudoEfetivo(ins, sv);
+  const rend = rendEfetivo(sv);
+  const cu = preco > 0 && cont > 0 ? (preco / cont) / (rend / 100) : 0;
   const filled = preco > 0;
+  const dias = filled ? diasDesde(sv.precoAt) : null;
+  const stale = dias !== null && dias > STALE_DIAS;
+  const hist = (sv.hist || []).slice(-5).reverse();
 
   const inpStyle = {
     border:'1px solid #ddd', borderRadius:6, padding:'7px 10px', fontSize:16,
     background:'#fafafa', width:'100%', color:'#0f0f0f',
   };
   const selStyle = { ...inpStyle, appearance:'none', WebkitAppearance:'none', paddingRight:8 };
+  const lbl = { fontSize:11, color:'#888', marginBottom:3 };
 
   return (
     <div style={{
       padding:'12px 16px', borderBottom:'1px solid #f0ede9',
       background: filled ? '#f0faf4' : '#fff',
     }}>
-      <div style={{ fontWeight:600, fontSize:14, marginBottom:8, color:'#0f0f0f' }}>{ins.n}</div>
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom: isCaixa ? 8 : 0 }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
+        <div style={{ fontWeight:600, fontSize:14, color:'#0f0f0f' }}>
+          {ins.n}
+          {stale && <span title="Preço desatualizado" style={{ marginLeft:6, fontSize:11, color:'#c0392b', fontWeight:600 }}>⏰ {dias}d</span>}
+        </div>
+        {ins.custom && (
+          <span style={{ display:'flex', gap:10, flexShrink:0 }}>
+            <button onClick={onEdit} style={{ background:'transparent', fontSize:14 }} title="Editar insumo">✏️</button>
+            <button onClick={onDelete} style={{ background:'transparent', fontSize:14 }} title="Excluir insumo">🗑️</button>
+          </span>
+        )}
+      </div>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
         <div>
-          <div style={{ fontSize:11, color:'#888', marginBottom:3 }}>Preço de Compra (R$)</div>
+          <div style={lbl}>Preço de Compra (R$)</div>
           <input
             type="text" inputMode="decimal"
             placeholder="0,00"
@@ -701,36 +926,59 @@ function InsumoRow({ ins, sv, updateInsumo }) {
           />
         </div>
         <div>
-          <div style={{ fontSize:11, color:'#888', marginBottom:3 }}>Unidade de Compra</div>
+          <div style={lbl}>Unidade de Compra</div>
           <select value={unid} onChange={e => updateInsumo(ins.id, 'unid', e.target.value)} style={selStyle}>
             {UNID_COMPRA.map(u => <option key={u} value={u}>{u}</option>)}
+            {!UNID_COMPRA.includes(unid) && <option value={unid}>{unid}</option>}
           </select>
         </div>
       </div>
-      {isCaixa && (
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:6 }}>
-          <div>
-            <div style={{ fontSize:11, color:'#888', marginBottom:3 }}>Qtd por Caixa (un)</div>
-            <input
-              type="number" inputMode="numeric" min="1"
-              placeholder={String(ins.f)}
-              value={sv.qtd_caixa || ''}
-              onChange={e => updateInsumo(ins.id, 'qtd_caixa', e.target.value)}
-              style={inpStyle}
-            />
+      <div style={{ fontSize:12, color:'#888', marginTop:6, display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:4 }}>
+        <span>
+          1 {unid} = {cont} {ins.b}{rend < 100 ? ` · rend. ${rend}%` : ''}
+          {cu > 0 && <span> · custo/{ins.b}: <strong style={{ color:'#0f0f0f' }}>{ins.b === 'un' ? fmt2(cu) : fmt4(cu)}</strong></span>}
+        </span>
+        <button onClick={() => setDet(d => !d)} style={{ background:'transparent', fontSize:11, color:'#c9973a', fontWeight:600 }}>
+          ⚙️ ajustes {det ? '▾' : '▸'}
+        </button>
+      </div>
+      {det && (
+        <div style={{ marginTop:8, padding:'10px 12px', background:'#faf8f5', borderRadius:8, border:'1px solid #f0ede9' }}>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+            <div>
+              <div style={lbl}>Conteúdo ({ins.b} por {unid})</div>
+              <input
+                type="text" inputMode="decimal"
+                placeholder={String(conteudoPadrao(ins, unid))}
+                value={sv.conteudo || ''}
+                onChange={e => updateInsumo(ins.id, 'conteudo', e.target.value)}
+                style={inpStyle}
+              />
+            </div>
+            <div>
+              <div style={lbl}>Rendimento % (aparas/perdas)</div>
+              <input
+                type="text" inputMode="decimal"
+                placeholder="100"
+                value={sv.rend || ''}
+                onChange={e => updateInsumo(ins.id, 'rend', e.target.value)}
+                style={inpStyle}
+              />
+            </div>
           </div>
-          <div style={{ display:'flex', alignItems:'flex-end', paddingBottom:8 }}>
-            {preco > 0 && qtdCx > 0 && (
-              <span style={{ fontSize:12, color:'#1e8449', fontWeight:600 }}>
-                {fmt2(preco / qtdCx)}/un
-              </span>
-            )}
+          {rend < 100 && cu > 0 && (
+            <div style={{ fontSize:11, color:'#856404', marginTop:6 }}>
+              Custo corrigido pela perda de {100 - rend}%: cada {ins.b} utilizável custa {ins.b === 'un' ? fmt2(cu) : fmt4(cu)}.
+            </div>
+          )}
+          <div style={{ fontSize:11, color:'#888', marginTop:8 }}>
+            {sv.precoAt ? `Preço atualizado em ${fmtData(sv.precoAt)}` : 'Sem registro de data do preço'}
           </div>
-        </div>
-      )}
-      {cu > 0 && (
-        <div style={{ fontSize:12, color:'#888', marginTop:2 }}>
-          Custo por {ins.b}: <strong style={{ color:'#0f0f0f' }}>{fmt2(cu)}</strong>
+          {hist.length > 0 && (
+            <div style={{ fontSize:11, color:'#888', marginTop:4 }}>
+              Histórico: {hist.map(h => `${fmtData(h.d)} ${fmt2(h.p)}`).join(' · ')}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -738,10 +986,10 @@ function InsumoRow({ ins, sv, updateInsumo }) {
 }
 
 // ─── COMPONENTE: INSUMOS GROUP ────────────────────────────────────────────────
-function InsumosGroup({ grupo, insumos, stateInsumos, updateInsumo }) {
+function InsumosGroup({ grupo, insumos, stateInsumos, updateInsumo, onEditIns, onDeleteIns }) {
   const [open, setOpen] = useState(true);
   const filled = insumos.filter(ins => parsePreco((stateInsumos[ins.id] || {}).preco) > 0).length;
-  const groupIcons = { CARNES:'🥩', PAES:'🍞', LATICINIOS:'🧀', OUTROS:'🥔', CERVEJAS_600:'🍺', LONG_NECKS:'🍻', NAO_ALCOOLICOS:'🥤', DRINKS:'🍹' };
+  const groupIcons = { CARNES:'🥩', PAES:'🍞', LATICINIOS:'🧀', OUTROS:'🥔', CERVEJAS_600:'🍺', LONG_NECKS:'🍻', NAO_ALCOOLICOS:'🥤', DRINKS:'🍹', CHOPP_INS:'🍺', SORTIDOS_INS:'🍬' };
   return (
     <div style={{ marginBottom:2 }}>
       <button onClick={() => setOpen(o => !o)} style={{
@@ -765,7 +1013,10 @@ function InsumosGroup({ grupo, insumos, stateInsumos, updateInsumo }) {
       {open && (
         <div className="insumos-grid">
           {insumos.map(ins => (
-            <InsumoRow key={ins.id} ins={ins} sv={stateInsumos[ins.id] || {}} updateInsumo={updateInsumo} />
+            <InsumoRow
+              key={ins.id} ins={ins} sv={stateInsumos[ins.id] || {}} updateInsumo={updateInsumo}
+              onEdit={() => onEditIns && onEditIns(ins)} onDelete={() => onDeleteIns && onDeleteIns(ins)}
+            />
           ))}
         </div>
       )}
@@ -773,11 +1024,68 @@ function InsumosGroup({ grupo, insumos, stateInsumos, updateInsumo }) {
   );
 }
 
+// ─── MODAL: CADASTRO DE INSUMO ────────────────────────────────────────────────
+function InsumoFormModal({ initial, state, onSave, onClose }) {
+  const grupos = [...new Set(getInsumos(state).map(i => i.g))];
+  const [f, setF] = useState(initial
+    ? { g: initial.g, n: initial.n, u: initial.u, f: String(initial.f), b: initial.b }
+    : { g: 'OUTROS', n: '', u: 'kg', f: '', b: 'g' });
+  const set = (k, v) => setF(prev => ({ ...prev, [k]: v }));
+  const contPadrao = { kg:'1000', g:'1', L:'1000', ml:'1', duzia:'12', unidade:'1' }[f.u] || '';
+  const valido = f.n.trim() && (parsePreco(f.f) > 0 || parsePreco(contPadrao) > 0);
+  const inpStyle = { border:'1px solid #ddd', borderRadius:6, padding:'8px 10px', fontSize:16, background:'#fafafa', width:'100%' };
+  const lbl = { fontSize:11, color:'#888', marginBottom:3, marginTop:10 };
+  return (
+    <div style={{ position:'fixed', inset:0, zIndex:999, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}>
+      <div style={{ background:'#fff', borderRadius:12, padding:20, maxWidth:400, width:'100%', maxHeight:'85vh', overflowY:'auto' }}>
+        <div style={{ fontWeight:700, fontSize:16, marginBottom:4 }}>{initial ? 'Editar Insumo' : 'Novo Insumo'}</div>
+        <div style={lbl}>Nome</div>
+        <input style={inpStyle} value={f.n} onChange={e => set('n', e.target.value)} placeholder="Ex: Molho barbecue" />
+        <div style={lbl}>Grupo</div>
+        <select style={inpStyle} value={f.g} onChange={e => set('g', e.target.value)}>
+          {grupos.map(g => <option key={g} value={g}>{g}</option>)}
+        </select>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+          <div>
+            <div style={lbl}>Unidade de compra</div>
+            <select style={inpStyle} value={f.u} onChange={e => set('u', e.target.value)}>
+              {UNID_COMPRA.map(u => <option key={u} value={u}>{u}</option>)}
+            </select>
+          </div>
+          <div>
+            <div style={lbl}>Unidade de uso (base)</div>
+            <select style={inpStyle} value={f.b} onChange={e => set('b', e.target.value)}>
+              <option value="g">g (grama)</option>
+              <option value="ml">ml</option>
+              <option value="un">un (unidade)</option>
+            </select>
+          </div>
+        </div>
+        <div style={lbl}>Conteúdo: quantos {f.b} tem 1 {f.u}?</div>
+        <input style={inpStyle} inputMode="decimal" value={f.f} onChange={e => set('f', e.target.value)} placeholder={contPadrao || 'Ex: 700'} />
+        <div style={{ display:'flex', gap:10, marginTop:18 }}>
+          <button onClick={onClose} style={{ flex:1, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:600, background:'#f0ede9', color:'#333' }}>Cancelar</button>
+          <button
+            disabled={!valido}
+            onClick={() => onSave({
+              g: f.g, id: initial ? initial.id : genId('ci'), n: f.n.trim(), u: f.u,
+              f: parsePreco(f.f) || parsePreco(contPadrao) || 1, b: f.b, custom: true,
+            })}
+            style={{ flex:1, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:700, background: valido ? '#1e8449' : '#ccc', color:'#fff' }}
+          >{initial ? 'Salvar' : 'Cadastrar'}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── COMPONENTE: INSUMOS TAB ──────────────────────────────────────────────────
-function InsumosTab({ state, updateInsumo }) {
+function InsumosTab({ state, updateInsumo, saveCustomInsumo, deleteCustomInsumo }) {
   const [search, setSearch] = useState('');
+  const [modal, setModal] = useState(null);       // null | 'novo' | insumo em edição
+  const [confirmDel, setConfirmDel] = useState(null);
   const grupos = {};
-  INSUMOS.forEach(ins => {
+  getInsumos(state).forEach(ins => {
     if (!search || ins.n.toLowerCase().includes(search.toLowerCase())) {
       if (!grupos[ins.g]) grupos[ins.g] = [];
       grupos[ins.g].push(ins);
@@ -785,26 +1093,46 @@ function InsumosTab({ state, updateInsumo }) {
   });
   return (
     <div>
-      <div style={{ padding:'12px 16px', background:'#fff', borderBottom:'1px solid #f0ede9' }}>
+      <div style={{ padding:'12px 16px', background:'#fff', borderBottom:'1px solid #f0ede9', display:'flex', gap:8 }}>
         <input
           type="search" placeholder="Buscar insumo..." value={search}
           onChange={e => setSearch(e.target.value)}
           style={{
-            width:'100%', padding:'9px 14px', border:'1px solid #ddd', borderRadius:8,
+            flex:1, padding:'9px 14px', border:'1px solid #ddd', borderRadius:8,
             fontSize:16, background:'#fafafa',
           }}
         />
+        <button onClick={() => setModal('novo')} style={{
+          padding:'9px 14px', borderRadius:8, fontSize:13, fontWeight:700,
+          background:'#c9973a', color:'#fff', whiteSpace:'nowrap',
+        }}>➕ Novo</button>
       </div>
       {Object.entries(grupos).map(([g, insumos]) => (
         <InsumosGroup
           key={g} grupo={g} insumos={insumos}
           stateInsumos={state.insumos || {}} updateInsumo={updateInsumo}
+          onEditIns={ins => setModal(ins)} onDeleteIns={ins => setConfirmDel(ins)}
         />
       ))}
       {Object.keys(grupos).length === 0 && (
         <div style={{ textAlign:'center', padding:40, color:'#aaa' }}>Nenhum insumo encontrado</div>
       )}
       <div style={{ height:16 }} />
+      {modal && (
+        <InsumoFormModal
+          initial={modal === 'novo' ? null : modal} state={state}
+          onSave={ins => { saveCustomInsumo(ins); setModal(null); }}
+          onClose={() => setModal(null)}
+        />
+      )}
+      {confirmDel && (
+        <ConfirmModal
+          message={`Excluir o insumo "${confirmDel.n}"? Fichas que o utilizam ficarão sem custo automático.`}
+          okLabel="Excluir"
+          onConfirm={() => { deleteCustomInsumo(confirmDel.id); setConfirmDel(null); }}
+          onCancel={() => setConfirmDel(null)}
+        />
+      )}
     </div>
   );
 }
@@ -812,54 +1140,82 @@ function InsumosTab({ state, updateInsumo }) {
 // ─── COMPONENTE: INGREDIENTE ROW ──────────────────────────────────────────────
 function IngRow({ ing, ii, fid, sf, stateGlobal, updateFicha }) {
   const si = sf['i' + ii] || {};
-  const rawQ = si.qtd !== undefined ? si.qtd : (ing.q !== null ? String(ing.q) : '');
-  const q = parseFloat(rawQ) || 0;
-  const cu = ing.r ? custoBase(ing.r, stateGlobal) : 0;
-  const custoIng = q > 0 && cu > 0 ? q * cu : 0;
-  const hasRef = ing.r !== null;
+  const rawQ = si.qtd !== undefined ? si.qtd : (ing.q != null ? String(ing.q) : '');
+  const r = calcIng(fid, ii, stateGlobal);
+  const isSub = ing.r && String(ing.r).slice(0, 2) === 'f:';
+  const insDef = ing.r && !isSub ? getInsumoDef(ing.r, stateGlobal) : null;
+  const hasRef = !!ing.r;
+  const cur = si.unid || ing.u;
+  let unidOpts = UNID_ING;
+  if (insDef) unidOpts = insDef.b === 'un' ? ['un'] : ['g', 'kg', 'ml', 'L'];
   const inpStyle = {
     border:'1px solid #ddd', borderRadius:6, padding:'6px 8px',
     fontSize:16, background:'#fafafa', width:'100%', color:'#0f0f0f',
   };
   return (
-    <div style={{ padding:'8px 12px', borderBottom:'1px solid #f7f5f2', display:'grid', gridTemplateColumns:'1fr 80px 70px', gap:6, alignItems:'start' }}>
+    <div style={{ padding:'8px 12px', borderBottom:'1px solid #f7f5f2', display:'grid', gridTemplateColumns:'1fr 60px 54px 68px', gap:5, alignItems:'start' }}>
       <div>
         <div style={{ display:'flex', alignItems:'center', gap:5, marginBottom:4 }}>
           <span style={{
             width:7, height:7, borderRadius:'50%', display:'inline-block', flexShrink:0,
-            background: hasRef ? '#1e8449' : '#bbb',
+            background: r.custo > 0 ? '#1e8449' : hasRef ? '#c9973a' : '#bbb',
           }} />
           <span style={{ fontSize:13, color:'#333', fontWeight:500 }}>{ing.n}</span>
         </div>
-        {custoIng > 0 && (
-          <div style={{ fontSize:11, color:'#888', paddingLeft:12 }}>Custo: {fmt2(custoIng)}</div>
+        {r.custo > 0 && (
+          <div style={{ fontSize:11, color:'#888', paddingLeft:12 }}>
+            Custo: {fmt2(r.custo)}{r.manual ? ' (manual)' : ''}
+          </div>
+        )}
+        {r.custo === 0 && !hasRef && (
+          <div style={{ fontSize:10, color:'#c9973a', paddingLeft:12 }}>sem insumo — informe R$ →</div>
         )}
       </div>
       <input
-        type="number" inputMode="decimal" step="any" min="0"
-        placeholder={ing.q !== null ? String(ing.q) : 'qtd'}
+        type="text" inputMode="decimal"
+        placeholder={ing.q != null ? String(ing.q) : 'qtd'}
         value={rawQ}
-        onChange={e => updateFicha(fid, 'i' + ii, { ...si, qtd: e.target.value })}
+        onChange={e => {
+          const v = e.target.value;
+          if (v === '' || /^\d*[.,]?\d*$/.test(v)) updateFicha(fid, 'i' + ii, { ...si, qtd: v });
+        }}
         style={inpStyle}
       />
       <select
-        value={si.unid || ing.u}
+        value={cur}
         onChange={e => updateFicha(fid, 'i' + ii, { ...si, unid: e.target.value })}
-        style={{ ...inpStyle, appearance:'none', WebkitAppearance:'none', fontSize:13 }}
+        style={{ ...inpStyle, appearance:'none', WebkitAppearance:'none', fontSize:13, padding:'6px 4px' }}
       >
-        {UNID_ING.map(u => <option key={u} value={u}>{u}</option>)}
+        {unidOpts.map(u => <option key={u} value={u}>{u}</option>)}
+        {!unidOpts.includes(cur) && <option value={cur}>{cur}</option>}
       </select>
+      <input
+        type="text" inputMode="decimal" title="Custo manual em R$ (substitui o cálculo automático)"
+        placeholder="R$ man."
+        value={si.custo || ''}
+        onChange={e => {
+          const v = e.target.value.replace('.', ',');
+          if (v === '' || /^\d*,?\d{0,2}$/.test(v)) updateFicha(fid, 'i' + ii, { ...si, custo: v });
+        }}
+        style={{ ...inpStyle, fontSize:13, background: si.custo ? '#fff8e1' : '#fafafa' }}
+      />
     </div>
   );
 }
 
 // ─── COMPONENTE: FICHA CARD ───────────────────────────────────────────────────
-function FichaCard({ fid, ficha, state, updateFicha }) {
+function FichaCard({ fid, ficha, state, updateFicha, onEdit, onDelete, indiceRateio, somaPrecos }) {
   const [open, setOpen] = useState(false);
   const sf = (state.fichas || {})[fid] || {};
-  const { total, mb, ml, pmin, pdes, calculado } = calcFicha(fid, state);
+  const calc = calcFicha(fid, state);
+  const { total, mb, ml, pmin, pdes, calculado, completo, comCusto, nIng, p, a } = calc;
+  const incompleta = calculado && completo < 1;
+  const impostoRS = calculado && !ficha.sub ? p * a : 0;
+  const rateioRS = !ficha.sub && p > 0 ? p * (indiceRateio || 0) : 0;
+  const participacao = !ficha.sub && p > 0 && somaPrecos > 0 ? p / somaPrecos : 0;
+  const lucroRealRS = calculado && !ficha.sub ? p * ml - rateioRS : 0;
 
-  const mbColor = calculado ? (mb >= ficha.m ? '#1e8449' : mb >= ficha.m - 0.05 ? '#c9973a' : '#c0392b') : '#aaa';
+  const mbColor = calculado ? (mb >= calc.m ? '#1e8449' : mb >= calc.m - 0.05 ? '#c9973a' : '#c0392b') : '#aaa';
 
   const metricBox = (label, value, color) => (
     <div style={{ background:'#f8f6f3', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
@@ -867,6 +1223,8 @@ function FichaCard({ fid, ficha, state, updateFicha }) {
       <div style={{ fontSize:14, fontWeight:700, color: color || '#0f0f0f' }}>{value}</div>
     </div>
   );
+  const inpStyle = { border:'1px solid #ddd', borderRadius:6, padding:'6px 8px', fontSize:15, background:'#fff', width:'100%', color:'#0f0f0f' };
+  const lbl = { fontSize:10, color:'#888', marginBottom:2 };
 
   return (
     <div style={{ margin:'0 0 2px', background:'#fff', borderBottom:'1px solid #f0ede9' }}>
@@ -875,63 +1233,243 @@ function FichaCard({ fid, ficha, state, updateFicha }) {
         padding:'12px 16px', background:'transparent', border:'none', cursor:'pointer', textAlign:'left',
       }}>
         <div>
-          <div style={{ fontWeight:600, fontSize:14, color:'#0f0f0f' }}>{ficha.n}</div>
+          <div style={{ fontWeight:600, fontSize:14, color:'#0f0f0f' }}>
+            {ficha.sub ? '🧪 ' : ''}{ficha.n}
+          </div>
           <div style={{ fontSize:12, color:'#888', marginTop:2 }}>
-            Venda: {fmt2(ficha.p)}
-            {calculado && <span style={{ color: mbColor, marginLeft:8, fontWeight:600 }}>• MgB {fmtPct(mb)}</span>}
+            {ficha.sub
+              ? (calculado ? `Rende ${ficha.rendQ}${ficha.rendU} • custo/${ficha.rendU}: ${fmt4(total / (parsePreco(ficha.rendQ) || 1))}` : 'Sub-receita — preencha os custos')
+              : <span>Venda: {fmt2(p)}
+                  {calculado && <span style={{ color: mbColor, marginLeft:8, fontWeight:600 }}>• MgB {fmtPct(mb)}</span>}
+                  {rateioRS > 0 && <span style={{ color:'#856404', marginLeft:8, fontWeight:600 }}>• Fixo {fmt2(rateioRS)}</span>}
+                  {incompleta && <span style={{ color:'#c9973a', marginLeft:8, fontWeight:600 }}>⚠️ {comCusto}/{nIng}</span>}
+                </span>}
           </div>
         </div>
-        <span style={{ fontSize:16, color:'#ccc', transition:'transform .2s', display:'inline-block', transform: open ? 'rotate(90deg)' : 'rotate(0)' }}>›</span>
+        <span style={{ display:'flex', alignItems:'center', gap:10 }}>
+          {ficha.custom && (
+            <span style={{ display:'flex', gap:8 }}
+              onClick={e => e.stopPropagation()}>
+              <span onClick={onEdit} style={{ fontSize:14, cursor:'pointer' }} title="Editar ficha">✏️</span>
+              <span onClick={onDelete} style={{ fontSize:14, cursor:'pointer' }} title="Excluir ficha">🗑️</span>
+            </span>
+          )}
+          <span style={{ fontSize:16, color:'#ccc', transition:'transform .2s', display:'inline-block', transform: open ? 'rotate(90deg)' : 'rotate(0)' }}>›</span>
+        </span>
       </button>
       {open && (
         <div>
-          {calculado && (
+          {incompleta && (
+            <div style={{ margin:'0 12px 10px', padding:'8px 12px', background:'#fff8e1', border:'1px solid #ffe082', borderRadius:8, fontSize:12, color:'#856404' }}>
+              ⚠️ Ficha incompleta: {comCusto} de {nIng} ingredientes com custo. A margem real é MENOR que a exibida.
+            </div>
+          )}
+          {calculado && !ficha.sub && (
             <div style={{ padding:'0 12px 12px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:6 }}>
               {metricBox('Custo Total', fmt2(total))}
               {metricBox('Margem Bruta', fmtPct(mb), mbColor)}
               {metricBox('Margem Líquida', fmtPct(ml), mb > 0 && ml > 0 ? '#1e8449' : '#c0392b')}
-              {metricBox('Preço Mín. Viável', fmt2(pmin), pmin > ficha.p ? '#c0392b' : '#1e8449')}
+              {metricBox('Preço Mín. Viável', pmin > 0 ? fmt2(pmin) : '—', pmin > p ? '#c0392b' : '#1e8449')}
+              {metricBox('Imposto (' + fmtPct(a) + ')', fmt2(impostoRS), '#856404')}
+              {rateioRS > 0
+                ? metricBox('Rateio Fixo/dia (' + fmtPct(participacao) + ' do cardápio)', fmt2(rateioRS), '#856404')
+                : metricBox('Rateio Fixo/dia', '—')}
+              {indiceRateio > 0 && (
+                <div style={{ gridColumn:'1 / -1' }}>
+                  {metricBox('Lucro Líquido Real', fmt2(lucroRealRS), lucroRealRS >= 0 ? '#1e8449' : '#c0392b')}
+                </div>
+              )}
+            </div>
+          )}
+          {!ficha.sub && (
+            <div style={{ padding:'0 12px 10px', display:'grid', gridTemplateColumns:'1fr 1fr 1fr 1fr', gap:6 }}>
+              <div>
+                <div style={lbl}>Preço Venda R$</div>
+                <input type="text" inputMode="decimal" placeholder={String(ficha.p)} value={sf.p || ''}
+                  onChange={e => { const v = e.target.value.replace('.', ','); if (v === '' || /^\d*,?\d{0,2}$/.test(v)) updateFicha(fid, 'p', v); }}
+                  style={inpStyle} />
+              </div>
+              <div>
+                <div style={lbl}>Meta Mg %</div>
+                <input type="text" inputMode="decimal" placeholder={String(Math.round((ficha.m || 0) * 100))} value={sf.m || ''}
+                  onChange={e => { const v = e.target.value; if (v === '' || /^\d{0,2}$/.test(v)) updateFicha(fid, 'm', v); }}
+                  style={inpStyle} />
+              </div>
+              <div>
+                <div style={lbl}>Imposto</div>
+                <select value={sf.a !== undefined && sf.a !== '' ? String(sf.a) : String(ficha.a)}
+                  onChange={e => updateFicha(fid, 'a', e.target.value)}
+                  style={{ ...inpStyle, appearance:'none', WebkitAppearance:'none', fontSize:12, padding:'7px 4px' }}>
+                  {ALIQUOTAS.map(al => <option key={al.v} value={String(al.v)}>{al.n}</option>)}
+                </select>
+              </div>
+              <div>
+                <div style={lbl}>Embalagem R$</div>
+                <input type="text" inputMode="decimal" placeholder="0,00" value={sf.emb || ''}
+                  onChange={e => { const v = e.target.value.replace('.', ','); if (v === '' || /^\d*,?\d{0,2}$/.test(v)) updateFicha(fid, 'emb', v); }}
+                  style={inpStyle} />
+              </div>
             </div>
           )}
           <div style={{ background:'#fafafa', borderTop:'1px solid #f0ede9', borderBottom:'1px solid #f0ede9' }}>
             <div style={{ padding:'8px 12px 4px', fontSize:11, color:'#aaa', fontWeight:700, letterSpacing:.5 }}>
-              INGREDIENTES — Nome | Qtd | Unid
+              INGREDIENTES — Nome | Qtd | Unid | R$ Manual
             </div>
             {ficha.i.map((ing, ii) => (
               <IngRow key={ii} ing={ing} ii={ii} fid={fid} sf={sf} stateGlobal={state} updateFicha={updateFicha} />
             ))}
           </div>
-          {calculado && (
-            <div style={{ padding:'10px 16px', fontSize:12, color:'#666', display:'flex', gap:16 }}>
-              <span>Custo: <strong>{fmt2(total)}</strong></span>
-              <span>Mínimo: <strong style={{ color: pmin > ficha.p ? '#c0392b' : '#1e8449' }}>{fmt2(pmin)}</strong></span>
-              <span>Desejável: <strong>{fmt2(pdes)}</strong></span>
-            </div>
-          )}
         </div>
       )}
     </div>
   );
 }
 
-// ─── COMPONENTE: FICHAS TAB ───────────────────────────────────────────────────
-function FichasTab({ state, updateFicha }) {
-  const [search, setSearch] = useState('');
-  const [openGroups, setOpenGroups] = useState({
-    CHOPP:true, HAMBURGUERES:true, COMBOS:true, BATATAS:true, PANQUECAS:true,
-    CARNES:true, SOBREMESAS:true, PETISCOS:true, EXECUTIVOS:true, DRINKS:true,
-    CERVEJAS_600:true, LONG_NECKS:true, SUCOS_AGUAS:true, REFRIGERANTES:true,
-    ENERGETICOS:true, DESTILADOS:true, GUARNICOES:true, ADICIONAIS:true, SORTIDOS:true,
-  });
+// ─── MODAL: CADASTRO DE FICHA / SUB-RECEITA ───────────────────────────────────
+function FichaFormModal({ initial, state, onSave, onClose }) {
+  const cats = [...new Set(FIC.map(f => f.c).concat(((state.custom || {}).fichas || []).map(f => f.c)))].filter(c => c !== 'SUB_RECEITAS');
+  const [f, setF] = useState(initial
+    ? { c: initial.c, n: initial.n, p: initial.p ? String(initial.p) : '', m: String(Math.round((initial.m || 0.65) * 100)),
+        a: String(initial.a != null ? initial.a : 0.0809), sub: !!initial.sub,
+        rendQ: initial.rendQ ? String(initial.rendQ) : '', rendU: initial.rendU || 'g',
+        i: initial.i.map(x => ({ n: x.n, r: x.r || '', q: x.q != null ? String(x.q) : '', u: x.u || 'g' })) }
+    : { c: 'DRINKS', n: '', p: '', m: '65', a: '0.0809', sub: false, rendQ: '', rendU: 'g',
+        i: [{ n: '', r: '', q: '', u: 'g' }] });
+  const set = (k, v) => setF(prev => ({ ...prev, [k]: v }));
+  const setIng = (ix, k, v) => setF(prev => ({ ...prev, i: prev.i.map((r, j) => j === ix ? { ...r, [k]: v } : r) }));
+  const addIng = () => setF(prev => ({ ...prev, i: [...prev.i, { n: '', r: '', q: '', u: 'g' }] }));
+  const delIng = ix => setF(prev => ({ ...prev, i: prev.i.filter((r, j) => j !== ix) }));
 
-  const toggleGroup = g => setOpenGroups(prev => ({ ...prev, [g]: !prev[g] }));
+  const insumosPorGrupo = {};
+  getInsumos(state).forEach(ins => { (insumosPorGrupo[ins.g] = insumosPorGrupo[ins.g] || []).push(ins); });
+  const subReceitas = ((state.custom || {}).fichas || []).filter(x => x.sub && (!initial || x.id !== initial.id));
+
+  const ingsValidos = f.i.filter(r => r.n.trim());
+  const valido = f.n.trim() && ingsValidos.length > 0 && (f.sub ? parsePreco(f.rendQ) > 0 : parsePreco(f.p) > 0);
+  const inpStyle = { border:'1px solid #ddd', borderRadius:6, padding:'8px 10px', fontSize:15, background:'#fafafa', width:'100%' };
+  const lbl = { fontSize:11, color:'#888', marginBottom:3, marginTop:10 };
+
+  return (
+    <div style={{ position:'fixed', inset:0, zIndex:999, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', padding:14 }}>
+      <div style={{ background:'#fff', borderRadius:12, padding:18, maxWidth:460, width:'100%', maxHeight:'90vh', overflowY:'auto' }}>
+        <div style={{ fontWeight:700, fontSize:16 }}>{initial ? 'Editar Ficha' : 'Nova Ficha Técnica'}</div>
+        <label style={{ display:'flex', alignItems:'center', gap:8, marginTop:10, fontSize:13, color:'#555' }}>
+          <input type="checkbox" checked={f.sub} onChange={e => set('sub', e.target.checked)} />
+          É sub-receita (molho, massa, maionese — usada dentro de outras fichas)
+        </label>
+        <div style={lbl}>Nome</div>
+        <input style={inpStyle} value={f.n} onChange={e => set('n', e.target.value)} placeholder={f.sub ? 'Ex: Maionese de Bacon' : 'Ex: Burguer Novo'} />
+        {!f.sub && (
+          <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:8 }}>
+            <div>
+              <div style={lbl}>Categoria</div>
+              <select style={inpStyle} value={f.c} onChange={e => set('c', e.target.value)}>
+                {cats.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <div style={lbl}>Preço R$</div>
+              <input style={inpStyle} inputMode="decimal" value={f.p} onChange={e => set('p', e.target.value)} placeholder="0,00" />
+            </div>
+            <div>
+              <div style={lbl}>Meta %</div>
+              <input style={inpStyle} inputMode="decimal" value={f.m} onChange={e => set('m', e.target.value)} placeholder="65" />
+            </div>
+          </div>
+        )}
+        {!f.sub && (
+          <div>
+            <div style={lbl}>Imposto</div>
+            <select style={inpStyle} value={f.a} onChange={e => set('a', e.target.value)}>
+              {ALIQUOTAS.map(al => <option key={al.v} value={String(al.v)}>{al.n}</option>)}
+            </select>
+          </div>
+        )}
+        {f.sub && (
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+            <div>
+              <div style={lbl}>Rendimento (quanto rende)</div>
+              <input style={inpStyle} inputMode="decimal" value={f.rendQ} onChange={e => set('rendQ', e.target.value)} placeholder="Ex: 1000" />
+            </div>
+            <div>
+              <div style={lbl}>Unidade do rendimento</div>
+              <select style={inpStyle} value={f.rendU} onChange={e => set('rendU', e.target.value)}>
+                <option value="g">g</option><option value="ml">ml</option><option value="un">un</option>
+              </select>
+            </div>
+          </div>
+        )}
+        <div style={{ ...lbl, marginTop:14, fontWeight:700 }}>INGREDIENTES</div>
+        {f.i.map((r, ix) => (
+          <div key={ix} style={{ border:'1px solid #eee', borderRadius:8, padding:8, marginBottom:8 }}>
+            <div style={{ display:'flex', gap:6 }}>
+              <input style={{ ...inpStyle, flex:1 }} value={r.n} onChange={e => setIng(ix, 'n', e.target.value)} placeholder="Nome do ingrediente" />
+              <button onClick={() => delIng(ix)} style={{ background:'transparent', fontSize:15 }} title="Remover">🗑️</button>
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:6, marginTop:6 }}>
+              <select style={{ ...inpStyle, fontSize:12 }} value={r.r} onChange={e => setIng(ix, 'r', e.target.value)}>
+                <option value="">— custo manual —</option>
+                {subReceitas.length > 0 && (
+                  <optgroup label="SUB-RECEITAS">
+                    {subReceitas.map(s => <option key={s.id} value={'f:' + s.id}>🧪 {s.n}</option>)}
+                  </optgroup>
+                )}
+                {Object.entries(insumosPorGrupo).map(([g, list]) => (
+                  <optgroup key={g} label={g}>
+                    {list.map(ins => <option key={ins.id} value={ins.id}>{ins.n}</option>)}
+                  </optgroup>
+                ))}
+              </select>
+              <input style={inpStyle} inputMode="decimal" value={r.q} onChange={e => setIng(ix, 'q', e.target.value)} placeholder="qtd" />
+              <select style={inpStyle} value={r.u} onChange={e => setIng(ix, 'u', e.target.value)}>
+                {UNID_ING.map(u => <option key={u} value={u}>{u}</option>)}
+              </select>
+            </div>
+          </div>
+        ))}
+        <button onClick={addIng} style={{ width:'100%', padding:'9px 0', borderRadius:8, fontSize:13, fontWeight:600, background:'#f0ede9', color:'#333' }}>➕ Adicionar ingrediente</button>
+        <div style={{ display:'flex', gap:10, marginTop:16 }}>
+          <button onClick={onClose} style={{ flex:1, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:600, background:'#f0ede9', color:'#333' }}>Cancelar</button>
+          <button
+            disabled={!valido}
+            onClick={() => onSave({
+              id: initial ? initial.id : genId('cf'),
+              c: f.sub ? 'SUB_RECEITAS' : f.c, n: f.n.trim(),
+              p: f.sub ? 0 : parsePreco(f.p),
+              m: (parsePreco(f.m) || 65) / 100,
+              a: parseFloat(f.a) || 0.0809,
+              sub: f.sub, rendQ: f.sub ? parsePreco(f.rendQ) : undefined, rendU: f.sub ? f.rendU : undefined,
+              custom: true,
+              i: ingsValidos.map(r => ({ n: r.n.trim(), r: r.r || null, q: parsePreco(r.q) || null, u: r.u })),
+            })}
+            style={{ flex:1, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:700, background: valido ? '#1e8449' : '#ccc', color:'#fff' }}
+          >{initial ? 'Salvar' : 'Criar Ficha'}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── COMPONENTE: FICHAS TAB ───────────────────────────────────────────────────
+function FichasTab({ state, updateFicha, saveCustomFicha, deleteCustomFicha }) {
+  const [search, setSearch] = useState('');
+  const [openGroups, setOpenGroups] = useState({});
+  const [modal, setModal] = useState(null);       // null | 'novo' | ficha custom em edição
+  const [confirmDel, setConfirmDel] = useState(null);
+
+  const isOpen = g => openGroups[g] !== false;
+  const toggleGroup = g => setOpenGroups(prev => ({ ...prev, [g]: !isOpen(g) }));
 
   const updateFichaIng = useCallback((fid, key, val) => {
     updateFicha(fid, key, val);
   }, [updateFicha]);
 
+  const { indiceRateio, somaPrecos } = calcRateioFixo(state);
+
   const grupos = {};
-  FIC.forEach((f, fid) => {
+  getFichaIds(state).forEach(fid => {
+    const f = fichaDef(fid, state);
+    if (!f) return;
     if (!search || f.n.toLowerCase().includes(search.toLowerCase())) {
       if (!grupos[f.c]) grupos[f.c] = [];
       grupos[f.c].push({ f, fid });
@@ -943,17 +1481,21 @@ function FichasTab({ state, updateFicha }) {
     CARNES:'🥩', SOBREMESAS:'🍮', PETISCOS:'🍗', EXECUTIVOS:'🍽️',
     DRINKS:'🍹', CERVEJAS_600:'🍺', LONG_NECKS:'🍻',
     SUCOS_AGUAS:'💧', REFRIGERANTES:'🥤', ENERGETICOS:'⚡',
-    DESTILADOS:'🥃', GUARNICOES:'🌿', ADICIONAIS:'➕', SORTIDOS:'🍬',
+    DESTILADOS:'🥃', GUARNICOES:'🌿', ADICIONAIS:'➕', SORTIDOS:'🍬', SUB_RECEITAS:'🧪',
   };
 
   return (
     <div>
-      <div style={{ padding:'12px 16px', background:'#fff', borderBottom:'1px solid #f0ede9' }}>
+      <div style={{ padding:'12px 16px', background:'#fff', borderBottom:'1px solid #f0ede9', display:'flex', gap:8 }}>
         <input
           type="search" placeholder="Buscar ficha ou produto..." value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ width:'100%', padding:'9px 14px', border:'1px solid #ddd', borderRadius:8, fontSize:16, background:'#fafafa' }}
+          style={{ flex:1, padding:'9px 14px', border:'1px solid #ddd', borderRadius:8, fontSize:16, background:'#fafafa' }}
         />
+        <button onClick={() => setModal('novo')} style={{
+          padding:'9px 14px', borderRadius:8, fontSize:13, fontWeight:700,
+          background:'#c9973a', color:'#fff', whiteSpace:'nowrap',
+        }}>➕ Nova</button>
       </div>
       {Object.entries(grupos).map(([g, items]) => {
         const calcCount = items.filter(({ fid }) => calcFicha(fid, state).calculado).length;
@@ -972,11 +1514,15 @@ function FichasTab({ state, updateFicha }) {
                   background: calcCount === items.length ? '#d4edda' : '#fff',
                   color: calcCount === items.length ? '#155724' : '#666', fontWeight:600,
                 }}>{calcCount}/{items.length}</span>
-                <span style={{ fontSize:14, transition:'transform .2s', display:'inline-block', transform: openGroups[g] ? 'rotate(90deg)' : 'rotate(0)' }}>›</span>
+                <span style={{ fontSize:14, transition:'transform .2s', display:'inline-block', transform: isOpen(g) ? 'rotate(90deg)' : 'rotate(0)' }}>›</span>
               </span>
             </button>
-            {openGroups[g] && items.map(({ f, fid }) => (
-              <FichaCard key={fid} fid={fid} ficha={f} state={state} updateFicha={updateFichaIng} />
+            {isOpen(g) && items.map(({ f, fid }) => (
+              <FichaCard
+                key={fid} fid={fid} ficha={f} state={state} updateFicha={updateFichaIng}
+                onEdit={() => setModal(f)} onDelete={() => setConfirmDel({ f, fid })}
+                indiceRateio={indiceRateio} somaPrecos={somaPrecos}
+              />
             ))}
           </div>
         );
@@ -985,14 +1531,40 @@ function FichasTab({ state, updateFicha }) {
         <div style={{ textAlign:'center', padding:40, color:'#aaa' }}>Nenhuma ficha encontrada</div>
       )}
       <div style={{ height:16 }} />
+      {modal && (
+        <FichaFormModal
+          initial={modal === 'novo' ? null : modal} state={state}
+          onSave={fic => { saveCustomFicha(fic); setModal(null); }}
+          onClose={() => setModal(null)}
+        />
+      )}
+      {confirmDel && (
+        <ConfirmModal
+          message={`Excluir a ficha "${confirmDel.f.n}"? As quantidades e vendas lançadas dela serão removidas.`}
+          okLabel="Excluir"
+          onConfirm={() => { deleteCustomFicha(confirmDel.fid); setConfirmDel(null); }}
+          onCancel={() => setConfirmDel(null)}
+        />
+      )}
     </div>
   );
 }
 
 // ─── COMPONENTE: RESUMO TAB ───────────────────────────────────────────────────
 function ResumoTab({ state }) {
-  const insFilledCount = INSUMOS.filter(ins => parsePreco((state.insumos || {})[ins.id]?.preco) > 0).length;
-  const calcFichas = FIC.map((f, fid) => ({ f, fid, ...calcFicha(fid, state) })).filter(x => x.calculado);
+  const todosInsumos = getInsumos(state);
+  const insFilledCount = todosInsumos.filter(ins => parsePreco(((state.insumos || {})[ins.id] || {}).preco) > 0).length;
+  const todasFichas = getFichaIds(state)
+    .map(fid => ({ f: fichaDef(fid, state), fid }))
+    .filter(x => x.f && !x.f.sub)
+    .map(x => ({ ...x, ...calcFicha(x.fid, state) }));
+  const calcFichas = todasFichas.filter(x => x.calculado);
+  const incompletas = calcFichas.filter(x => x.completo < 1);
+  const desatualizados = todosInsumos.filter(ins => {
+    const sv = (state.insumos || {})[ins.id] || {};
+    const d = parsePreco(sv.preco) > 0 ? diasDesde(sv.precoAt) : null;
+    return d !== null && d > STALE_DIAS;
+  });
   const catColors = {
     CHOPP:'#e3f2fd', HAMBURGUERES:'#e8f4fd', COMBOS:'#e3f2fd', BATATAS:'#fff8e1',
     PANQUECAS:'#fff3e0', CARNES:'#fde8e8', SOBREMESAS:'#fce4ec', PETISCOS:'#e8f5e9',
@@ -1013,19 +1585,39 @@ function ResumoTab({ state }) {
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:16 }}>
         <div style={{ background:'#fff', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px rgba(0,0,0,0.06)' }}>
           <div style={{ fontSize:11, color:'#888', marginBottom:4 }}>INSUMOS PREENCHIDOS</div>
-          <div style={{ fontSize:28, fontWeight:800, color:'#c9973a' }}>{insFilledCount}<span style={{ fontSize:16, color:'#bbb' }}>/{INSUMOS.length}</span></div>
+          <div style={{ fontSize:28, fontWeight:800, color:'#c9973a' }}>{insFilledCount}<span style={{ fontSize:16, color:'#bbb' }}>/{todosInsumos.length}</span></div>
           <div style={{ marginTop:6, height:4, background:'#f0ede9', borderRadius:2 }}>
-            <div style={{ height:'100%', background:'#c9973a', width: (insFilledCount/INSUMOS.length*100) + '%', borderRadius:2 }} />
+            <div style={{ height:'100%', background:'#c9973a', width: (insFilledCount/todosInsumos.length*100) + '%', borderRadius:2 }} />
           </div>
         </div>
         <div style={{ background:'#fff', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px rgba(0,0,0,0.06)' }}>
           <div style={{ fontSize:11, color:'#888', marginBottom:4 }}>FICHAS CALCULADAS</div>
-          <div style={{ fontSize:28, fontWeight:800, color:'#1e8449' }}>{calcFichas.length}<span style={{ fontSize:16, color:'#bbb' }}>/{FIC.length}</span></div>
+          <div style={{ fontSize:28, fontWeight:800, color:'#1e8449' }}>{calcFichas.length}<span style={{ fontSize:16, color:'#bbb' }}>/{todasFichas.length}</span></div>
           <div style={{ marginTop:6, height:4, background:'#f0ede9', borderRadius:2 }}>
-            <div style={{ height:'100%', background:'#1e8449', width: (calcFichas.length/FIC.length*100) + '%', borderRadius:2 }} />
+            <div style={{ height:'100%', background:'#1e8449', width: (todasFichas.length ? calcFichas.length/todasFichas.length*100 : 0) + '%', borderRadius:2 }} />
           </div>
         </div>
       </div>
+
+      {incompletas.length > 0 && (
+        <div style={{ background:'#fff8e1', border:'1px solid #ffe082', borderRadius:10, padding:'12px 16px', marginBottom:12 }}>
+          <div style={{ fontWeight:700, fontSize:13, color:'#856404', marginBottom:4 }}>⚠️ {incompletas.length} ficha(s) incompleta(s) — margem exibida MAIOR que a real</div>
+          <div style={{ fontSize:12, color:'#856404', lineHeight:1.5 }}>
+            {incompletas.slice(0, 8).map(x => `${x.f.n} (${x.comCusto}/${x.nIng})`).join(' · ')}
+            {incompletas.length > 8 ? ` · +${incompletas.length - 8}` : ''}
+          </div>
+        </div>
+      )}
+
+      {desatualizados.length > 0 && (
+        <div style={{ background:'#fdecea', border:'1px solid #f5c6cb', borderRadius:10, padding:'12px 16px', marginBottom:12 }}>
+          <div style={{ fontWeight:700, fontSize:13, color:'#721c24', marginBottom:4 }}>⏰ {desatualizados.length} insumo(s) com preço há mais de {STALE_DIAS} dias sem atualização</div>
+          <div style={{ fontSize:12, color:'#721c24', lineHeight:1.5 }}>
+            {desatualizados.slice(0, 8).map(i => i.n).join(' · ')}
+            {desatualizados.length > 8 ? ` · +${desatualizados.length - 8}` : ''}
+          </div>
+        </div>
+      )}
 
       <div style={{
         background:'#fff3cd', border:'1px solid #ffc107', borderRadius:10, padding:'14px 16px', marginBottom:16,
@@ -1041,8 +1633,8 @@ function ResumoTab({ state }) {
       {calcFichas.length > 0 && (
         <div>
           <div style={{ fontSize:12, fontWeight:700, color:'#888', letterSpacing:.5, marginBottom:8 }}>PRODUTOS CALCULADOS</div>
-          {calcFichas.map(({ f, fid, total, mb, ml, pmin }) => {
-            const mbOk = mb >= f.m;
+          {calcFichas.map(({ f, fid, total, mb, ml, pmin, p, m, completo, comCusto, nIng }) => {
+            const mbOk = mb >= m;
             return (
               <div key={fid} style={{
                 background:'#fff', borderRadius:8, padding:'12px 14px', marginBottom:8,
@@ -1057,8 +1649,8 @@ function ResumoTab({ state }) {
                     }}>{f.c}</span>
                   </div>
                   <div style={{ textAlign:'right' }}>
-                    <div style={{ fontSize:16, fontWeight:700 }}>{fmt2(f.p)}</div>
-                    <div style={{ fontSize:11, color:'#aaa' }}>venda</div>
+                    <div style={{ fontSize:16, fontWeight:700 }}>{fmt2(p)}</div>
+                    <div style={{ fontSize:11, color:'#aaa' }}>venda{completo < 1 ? ` · ⚠️ ${comCusto}/${nIng}` : ''}</div>
                   </div>
                 </div>
                 <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:6 }}>
@@ -1077,7 +1669,7 @@ function ResumoTab({ state }) {
                 </div>
                 {!mbOk && (
                   <div style={{ marginTop:6, fontSize:11, color:'#c0392b' }}>
-                    Abaixo da meta {fmtPct(f.m)} — Preço mínimo: {fmt2(pmin)}
+                    Abaixo da meta {fmtPct(m)} — Preço mínimo: {pmin > 0 ? fmt2(pmin) : '—'}
                   </div>
                 )}
               </div>
@@ -1097,8 +1689,333 @@ function ResumoTab({ state }) {
   );
 }
 
+// ─── COMPONENTE: GESTÃO TAB ───────────────────────────────────────────────────
+function GestaoTab({ state, updateGestao, onImport }) {
+  const [searchV, setSearchV] = useState('');
+  const [confirmImport, setConfirmImport] = useState(null);
+  const g = state.gestao || {};
+  const vendas = g.vendas || {};
+  const fileRef = useRef(null);
+
+  const { rows, vend, fat, vendComFicha, cmvT, fatComFicha, cmvPct, semFicha } = calcVendasResumo(state);
+
+  // Engenharia de cardápio (popularidade × margem)
+  const totalQ = vendComFicha.reduce((s, x) => s + x.q, 0);
+  const engenharia = vendComFicha.length >= 2 ? vendComFicha.map(x => {
+    const popular = x.q / totalQ >= 0.7 * (1 / vendComFicha.length);
+    const lucrativo = x.calc.mb >= x.calc.m;
+    const cls = popular && lucrativo ? '⭐ Estrela'
+      : popular ? '🐴 Burro de Carga'
+      : lucrativo ? '💎 Quebra-Cabeça'
+      : '🍍 Abacaxi';
+    return { ...x, cls, popular, lucrativo };
+  }) : [];
+  const ORDEM_CLS = ['⭐ Estrela', '🐴 Burro de Carga', '💎 Quebra-Cabeça', '🍍 Abacaxi'];
+  const DICA_CLS = {
+    '⭐ Estrela': 'Vende muito com boa margem — destaque no cardápio e proteja o padrão.',
+    '🐴 Burro de Carga': 'Vende muito com margem fraca — reduza custo ou reajuste o preço.',
+    '💎 Quebra-Cabeça': 'Margem boa mas vende pouco — promova, reposicione ou treine a equipe para sugerir.',
+    '🍍 Abacaxi': 'Nem vende nem dá margem — reformule ou tire do cardápio.',
+  };
+
+  // CMV real
+  const compras = parsePreco(g.compras);
+  const fatReal = parsePreco(g.fatReal);
+  const cmvRealPct = fatReal > 0 ? compras / fatReal : 0;
+
+  // Rateio de custos indiretos (fixos), proporcional ao cardápio (fixo diário)
+  const { custosFixos, custosFixosDia, somaPrecos, indiceRateio } = calcRateioFixo(state);
+  const faturamentoPeriodo = fatReal > 0 ? fatReal : fat;
+  // Redistribui a TODOS os produtos com ficha calculada, com ou sem venda lançada no período
+  const calcRows = rows.filter(x => x.calc.calculado);
+  const comRateio = calcRows.map(x => {
+    const rateioUn = x.calc.p * indiceRateio;
+    const lucroUn = x.calc.p * x.calc.ml - rateioUn;
+    return { ...x, rateioUn, lucroUn, lucroTotal: lucroUn * x.q };
+  });
+  const margemContribTotal = vendComFicha.reduce((s, x) => s + x.q * x.calc.p * x.calc.ml, 0);
+  const mcPct = fatComFicha > 0 ? margemContribTotal / fatComFicha : 0;
+  const pontoEquilibrio = mcPct > 0 ? custosFixos / mcPct : 0;
+  const lucroLiquidoPeriodo = comRateio.reduce((s, x) => s + x.lucroTotal, 0);
+
+  const card = { background:'#fff', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px rgba(0,0,0,0.06)', marginBottom:14 };
+  const h = { fontWeight:700, fontSize:13, letterSpacing:.5, marginBottom:10, color:'#0f0f0f' };
+  const inpStyle = { border:'1px solid #ddd', borderRadius:6, padding:'7px 10px', fontSize:16, background:'#fafafa', width:'100%', color:'#0f0f0f' };
+  const lbl = { fontSize:11, color:'#888', marginBottom:3 };
+  const numInput = (field, placeholder) => (
+    <input type="text" inputMode="decimal" placeholder={placeholder} value={g[field] || ''}
+      onChange={e => { const v = e.target.value.replace('.', ','); if (v === '' || /^\d*,?\d{0,2}$/.test(v)) updateGestao(field, v); }}
+      style={inpStyle} />
+  );
+
+  const exportBackup = () => {
+    const blob = new Blob([JSON.stringify({ vg: state }, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'village-gourmet-backup-' + hoje() + '.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  };
+  const handleFile = e => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const obj = JSON.parse(reader.result);
+        const dados = obj && obj.vg ? obj.vg : obj;
+        if (!dados || (typeof dados !== 'object')) throw new Error();
+        setConfirmImport(dados);
+      } catch { alert('Arquivo inválido — selecione um backup JSON gerado por este app.'); }
+    };
+    reader.readAsText(file);
+  };
+
+  const rowsFiltradas = rows.filter(x => !searchV || x.d.n.toLowerCase().includes(searchV.toLowerCase()));
+
+  return (
+    <div style={{ padding:'12px 16px' }}>
+      {/* Custos variáveis */}
+      <div style={card}>
+        <div style={h}>⚙️ CUSTOS VARIÁVEIS SOBRE A VENDA</div>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+          <div>
+            <div style={lbl}>Taxa de cartão média (%)</div>
+            {numInput('cartao', 'Ex: 3,5')}
+          </div>
+          <div>
+            <div style={lbl}>Outros custos variáveis (%)</div>
+            {numInput('outros', 'Ex: 2')}
+          </div>
+        </div>
+        <div style={{ fontSize:11, color:'#888', marginTop:8 }}>
+          Entram na Margem Líquida de todas as fichas, somados ao imposto de cada produto.
+        </div>
+      </div>
+
+      {/* Custos indiretos (fixos) */}
+      <div style={card}>
+        <div style={h}>🏢 CUSTOS INDIRETOS (FIXOS) DO PERÍODO</div>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+          <div>
+            <div style={lbl}>Aluguel (R$)</div>
+            {numInput('aluguel', '0,00')}
+          </div>
+          <div>
+            <div style={lbl}>Energia / Água (R$)</div>
+            {numInput('energia', '0,00')}
+          </div>
+          <div>
+            <div style={lbl}>Depreciação de equipamentos (R$)</div>
+            {numInput('deprec', '0,00')}
+          </div>
+          <div>
+            <div style={lbl}>Folha de funcionários (R$)</div>
+            {numInput('folha', '0,00')}
+          </div>
+          <div style={{ gridColumn:'1 / -1' }}>
+            <div style={lbl}>Outros fixos — internet, contador, seguro etc. (R$)</div>
+            {numInput('outrosFixos', '0,00')}
+          </div>
+        </div>
+        {custosFixos > 0 && (
+          <div style={{ marginTop:10, display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:6 }}>
+            <div style={{ background:'#f8f6f3', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
+              <div style={{ fontSize:10, color:'#888' }}>Fixos do mês</div>
+              <div style={{ fontSize:15, fontWeight:700 }}>{fmt2(custosFixos)}</div>
+            </div>
+            <div style={{ background:'#f8f6f3', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
+              <div style={{ fontSize:10, color:'#888' }}>Fixos por dia (÷30)</div>
+              <div style={{ fontSize:15, fontWeight:700 }}>{fmt2(custosFixosDia)}</div>
+            </div>
+            <div style={{ background:'#f8f6f3', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
+              <div style={{ fontSize:10, color:'#888' }}>Soma dos preços do cardápio</div>
+              <div style={{ fontSize:15, fontWeight:700 }}>{somaPrecos > 0 ? fmt2(somaPrecos) : '—'}</div>
+            </div>
+          </div>
+        )}
+        {custosFixos > 0 && indiceRateio === 0 && (
+          <div style={{ fontSize:12, color:'#c0392b', marginTop:8, padding:'8px 10px', background:'#fdecea', borderRadius:6 }}>
+            ⚠️ Nenhum produto com preço de venda cadastrado — revise os preços na aba Fichas para o rateio ser calculado.
+          </div>
+        )}
+        <div style={{ fontSize:11, color:'#888', marginTop:8 }}>
+          Método: rateio <strong>proporcional ao cardápio</strong>, com custo fixo diário — participação = preço do produto ÷ soma dos preços de todos os produtos;
+          rateio do produto = (custos fixos ÷ 30 dias) × participação. As fatias de todos os produtos somam 100% do fixo diário.
+          Não depende de faturamento nem de vendas; recalculado automaticamente a cada alteração.
+        </div>
+      </div>
+
+      {/* Lucro líquido real (após rateio) */}
+      {custosFixos > 0 && comRateio.length > 0 && (
+        <div style={card}>
+          <div style={h}>💵 LUCRO LÍQUIDO REAL POR PRODUTO (após rateio de fixos)</div>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:6, marginBottom:10 }}>
+            <div style={{ background:'#f8f6f3', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
+              <div style={{ fontSize:10, color:'#888' }}>Ponto de equilíbrio (faturamento)</div>
+              <div style={{ fontSize:15, fontWeight:700 }}>{pontoEquilibrio > 0 ? fmt2(pontoEquilibrio) : '—'}</div>
+            </div>
+            <div style={{ background:'#f8f6f3', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
+              <div style={{ fontSize:10, color:'#888' }}>Lucro líquido do período</div>
+              <div style={{ fontSize:15, fontWeight:700, color: lucroLiquidoPeriodo >= 0 ? '#1e8449' : '#c0392b' }}>{fmt2(lucroLiquidoPeriodo)}</div>
+            </div>
+          </div>
+          {faturamentoPeriodo > 0 && pontoEquilibrio > 0 && faturamentoPeriodo < pontoEquilibrio && (
+            <div style={{ fontSize:12, color:'#c0392b', marginBottom:10 }}>
+              🔴 Faturamento do período ({fmt2(faturamentoPeriodo)}) está abaixo do ponto de equilíbrio — operação com prejuízo real mesmo com margem bruta positiva.
+            </div>
+          )}
+          {vendComFicha.length === 0 && (
+            <div style={{ fontSize:11, color:'#c9973a', marginBottom:10 }}>
+              Nenhuma venda lançada ainda — o rateio por unidade já está calculado, mas o total do período e o ponto de equilíbrio ficam mais precisos lançando as vendas abaixo.
+            </div>
+          )}
+          <div style={{ maxHeight:280, overflowY:'auto', border:'1px solid #f0ede9', borderRadius:8 }}>
+            {comRateio.sort((a, b) => a.lucroUn - b.lucroUn).map(x => (
+              <div key={x.fid} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 10px', borderBottom:'1px solid #f7f5f2' }}>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ fontSize:12, fontWeight:500, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{x.d.n}</div>
+                  <div style={{ fontSize:10, color:'#aaa' }}>rateio: {fmt2(x.rateioUn)} · {x.q > 0 ? x.q + '× vendido' : 'sem venda lançada'}</div>
+                </div>
+                <div style={{ textAlign:'right', flexShrink:0 }}>
+                  <div style={{ fontSize:13, fontWeight:700, color: x.lucroUn >= 0 ? '#1e8449' : '#c0392b' }}>{fmt2(x.lucroUn)}/un</div>
+                  {x.q > 0 && <div style={{ fontSize:10, color:'#888' }}>{fmt2(x.lucroTotal)} total</div>}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ fontSize:11, color:'#888', marginTop:8 }}>
+            Lucro líquido real = Margem Líquida (já descontando ingredientes, embalagem, impostos e cartão) − Rateio de custos fixos. Produtos no vermelho vendem, mas não sustentam a estrutura do bar sozinhos.
+          </div>
+        </div>
+      )}
+
+      {/* Vendas do período */}
+      <div style={card}>
+        <div style={h}>📈 VENDAS DO PERÍODO</div>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr', gap:8, marginBottom:10 }}>
+          <input type="text" placeholder="Período (ex: 07/2026)" value={g.periodo || ''}
+            onChange={e => updateGestao('periodo', e.target.value)} style={inpStyle} />
+          <input type="search" placeholder="Buscar produto para lançar venda..." value={searchV}
+            onChange={e => setSearchV(e.target.value)} style={inpStyle} />
+        </div>
+        <div style={{ maxHeight:300, overflowY:'auto', border:'1px solid #f0ede9', borderRadius:8 }}>
+          {rowsFiltradas.map(x => (
+            <div key={x.fid} style={{ display:'flex', alignItems:'center', gap:8, padding:'6px 10px', borderBottom:'1px solid #f7f5f2' }}>
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ fontSize:12, fontWeight:500, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{x.d.n}</div>
+                <div style={{ fontSize:10, color:'#aaa' }}>{fmt2(x.calc.p)}{x.calc.calculado ? ' · custo ' + fmt2(x.calc.total) : ' · sem ficha'}</div>
+              </div>
+              <input type="text" inputMode="numeric" placeholder="qtd" value={vendas[x.fid] || ''}
+                onChange={e => { const v = e.target.value; if (v === '' || /^\d{0,5}$/.test(v)) updateGestao('vendas', { ...vendas, [x.fid]: v }); }}
+                style={{ ...inpStyle, width:64, textAlign:'center', padding:'6px 4px' }} />
+            </div>
+          ))}
+        </div>
+        {vend.length > 0 && (
+          <div style={{ marginTop:10, display:'grid', gridTemplateColumns:'1fr 1fr', gap:6 }}>
+            <div style={{ background:'#f8f6f3', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
+              <div style={{ fontSize:10, color:'#888' }}>Faturamento teórico</div>
+              <div style={{ fontSize:15, fontWeight:700 }}>{fmt2(fat)}</div>
+            </div>
+            <div style={{ background:'#f8f6f3', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
+              <div style={{ fontSize:10, color:'#888' }}>CMV teórico</div>
+              <div style={{ fontSize:15, fontWeight:700, color: cmvPct > 0.38 ? '#c0392b' : '#1e8449' }}>{fmt2(cmvT)} ({fmtPct(cmvPct)})</div>
+            </div>
+            <div style={{ background:'#f8f6f3', borderRadius:6, padding:'8px 10px', textAlign:'center', gridColumn:'1 / -1' }}>
+              <div style={{ fontSize:10, color:'#888' }}>Margem de contribuição (fichas calculadas)</div>
+              <div style={{ fontSize:15, fontWeight:700, color:'#1e8449' }}>{fmt2(fatComFicha - cmvT)}</div>
+            </div>
+            {semFicha > 0 && (
+              <div style={{ gridColumn:'1 / -1', fontSize:11, color:'#c9973a' }}>
+                ⚠️ {semFicha} produto(s) vendido(s) sem ficha calculada — fora do CMV teórico.
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Engenharia de cardápio */}
+      {engenharia.length > 0 && (
+        <div style={card}>
+          <div style={h}>🏆 ENGENHARIA DE CARDÁPIO</div>
+          {ORDEM_CLS.map(cls => {
+            const items = engenharia.filter(x => x.cls === cls);
+            if (!items.length) return null;
+            return (
+              <div key={cls} style={{ marginBottom:10 }}>
+                <div style={{ fontSize:12, fontWeight:700, marginBottom:2 }}>{cls} ({items.length})</div>
+                <div style={{ fontSize:11, color:'#888', marginBottom:4 }}>{DICA_CLS[cls]}</div>
+                <div style={{ fontSize:12, color:'#333', lineHeight:1.6 }}>
+                  {items.sort((a, b) => b.q - a.q).map(x => `${x.d.n} (${x.q}× · MgB ${fmtPct(x.calc.mb)})`).join(' · ')}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* CMV real */}
+      <div style={card}>
+        <div style={h}>💰 CMV REAL × TEÓRICO</div>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+          <div>
+            <div style={lbl}>Compras de insumos no período (R$)</div>
+            {numInput('compras', '0,00')}
+          </div>
+          <div>
+            <div style={lbl}>Faturamento real do período (R$)</div>
+            {numInput('fatReal', '0,00')}
+          </div>
+        </div>
+        {fatReal > 0 && compras > 0 && (
+          <div style={{ marginTop:10, fontSize:13, lineHeight:1.7 }}>
+            <div>CMV real: <strong style={{ color: cmvRealPct > 0.38 ? '#c0392b' : '#1e8449' }}>{fmtPct(cmvRealPct)}</strong>
+              {cmvPct > 0 && <span> · CMV teórico: <strong>{fmtPct(cmvPct)}</strong></span>}
+            </div>
+            {cmvPct > 0 && cmvRealPct - cmvPct > 0.03 && (
+              <div style={{ fontSize:12, color:'#c0392b', marginTop:4 }}>
+                🔴 CMV real {fmtPct(cmvRealPct - cmvPct)} acima do teórico — investigue perdas, porções fora do padrão, desvios ou compras em excesso (estoque parado).
+              </div>
+            )}
+            {cmvPct > 0 && cmvRealPct - cmvPct <= 0.03 && cmvRealPct - cmvPct >= -0.03 && (
+              <div style={{ fontSize:12, color:'#1e8449', marginTop:4 }}>✅ CMV real alinhado ao teórico — operação sob controle.</div>
+            )}
+          </div>
+        )}
+        <div style={{ fontSize:11, color:'#888', marginTop:8 }}>
+          Referência para bares: CMV saudável entre 28% e 38%. A diferença entre real e teórico revela perdas invisíveis.
+        </div>
+      </div>
+
+      {/* Backup */}
+      <div style={card}>
+        <div style={h}>💾 BACKUP DOS DADOS</div>
+        <div style={{ display:'flex', gap:8 }}>
+          <button onClick={exportBackup} style={{ flex:1, padding:'10px 0', borderRadius:8, fontSize:13, fontWeight:700, background:'#1e8449', color:'#fff' }}>⬇️ Exportar JSON</button>
+          <button onClick={() => fileRef.current && fileRef.current.click()} style={{ flex:1, padding:'10px 0', borderRadius:8, fontSize:13, fontWeight:700, background:'#c9973a', color:'#fff' }}>⬆️ Importar JSON</button>
+          <input ref={fileRef} type="file" accept=".json,application/json" style={{ display:'none' }} onChange={handleFile} />
+        </div>
+        <div style={{ fontSize:11, color:'#888', marginTop:8 }}>
+          Exporte um backup antes de mudanças grandes. A importação substitui TODOS os dados atuais (exige ☁️ Salvar depois).
+        </div>
+      </div>
+      <div style={{ height:16 }} />
+      {confirmImport && (
+        <ConfirmModal
+          message="Importar este backup? Todos os dados atuais serão substituídos pelos do arquivo (será preciso clicar em ☁️ Salvar para enviar ao servidor)."
+          okLabel="Importar"
+          onConfirm={() => { onImport(confirmImport); setConfirmImport(null); }}
+          onCancel={() => setConfirmImport(null)}
+        />
+      )}
+    </div>
+  );
+}
+
 // ─── MODAL DE CONFIRMAÇÃO ─────────────────────────────────────────────────────
-function ConfirmModal({ message, onConfirm, onCancel }) {
+function ConfirmModal({ message, onConfirm, onCancel, okLabel }) {
   return (
     <div style={{
       position:'fixed', inset:0, zIndex:999, background:'rgba(0,0,0,0.5)',
@@ -1114,7 +2031,7 @@ function ConfirmModal({ message, onConfirm, onCancel }) {
           <button onClick={onConfirm} style={{
             flex:1, padding:'12px 0', borderRadius:8, fontSize:14, fontWeight:700,
             background:'#c0392b', color:'#fff', border:'none', cursor:'pointer',
-          }}>Descartar</button>
+          }}>{okLabel || 'Descartar'}</button>
         </div>
       </div>
     </div>
@@ -1198,27 +2115,36 @@ function PinScreen({ onUnlock }) {
 // ─── APP PRINCIPAL ────────────────────────────────────────────────────────────
 function App() {
   const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem('vg_auth') === '1');
-  const [state, setState] = useState(() => loadLS() || emptyState());
-  const [savedState, setSavedState] = useState(() => loadLS() || emptyState());
+  const [state, setState] = useState(() => migrate(loadLS()));
+  const [savedState, setSavedState] = useState(() => migrate(loadLS()));
   const [tab, setTab] = useState('insumos');
   const [syncStatus, setSyncStatus] = useState('idle');
   const [lastSync, setLastSync] = useState(null);
-  const [dirty, setDirty] = useState(false);
+  const [dirty, setDirty] = useState(() => isDirtyLS());
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [conflito, setConflito] = useState(null);   // payload aguardando decisão de conflito
+  const baselineRef = useRef(null);                 // updatedAt do remoto quando carregamos
 
-  // Carregar do JSONBin na inicialização
+  // Carregar do JSONBin na inicialização — sem sobrescrever edições locais não salvas
   useEffect(() => {
     setSyncStatus('loading');
     fetch(API_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } })
-      .then(r => r.json())
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(data => {
         if (data && data.record && data.record.vg) {
-          const remote = data.record.vg;
-          setState(remote);
-          setSavedState(remote);
-          saveLS(remote);
-          setLastSync(new Date());
-          setSyncStatus('synced');
+          const remote = migrate(data.record.vg);
+          baselineRef.current = data.record.vg.updatedAt || null;
+          if (isDirtyLS()) {
+            // Há edições locais não sincronizadas: preserva o trabalho local
+            setDirty(true);
+            setSyncStatus('idle');
+          } else {
+            setState(remote);
+            setSavedState(remote);
+            saveLS(remote);
+            setLastSync(new Date());
+            setSyncStatus('synced');
+          }
         } else {
           setSyncStatus('idle');
         }
@@ -1226,21 +2152,51 @@ function App() {
       .catch(() => setSyncStatus('offline'));
   }, []);
 
+  // Aviso do navegador ao fechar com alterações não salvas
+  useEffect(() => {
+    const h = e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } };
+    window.addEventListener('beforeunload', h);
+    return () => window.removeEventListener('beforeunload', h);
+  }, [dirty]);
+
+  const doPut = useCallback(payload => {
+    return fetch(API_URL, {
+      method: 'PUT',
+      headers: { 'X-Master-Key': API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ vg: payload }),
+    })
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(() => {
+        baselineRef.current = payload.updatedAt;
+        setState(payload);
+        setSavedState(payload);
+        saveLS(payload);
+        clearDirtyLS();
+        setDirty(false);
+        setLastSync(new Date());
+        setSyncStatus('synced');
+      })
+      .catch(() => setSyncStatus('error')); // dirty permanece true: nada foi confirmado no servidor
+  }, []);
+
   const handleSave = useCallback(() => {
     if (syncStatus === 'saving') return;
     setSyncStatus('saving');
-    saveLS(state);
-    setSavedState(state);
-    setDirty(false);
-    fetch(API_URL, {
-      method: 'PUT',
-      headers: { 'X-Master-Key': API_KEY, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ vg: state }),
-    })
-      .then(r => r.json())
-      .then(() => { setLastSync(new Date()); setSyncStatus('synced'); })
-      .catch(() => setSyncStatus('offline'));
-  }, [state, syncStatus]);
+    const payload = { ...withHist(state), updatedAt: new Date().toISOString() };
+    // Detecta se outro usuário salvou depois que carregamos
+    fetch(API_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } })
+      .then(r => (r.ok ? r.json() : null))
+      .then(data => {
+        const remoteAt = data && data.record && data.record.vg && data.record.vg.updatedAt;
+        if (remoteAt && baselineRef.current && remoteAt !== baselineRef.current) {
+          setSyncStatus('idle');
+          setConflito({ payload, remote: data.record.vg });
+          return;
+        }
+        return doPut(payload);
+      })
+      .catch(() => doPut(payload));
+  }, [state, syncStatus, doPut]);
 
   const handleCancel = useCallback(() => {
     if (!dirty) return;
@@ -1249,17 +2205,20 @@ function App() {
 
   const handleConfirmCancel = useCallback(() => {
     setState(savedState);
+    saveLS(savedState);
+    clearDirtyLS();
     setDirty(false);
     setConfirmCancel(false);
   }, [savedState]);
 
+  const touch = next => { saveLS(next); markDirtyLS(); };
+
   const updateInsumo = useCallback((id, field, value) => {
     setState(prev => {
-      const next = {
-        ...prev,
-        insumos: { ...prev.insumos, [id]: { ...(prev.insumos || {})[id], [field]: value } },
-      };
-      saveLS(next);
+      const atual = { ...(prev.insumos || {})[id], [field]: value };
+      if (field === 'preco') atual.precoAt = hoje();
+      const next = { ...prev, insumos: { ...prev.insumos, [id]: atual } };
+      touch(next);
       return next;
     });
     setDirty(true);
@@ -1271,16 +2230,93 @@ function App() {
         ...prev,
         fichas: { ...prev.fichas, [fid]: { ...(prev.fichas || {})[fid], [key]: val } },
       };
-      saveLS(next);
+      touch(next);
       return next;
     });
     setDirty(true);
   }, []);
 
+  const updateGestao = useCallback((field, val) => {
+    setState(prev => {
+      const next = { ...prev, gestao: { ...(prev.gestao || {}), [field]: val } };
+      touch(next);
+      return next;
+    });
+    setDirty(true);
+  }, []);
+
+  const saveCustomInsumo = useCallback(ins => {
+    setState(prev => {
+      const list = [...((prev.custom || {}).insumos || [])];
+      const ix = list.findIndex(x => x.id === ins.id);
+      if (ix >= 0) list[ix] = ins; else list.push(ins);
+      const next = { ...prev, custom: { ...(prev.custom || {}), insumos: list } };
+      touch(next);
+      return next;
+    });
+    setDirty(true);
+  }, []);
+
+  const deleteCustomInsumo = useCallback(id => {
+    setState(prev => {
+      const insumos = { ...prev.insumos };
+      delete insumos[id];
+      const next = {
+        ...prev,
+        insumos,
+        custom: { ...(prev.custom || {}), insumos: ((prev.custom || {}).insumos || []).filter(x => x.id !== id) },
+      };
+      touch(next);
+      return next;
+    });
+    setDirty(true);
+  }, []);
+
+  const saveCustomFicha = useCallback(fic => {
+    setState(prev => {
+      const list = [...((prev.custom || {}).fichas || [])];
+      const ix = list.findIndex(x => x.id === fic.id);
+      if (ix >= 0) list[ix] = fic; else list.push(fic);
+      const next = { ...prev, custom: { ...(prev.custom || {}), fichas: list } };
+      touch(next);
+      return next;
+    });
+    setDirty(true);
+  }, []);
+
+  const deleteCustomFicha = useCallback(fid => {
+    setState(prev => {
+      const fichas = { ...prev.fichas };
+      delete fichas[fid];
+      const gestao = { ...(prev.gestao || {}) };
+      if (gestao.vendas && gestao.vendas[fid] !== undefined) {
+        gestao.vendas = { ...gestao.vendas };
+        delete gestao.vendas[fid];
+      }
+      const next = {
+        ...prev,
+        fichas,
+        gestao,
+        custom: { ...(prev.custom || {}), fichas: ((prev.custom || {}).fichas || []).filter(x => x.id !== fid) },
+      };
+      touch(next);
+      return next;
+    });
+    setDirty(true);
+  }, []);
+
+  const handleImport = useCallback(dados => {
+    const next = migrate(dados);
+    setState(next);
+    touch(next);
+    setDirty(true);
+  }, []);
+
   const handleExport = useCallback(() => exportExcel(state), [state]);
 
-  const filled = INSUMOS.filter(ins => parsePreco(((state.insumos || {})[ins.id] || {}).preco) > 0).length;
-  const progress = Math.round(filled / INSUMOS.length * 100);
+  const todosInsumos = getInsumos(state);
+  const filled = todosInsumos.filter(ins => parsePreco(((state.insumos || {})[ins.id] || {}).preco) > 0).length;
+  const progress = Math.round(filled / todosInsumos.length * 100);
 
   if (!unlocked) return <PinScreen onUnlock={() => setUnlocked(true)} />;
 
@@ -1288,9 +2324,20 @@ function App() {
     <div className="app-shell">
       <Header tab={tab} setTab={setTab} syncStatus={syncStatus} progress={progress} />
       <main style={{ flex:1, paddingBottom:90 }}>
-        {tab === 'insumos' && <InsumosTab state={state} updateInsumo={updateInsumo} />}
-        {tab === 'fichas'  && <FichasTab  state={state} updateFicha={updateFicha} />}
-        {tab === 'resumo'  && <ResumoTab  state={state} />}
+        {tab === 'insumos' && (
+          <InsumosTab
+            state={state} updateInsumo={updateInsumo}
+            saveCustomInsumo={saveCustomInsumo} deleteCustomInsumo={deleteCustomInsumo}
+          />
+        )}
+        {tab === 'fichas' && (
+          <FichasTab
+            state={state} updateFicha={updateFicha}
+            saveCustomFicha={saveCustomFicha} deleteCustomFicha={deleteCustomFicha}
+          />
+        )}
+        {tab === 'resumo' && <ResumoTab state={state} />}
+        {tab === 'gestao' && <GestaoTab state={state} updateGestao={updateGestao} onImport={handleImport} />}
       </main>
       <Footer
         onSave={handleSave} onCancel={handleCancel} onExport={handleExport}
@@ -1301,6 +2348,14 @@ function App() {
           message="Descartar todas as alterações não salvas?"
           onConfirm={handleConfirmCancel}
           onCancel={() => setConfirmCancel(false)}
+        />
+      )}
+      {conflito && (
+        <ConfirmModal
+          message="⚠️ Outro usuário salvou alterações no servidor depois que você abriu o app. Sobrescrever com os SEUS dados? (Para manter os dados do outro usuário, escolha Não e recarregue a página.)"
+          okLabel="Sobrescrever"
+          onConfirm={() => { const p = conflito.payload; setConflito(null); setSyncStatus('saving'); doPut(p); }}
+          onCancel={() => setConflito(null)}
         />
       )}
     </div>
