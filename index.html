@@ -49,6 +49,21 @@
       /* gráficos */
       --ch-grid: #e1e0d9; --ch-tick: #898781;
       --s1: #2a78d6; --s2: #eb6834;
+      /* superfícies extras e linhas (hierarquia visual) */
+      --surface: #faf8f5;      /* seção agrupada dentro de um cartão */
+      --line: #e6e1da;         /* bordas visíveis (mais definidas que --soft) */
+      --gold-soft: #f6ecd6;    /* fundo suave da marca */
+      --green-soft: #e4f3ea; --red-soft: #fbe7e4;
+      /* escala tipográfica */
+      --fs-xs: 11px; --fs-sm: 12px; --fs-base: 13px; --fs-md: 15px; --fs-lg: 18px; --fs-xl: 22px; --fs-2xl: 28px;
+      /* espaçamento */
+      --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px; --sp-6: 28px; --sp-7: 40px;
+      /* raio */
+      --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-full: 999px;
+      /* sombras */
+      --sh-1: 0 1px 2px rgba(0,0,0,0.05);
+      --sh-2: 0 2px 10px rgba(0,0,0,0.07);
+      --sh-3: 0 10px 30px rgba(0,0,0,0.12);
     }
     html[data-theme="dark"] {
       --bg: #121211;
@@ -77,6 +92,13 @@
       --overlay: rgba(0,0,0,0.65);
       --ch-grid: #2c2c2a; --ch-tick: #898781;
       --s1: #3987e5; --s2: #d95926;
+      --surface: #292927;
+      --line: #3a3a36;
+      --gold-soft: #3a3016;
+      --green-soft: #1c3325; --red-soft: #3a2320;
+      --sh-1: 0 1px 2px rgba(0,0,0,0.35);
+      --sh-2: 0 2px 10px rgba(0,0,0,0.45);
+      --sh-3: 0 10px 30px rgba(0,0,0,0.6);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -94,36 +116,33 @@
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-thumb { background: #c9973a55; border-radius: 4px; }
 
-    /* ── Layout responsivo ─────────────────────────────────────────────── */
+    /* ── Layout: app em largura total ──────────────────────────────────── */
     .app-shell {
       display: flex; flex-direction: column; min-height: 100vh;
-      max-width: 640px; margin: 0 auto;
+      width: 100%;
       background: var(--shell);
-      box-shadow: 0 0 40px rgba(0,0,0,0.12);
     }
     .footer-wrap {
-      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-      width: 100%; max-width: 640px; z-index: 100;
-      background: var(--card); border-top: 1px solid var(--soft);
+      position: fixed; bottom: 0; left: 0; right: 0;
+      width: 100%; z-index: 100;
+      background: var(--card); border-top: 1px solid var(--line);
       box-shadow: 0 -2px 12px var(--shadow);
     }
 
-    /* Grid de 2 colunas para insumos em telas maiores */
+    /* Grades de conteúdo — preenchem toda a largura disponível.
+       Abaixo de 700px (celular) tudo fica em coluna única para manter legível. */
     @media (min-width: 540px) {
       .insumos-grid { display: grid; grid-template-columns: 1fr 1fr; }
     }
-
-    /* Desktop: shell amplo, conteúdo em grades */
-    @media (min-width: 900px) {
-      .app-shell, .footer-wrap { max-width: 1240px; }
-      .insumos-grid { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
-      .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 2px; align-items: start; background: var(--line-soft); }
-      .resumo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 10px; align-items: start; }
+    @media (min-width: 700px) {
+      .insumos-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+      .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 2px; align-items: start; background: var(--line-soft); }
+      .resumo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px; align-items: start; }
       .resumo-grid > div { margin-bottom: 0 !important; }
-      .gestao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+      .gestao-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; align-items: start; }
       .gestao-grid > div { margin-bottom: 0 !important; }
       .kpi-row { grid-template-columns: repeat(4, 1fr) !important; }
-      .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+      .charts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 14px; align-items: start; }
       .charts-grid > div { margin-bottom: 0 !important; }
       .tab-content { padding-left: 24px !important; padding-right: 24px !important; }
     }
@@ -636,10 +655,12 @@ function calcFicha(fid, state, depth) {
   return { total, custoIns, mb, ml, pmin: dmin > 0.02 ? total / dmin : 0, pdes: ddes > 0.02 ? total / ddes : 0, calculado, completo, nIng, comCusto, p, m, a, emb };
 }
 
-// Resumo agregado das vendas lançadas no período (usado no rateio e na aba Gestão)
-function calcVendasResumo(state) {
+// Resumo agregado das vendas do período (usado no rateio e na aba Gestão).
+// qtdMap (opcional) sobrepõe as vendas manuais — ex.: quantidades reais
+// importadas do PDV, já resolvidas por ficha ({ fid: quantidade }).
+function calcVendasResumo(state, qtdMap) {
   const g = state.gestao || {};
-  const vendas = g.vendas || {};
+  const vendas = qtdMap || g.vendas || {};
   const rows = getFichaIds(state)
     .map(fid => ({ fid, d: fichaDef(fid, state) }))
     .filter(x => x.d && !x.d.sub)
@@ -807,6 +828,26 @@ function agregarVendas(vendasData, deMes, ateMes) {
   const fatTotal = porProduto.reduce((s, x) => s + x.fat, 0);
   const qtdTotal = porProduto.reduce((s, x) => s + x.qtd, 0);
   return { meses: porMes, porProduto, fatTotal, qtdTotal };
+}
+
+// Converte as vendas importadas do período em quantidades e faturamento REAL por
+// ficha (resolvendo o vínculo venda↔ficha). Alimenta a aba Gestão com dados reais.
+function vendasImportadasPorFicha(vendasData, deMes, ateMes, state) {
+  const agg = agregarVendas(vendasData, deMes, ateMes);
+  const map = (vendasData || {}).map || {};
+  const qtdPorFid = {}, fatRealPorFid = {};
+  let fatRealTotal = 0, fatSemVinculo = 0, qtdSemVinculo = 0, nSemVinculo = 0;
+  agg.porProduto.forEach(pr => {
+    fatRealTotal += pr.fat;
+    const fid = resolverVinculo(pr.cod, pr.nome, map, state);
+    if (!fid) { fatSemVinculo += pr.fat; qtdSemVinculo += pr.qtd; nSemVinculo++; return; }
+    qtdPorFid[fid] = (qtdPorFid[fid] || 0) + pr.qtd;
+    fatRealPorFid[fid] = (fatRealPorFid[fid] || 0) + pr.fat;
+  });
+  return {
+    qtdPorFid, fatRealPorFid, fatRealTotal, fatSemVinculo, qtdSemVinculo, nSemVinculo,
+    nMeses: agg.meses.length, meses: agg.meses,
+  };
 }
 
 // ─── EXPORT EXCEL ─────────────────────────────────────────────────────────────
@@ -1018,49 +1059,74 @@ function exportExcel(state) {
   XLSX.writeFile(wb, 'village-gourmet-custos.xlsx');
 }
 
+// ─── COMPONENTES BASE DE UI (design system) ───────────────────────────────────
+// Alternador de sub-abas em pílula segmentada (usado dentro de Vendas e Gestão).
+function SubNav({ items, value, onChange, style }) {
+  return (
+    <div style={{
+      display:'inline-flex', background:'var(--box)', border:'1px solid var(--line)',
+      borderRadius:'var(--r-full)', padding:3, gap:2, ...style,
+    }}>
+      {items.map(it => {
+        const on = value === it.id;
+        return (
+          <button key={it.id} onClick={() => onChange(it.id)} style={{
+            padding:'6px 16px', borderRadius:'var(--r-full)', fontSize:'var(--fs-sm)', fontWeight:600,
+            border:'none', cursor:'pointer', whiteSpace:'nowrap', transition:'all .15s',
+            background: on ? 'var(--card)' : 'transparent',
+            color: on ? 'var(--gold)' : 'var(--tx2)',
+            boxShadow: on ? 'var(--sh-1)' : 'none',
+          }}>{it.label}</button>
+        );
+      })}
+    </div>
+  );
+}
+
 // ─── COMPONENTE: HEADER ───────────────────────────────────────────────────────
 function Header({ tab, setTab, syncStatus, progress, theme, onToggleTheme }) {
-  const badgeStyle = {
-    display:'inline-block', padding:'2px 10px', borderRadius:20, fontSize:11, fontWeight:600,
-    background: syncStatus === 'synced' ? 'var(--ok-bg)' : (syncStatus === 'offline' || syncStatus === 'error') ? 'var(--err-bg)' : syncStatus === 'saving' ? 'var(--warn-bg)' : 'var(--box)',
-    color: syncStatus === 'synced' ? 'var(--ok-tx)' : (syncStatus === 'offline' || syncStatus === 'error') ? 'var(--err-tx)' : syncStatus === 'saving' ? 'var(--amber)' : 'var(--tx2)',
-  };
-  const badgeText = { synced:'Sincronizado ✓', offline:'Offline', saving:'Salvando...', loading:'Carregando...', idle:'...', error:'Erro ao salvar ✗' }[syncStatus] || '...';
+  const dot = { synced:'var(--green)', offline:'var(--red)', error:'var(--red)', saving:'var(--amber)', loading:'var(--amber)', idle:'var(--tx4)' }[syncStatus] || 'var(--tx4)';
+  const badgeText = { synced:'Sincronizado', offline:'Offline', saving:'Salvando…', loading:'Carregando…', idle:'—', error:'Erro ao salvar' }[syncStatus] || '—';
   const tabs = [
     { id:'insumos',  label:'📦 Insumos' },
     { id:'fichas',   label:'🧾 Fichas' },
-    { id:'resumo',   label:'📊 Resumo' },
     { id:'vendas',   label:'💰 Vendas' },
-    { id:'graficos', label:'📉 Gráficos' },
     { id:'gestao',   label:'📈 Gestão' },
   ];
   return (
-    <div style={{ position:'sticky', top:0, zIndex:100, background:'var(--card)', boxShadow:'0 2px 8px var(--shadow)' }}>
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 16px 8px', gap:8 }}>
-        <div style={{ fontSize:20, fontWeight:700, letterSpacing:-0.5, whiteSpace:'nowrap' }}>
+    <div style={{ position:'sticky', top:0, zIndex:100, background:'var(--card)', boxShadow:'var(--sh-2)' }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'var(--sp-3) var(--sp-4) var(--sp-2)', gap:'var(--sp-2)' }}>
+        <div style={{ fontSize:'var(--fs-lg)', fontWeight:800, letterSpacing:-0.5, whiteSpace:'nowrap' }}>
           Village <span style={{ color:'var(--gold)' }}>Gourmet</span>
         </div>
-        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-          <span style={badgeStyle}>{badgeText}</span>
+        <div style={{ display:'flex', alignItems:'center', gap:'var(--sp-2)' }}>
+          <span title={badgeText} style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:'var(--fs-xs)', color:'var(--tx2)', fontWeight:600, whiteSpace:'nowrap' }}>
+            <span style={{ width:8, height:8, borderRadius:'50%', background:dot, flexShrink:0 }} />
+            {badgeText}
+          </span>
           <button onClick={onToggleTheme} title={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'} style={{
-            background:'var(--box)', border:'1px solid var(--soft)', borderRadius:20,
-            padding:'3px 10px', fontSize:13, lineHeight:1.4,
+            background:'var(--box)', border:'1px solid var(--line)', borderRadius:'var(--r-full)',
+            width:32, height:32, fontSize:14, lineHeight:1, display:'inline-flex', alignItems:'center', justifyContent:'center',
           }}>{theme === 'dark' ? '☀️' : '🌙'}</button>
         </div>
       </div>
-      <div style={{ display:'flex', borderTop:'1px solid var(--soft)', overflowX:'auto' }}>
-        {tabs.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} style={{
-            flex:1, padding:'10px 4px', fontSize:12, fontWeight:600, border:'none',
-            background:'transparent', cursor:'pointer', whiteSpace:'nowrap', minWidth:86,
-            color: tab === t.id ? 'var(--gold)' : 'var(--tx2)',
-            borderBottom: tab === t.id ? '2px solid var(--gold)' : '2px solid transparent',
-            transition:'all .15s',
-          }}>{t.label}</button>
-        ))}
+      <div style={{ display:'flex', borderTop:'1px solid var(--line)', overflowX:'auto', gap:2, padding:'0 var(--sp-2)' }}>
+        {tabs.map(t => {
+          const on = tab === t.id;
+          return (
+            <button key={t.id} onClick={() => setTab(t.id)} style={{
+              flex:1, padding:'11px 6px 9px', fontSize:'var(--fs-sm)', fontWeight:on ? 700 : 600, border:'none',
+              background: on ? 'var(--gold-soft)' : 'transparent', cursor:'pointer', whiteSpace:'nowrap', minWidth:82,
+              color: on ? 'var(--gold)' : 'var(--tx2)',
+              borderRadius:'var(--r-sm) var(--r-sm) 0 0',
+              borderBottom: on ? '2px solid var(--gold)' : '2px solid transparent',
+              transition:'all .15s',
+            }}>{t.label}</button>
+          );
+        })}
       </div>
-      <div style={{ height:3, background:'var(--soft)' }}>
-        <div style={{ height:'100%', background:'var(--gold)', width: progress + '%', transition:'width .3s', borderRadius:2 }} />
+      <div style={{ height:3, background:'var(--gold-soft)' }}>
+        <div style={{ height:'100%', background:'var(--gold)', width: progress + '%', transition:'width .3s' }} />
       </div>
     </div>
   );
@@ -1070,24 +1136,25 @@ function Header({ tab, setTab, syncStatus, progress, theme, onToggleTheme }) {
 function Footer({ onSave, onCancel, onExport, dirty, lastSync, syncStatus }) {
   return (
     <div className="footer-wrap" style={{
-      padding:'10px 16px', paddingBottom:'calc(10px + env(safe-area-inset-bottom))',
+      padding:'var(--sp-3) var(--sp-4)', paddingBottom:'calc(var(--sp-3) + env(safe-area-inset-bottom))',
     }}>
-      <div style={{ display:'flex', gap:8, marginBottom:6 }}>
+      <div style={{ display:'flex', gap:'var(--sp-2)', marginBottom:'var(--sp-2)' }}>
         <button onClick={onSave} style={{
-          flex:2, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:700,
-          background:'var(--green)', color:'var(--on-accent)', opacity: syncStatus === 'saving' ? 0.7 : 1,
+          flex:2, padding:'12px 0', borderRadius:'var(--r-sm)', fontSize:'var(--fs-base)', fontWeight:700,
+          background:'var(--green)', color:'var(--on-accent)', boxShadow:'var(--sh-1)',
+          opacity: syncStatus === 'saving' ? 0.7 : 1,
         }}>☁️ Salvar</button>
         <button onClick={onCancel} disabled={!dirty} style={{
-          flex:1, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:600,
+          flex:1, padding:'12px 0', borderRadius:'var(--r-sm)', fontSize:'var(--fs-base)', fontWeight:600,
           background: dirty ? 'var(--soft)' : 'var(--box)', color: dirty ? 'var(--tx1)' : 'var(--tx4)',
-          cursor: dirty ? 'pointer' : 'default',
+          border:'1px solid var(--line)', cursor: dirty ? 'pointer' : 'default',
         }}>✕ Cancelar</button>
         <button onClick={onExport} style={{
-          flex:2, padding:'11px 0', borderRadius:8, fontSize:14, fontWeight:700,
-          background:'var(--gold)', color:'var(--on-accent)',
+          flex:2, padding:'12px 0', borderRadius:'var(--r-sm)', fontSize:'var(--fs-base)', fontWeight:700,
+          background:'var(--gold)', color:'var(--on-accent)', boxShadow:'var(--sh-1)',
         }}>⬇️ Excel</button>
       </div>
-      <div style={{ textAlign:'center', fontSize:11, color:'var(--tx3)' }}>
+      <div style={{ textAlign:'center', fontSize:'var(--fs-xs)', color:'var(--tx3)' }}>
         {lastSync ? 'Última sync: ' + fmtTime(lastSync) : 'Não sincronizado ainda'}
         {dirty ? ' • Alterações não salvas' : ''}
       </div>
@@ -1117,7 +1184,7 @@ function InsumoRow({ ins, sv, updateInsumo, onEdit, onDelete }) {
 
   return (
     <div style={{
-      padding:'12px 16px', borderBottom:'1px solid var(--soft)',
+      padding:'var(--sp-3) var(--sp-4)', borderBottom:'1px solid var(--line)',
       background: filled ? 'var(--filled)' : 'var(--card)',
     }}>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
@@ -1164,7 +1231,7 @@ function InsumoRow({ ins, sv, updateInsumo, onEdit, onDelete }) {
         </button>
       </div>
       {det && (
-        <div style={{ marginTop:8, padding:'10px 12px', background:'var(--box)', borderRadius:8, border:'1px solid var(--soft)' }}>
+        <div style={{ marginTop:8, padding:'10px 12px', background:'var(--box)', borderRadius:'var(--r-sm)', border:'1px solid var(--line)' }}>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
             <div>
               <div style={lbl}>Conteúdo ({ins.b} por {unid})</div>
@@ -1215,15 +1282,15 @@ function InsumosGroup({ grupo, insumos, stateInsumos, updateInsumo, onEditIns, o
     <div style={{ marginBottom:2 }}>
       <button onClick={() => setOpen(o => !o)} style={{
         width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between',
-        padding:'12px 16px', background:'var(--soft)', border:'none', cursor:'pointer',
-        textAlign:'left',
+        padding:'var(--sp-3) var(--sp-4)', background:'var(--soft)', border:'none', cursor:'pointer',
+        borderTop:'1px solid var(--line)', borderBottom:'1px solid var(--line)', textAlign:'left',
       }}>
-        <span style={{ fontWeight:700, fontSize:13, letterSpacing:.5 }}>
+        <span style={{ fontWeight:700, fontSize:'var(--fs-base)', letterSpacing:.3 }}>
           {groupIcons[grupo] || '📦'} {grupo}
         </span>
-        <span style={{ fontSize:12, color:'var(--tx3)', display:'flex', alignItems:'center', gap:8 }}>
+        <span style={{ fontSize:'var(--fs-sm)', color:'var(--tx3)', display:'flex', alignItems:'center', gap:'var(--sp-2)' }}>
           <span style={{
-            padding:'2px 8px', borderRadius:10,
+            padding:'2px 8px', borderRadius:'var(--r-full)',
             background: filled === insumos.length ? 'var(--ok-bg)' : 'var(--card)',
             color: filled === insumos.length ? 'var(--ok-tx)' : 'var(--tx2)',
             fontWeight:600,
@@ -1258,7 +1325,7 @@ function InsumoFormModal({ initial, state, onSave, onClose }) {
   const lbl = { fontSize:11, color:'var(--tx3)', marginBottom:3, marginTop:10 };
   return (
     <div style={{ position:'fixed', inset:0, zIndex:999, background:'var(--overlay)', display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}>
-      <div style={{ background:'var(--card)', borderRadius:12, padding:20, maxWidth:400, width:'100%', maxHeight:'85vh', overflowY:'auto' }}>
+      <div style={{ background:'var(--card)', borderRadius:'var(--r-lg)', padding:20, maxWidth:400, width:'100%', maxHeight:'85vh', overflowY:'auto', boxShadow:'var(--sh-3)', border:'1px solid var(--line)' }}>
         <div style={{ fontWeight:700, fontSize:16, marginBottom:4 }}>{initial ? 'Editar Insumo' : 'Novo Insumo'}</div>
         <div style={lbl}>Nome</div>
         <input style={inpStyle} value={f.n} onChange={e => set('n', e.target.value)} placeholder="Ex: Molho barbecue" />
@@ -1314,18 +1381,18 @@ function InsumosTab({ state, updateInsumo, saveCustomInsumo, deleteCustomInsumo 
   });
   return (
     <div>
-      <div style={{ padding:'12px 16px', background:'var(--card)', borderBottom:'1px solid var(--soft)', display:'flex', gap:8 }}>
+      <div style={{ padding:'var(--sp-3) var(--sp-4)', background:'var(--card)', borderBottom:'1px solid var(--line)', display:'flex', gap:'var(--sp-2)' }}>
         <input
           type="search" placeholder="Buscar insumo..." value={search}
           onChange={e => setSearch(e.target.value)}
           style={{
-            flex:1, padding:'9px 14px', border:'1px solid var(--inp-line)', borderRadius:8,
-            fontSize:16, background:'var(--inp-bg)',
+            flex:1, padding:'9px 14px', border:'1px solid var(--inp-line)', borderRadius:'var(--r-sm)',
+            fontSize:16, background:'var(--inp-bg)', color:'var(--tx)',
           }}
         />
         <button onClick={() => setModal('novo')} style={{
-          padding:'9px 14px', borderRadius:8, fontSize:13, fontWeight:700,
-          background:'var(--gold)', color:'var(--on-accent)', whiteSpace:'nowrap',
+          padding:'9px 16px', borderRadius:'var(--r-sm)', fontSize:'var(--fs-base)', fontWeight:700,
+          background:'var(--gold)', color:'var(--on-accent)', whiteSpace:'nowrap', boxShadow:'var(--sh-1)',
         }}>➕ Novo</button>
       </div>
       {Object.entries(grupos).map(([g, insumos]) => (
@@ -1439,19 +1506,19 @@ function FichaCard({ fid, ficha, state, updateFicha, onEdit, onDelete, indiceRat
   const mbColor = calculado ? (mb >= calc.m ? 'var(--green)' : mb >= calc.m - 0.05 ? 'var(--gold)' : 'var(--red)') : 'var(--tx4)';
 
   const metricBox = (label, value, color) => (
-    <div style={{ background:'var(--box)', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
+    <div style={{ background:'var(--box)', borderRadius:'var(--r-sm)', border:'1px solid var(--line)', padding:'var(--sp-2) var(--sp-3)', textAlign:'center' }}>
       <div style={{ fontSize:10, color:'var(--tx3)', marginBottom:2 }}>{label}</div>
-      <div style={{ fontSize:14, fontWeight:700, color: color || 'var(--tx)' }}>{value}</div>
+      <div style={{ fontSize:'var(--fs-md)', fontWeight:700, color: color || 'var(--tx)', fontVariantNumeric:'tabular-nums' }}>{value}</div>
     </div>
   );
   const inpStyle = { border:'1px solid var(--inp-line)', borderRadius:6, padding:'6px 8px', fontSize:15, background:'var(--card)', width:'100%', color:'var(--tx)' };
   const lbl = { fontSize:10, color:'var(--tx3)', marginBottom:2 };
 
   return (
-    <div style={{ margin:'0 0 2px', background:'var(--card)', borderBottom:'1px solid var(--soft)' }}>
+    <div style={{ margin:'0 0 2px', background:'var(--card)', borderBottom:'1px solid var(--line)' }}>
       <button onClick={() => setOpen(o => !o)} style={{
         width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between',
-        padding:'12px 16px', background:'transparent', border:'none', cursor:'pointer', textAlign:'left',
+        padding:'var(--sp-3) var(--sp-4)', background:'transparent', border:'none', cursor:'pointer', textAlign:'left',
       }}>
         <div>
           <div style={{ fontWeight:600, fontSize:14, color:'var(--tx)' }}>
@@ -1532,7 +1599,7 @@ function FichaCard({ fid, ficha, state, updateFicha, onEdit, onDelete, indiceRat
               </div>
             </div>
           )}
-          <div style={{ background:'var(--inp-bg)', borderTop:'1px solid var(--soft)', borderBottom:'1px solid var(--soft)' }}>
+          <div style={{ background:'var(--inp-bg)', borderTop:'1px solid var(--line)', borderBottom:'1px solid var(--line)' }}>
             <div style={{ padding:'8px 12px 4px', fontSize:11, color:'var(--tx4)', fontWeight:700, letterSpacing:.5 }}>
               INGREDIENTES — Nome | Qtd | Unid | R$ Manual
             </div>
@@ -1572,7 +1639,7 @@ function FichaFormModal({ initial, state, onSave, onClose }) {
 
   return (
     <div style={{ position:'fixed', inset:0, zIndex:999, background:'var(--overlay)', display:'flex', alignItems:'center', justifyContent:'center', padding:14 }}>
-      <div style={{ background:'var(--card)', borderRadius:12, padding:18, maxWidth:460, width:'100%', maxHeight:'90vh', overflowY:'auto' }}>
+      <div style={{ background:'var(--card)', borderRadius:'var(--r-lg)', padding:18, maxWidth:460, width:'100%', maxHeight:'90vh', overflowY:'auto', boxShadow:'var(--sh-3)', border:'1px solid var(--line)' }}>
         <div style={{ fontWeight:700, fontSize:16 }}>{initial ? 'Editar Ficha' : 'Nova Ficha Técnica'}</div>
         <label style={{ display:'flex', alignItems:'center', gap:8, marginTop:10, fontSize:13, color:'var(--tx2)' }}>
           <input type="checkbox" checked={f.sub} onChange={e => set('sub', e.target.checked)} />
@@ -1707,15 +1774,15 @@ function FichasTab({ state, updateFicha, saveCustomFicha, deleteCustomFicha }) {
 
   return (
     <div>
-      <div style={{ padding:'12px 16px', background:'var(--card)', borderBottom:'1px solid var(--soft)', display:'flex', gap:8 }}>
+      <div style={{ padding:'var(--sp-3) var(--sp-4)', background:'var(--card)', borderBottom:'1px solid var(--line)', display:'flex', gap:'var(--sp-2)' }}>
         <input
           type="search" placeholder="Buscar ficha ou produto..." value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ flex:1, padding:'9px 14px', border:'1px solid var(--inp-line)', borderRadius:8, fontSize:16, background:'var(--inp-bg)' }}
+          style={{ flex:1, padding:'9px 14px', border:'1px solid var(--inp-line)', borderRadius:'var(--r-sm)', fontSize:16, background:'var(--inp-bg)', color:'var(--tx)' }}
         />
         <button onClick={() => setModal('novo')} style={{
-          padding:'9px 14px', borderRadius:8, fontSize:13, fontWeight:700,
-          background:'var(--gold)', color:'var(--on-accent)', whiteSpace:'nowrap',
+          padding:'9px 16px', borderRadius:'var(--r-sm)', fontSize:'var(--fs-base)', fontWeight:700,
+          background:'var(--gold)', color:'var(--on-accent)', whiteSpace:'nowrap', boxShadow:'var(--sh-1)',
         }}>➕ Nova</button>
       </div>
       {Object.entries(grupos).map(([g, items]) => {
@@ -1724,14 +1791,15 @@ function FichasTab({ state, updateFicha, saveCustomFicha, deleteCustomFicha }) {
           <div key={g}>
             <button onClick={() => toggleGroup(g)} style={{
               width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between',
-              padding:'12px 16px', background:'var(--soft)', border:'none', cursor:'pointer', textAlign:'left',
+              padding:'var(--sp-3) var(--sp-4)', background:'var(--soft)', border:'none', cursor:'pointer',
+              borderTop:'1px solid var(--line)', borderBottom:'1px solid var(--line)', textAlign:'left',
             }}>
-              <span style={{ fontWeight:700, fontSize:13, letterSpacing:.5 }}>
+              <span style={{ fontWeight:700, fontSize:'var(--fs-base)', letterSpacing:.3 }}>
                 {catIcons[g] || '📋'} {g}
               </span>
-              <span style={{ fontSize:12, color:'var(--tx3)', display:'flex', alignItems:'center', gap:8 }}>
+              <span style={{ fontSize:'var(--fs-sm)', color:'var(--tx3)', display:'flex', alignItems:'center', gap:'var(--sp-2)' }}>
                 <span style={{
-                  padding:'2px 8px', borderRadius:10,
+                  padding:'2px 8px', borderRadius:'var(--r-full)',
                   background: calcCount === items.length ? 'var(--ok-bg)' : 'var(--card)',
                   color: calcCount === items.length ? 'var(--ok-tx)' : 'var(--tx2)', fontWeight:600,
                 }}>{calcCount}/{items.length}</span>
@@ -1775,8 +1843,8 @@ function FichasTab({ state, updateFicha, saveCustomFicha, deleteCustomFicha }) {
   );
 }
 
-// ─── COMPONENTE: RESUMO TAB ───────────────────────────────────────────────────
-function ResumoTab({ state }) {
+// ─── COMPONENTE: RESUMO VIEW (embutido na aba 📈 Gestão) ──────────────────────
+function ResumoView({ state }) {
   const todosInsumos = getInsumos(state);
   const insFilledCount = todosInsumos.filter(ins => parsePreco(((state.insumos || {})[ins.id] || {}).preco) > 0).length;
   const todasFichas = getFichaIds(state)
@@ -1808,19 +1876,19 @@ function ResumoTab({ state }) {
   };
 
   return (
-    <div className="tab-content" style={{ padding:'12px 16px' }}>
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:16 }}>
-        <div style={{ background:'var(--card)', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px var(--shadow)' }}>
-          <div style={{ fontSize:11, color:'var(--tx3)', marginBottom:4 }}>INSUMOS PREENCHIDOS</div>
-          <div style={{ fontSize:28, fontWeight:800, color:'var(--gold)' }}>{insFilledCount}<span style={{ fontSize:16, color:'var(--tx4)' }}>/{todosInsumos.length}</span></div>
-          <div style={{ marginTop:6, height:4, background:'var(--soft)', borderRadius:2 }}>
+    <div>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'var(--sp-3)', marginBottom:'var(--sp-4)' }}>
+        <div style={{ background:'var(--card)', borderRadius:'var(--r-md)', padding:'var(--sp-4)', boxShadow:'var(--sh-1)', border:'1px solid var(--line)' }}>
+          <div style={{ fontSize:'var(--fs-xs)', color:'var(--tx3)', marginBottom:'var(--sp-1)', textTransform:'uppercase', letterSpacing:0.4 }}>Insumos preenchidos</div>
+          <div style={{ fontSize:'var(--fs-2xl)', fontWeight:800, color:'var(--gold)' }}>{insFilledCount}<span style={{ fontSize:'var(--fs-md)', color:'var(--tx4)' }}>/{todosInsumos.length}</span></div>
+          <div style={{ marginTop:'var(--sp-2)', height:4, background:'var(--soft)', borderRadius:2 }}>
             <div style={{ height:'100%', background:'var(--gold)', width: (insFilledCount/todosInsumos.length*100) + '%', borderRadius:2 }} />
           </div>
         </div>
-        <div style={{ background:'var(--card)', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px var(--shadow)' }}>
-          <div style={{ fontSize:11, color:'var(--tx3)', marginBottom:4 }}>FICHAS CALCULADAS</div>
-          <div style={{ fontSize:28, fontWeight:800, color:'var(--green)' }}>{calcFichas.length}<span style={{ fontSize:16, color:'var(--tx4)' }}>/{todasFichas.length}</span></div>
-          <div style={{ marginTop:6, height:4, background:'var(--soft)', borderRadius:2 }}>
+        <div style={{ background:'var(--card)', borderRadius:'var(--r-md)', padding:'var(--sp-4)', boxShadow:'var(--sh-1)', border:'1px solid var(--line)' }}>
+          <div style={{ fontSize:'var(--fs-xs)', color:'var(--tx3)', marginBottom:'var(--sp-1)', textTransform:'uppercase', letterSpacing:0.4 }}>Fichas calculadas</div>
+          <div style={{ fontSize:'var(--fs-2xl)', fontWeight:800, color:'var(--green)' }}>{calcFichas.length}<span style={{ fontSize:'var(--fs-md)', color:'var(--tx4)' }}>/{todasFichas.length}</span></div>
+          <div style={{ marginTop:'var(--sp-2)', height:4, background:'var(--soft)', borderRadius:2 }}>
             <div style={{ height:'100%', background:'var(--green)', width: (todasFichas.length ? calcFichas.length/todasFichas.length*100 : 0) + '%', borderRadius:2 }} />
           </div>
         </div>
@@ -1919,14 +1987,22 @@ function ResumoTab({ state }) {
 }
 
 // ─── COMPONENTE: GESTÃO TAB ───────────────────────────────────────────────────
-function GestaoTab({ state, updateGestao, onImport }) {
+function GestaoTab({ state, updateGestao, onImport, vendasImp, filtro, setFiltro }) {
   const [searchV, setSearchV] = useState('');
   const [confirmImport, setConfirmImport] = useState(null);
+  const [sub, setSub] = useState('resumo');   // 'resumo' | 'custos'
   const g = state.gestao || {};
   const vendas = g.vendas || {};
   const fileRef = useRef(null);
 
-  const { rows, vend, fat, vendComFicha, cmvT, fatComFicha, cmvPct, semFicha } = calcVendasResumo(state);
+  // Fonte das vendas: importadas do PDV (padrão quando há dados) ou digitação manual
+  const imp = vendasImportadasPorFicha(vendasImp, filtro.de, filtro.ate, state);
+  const temImportadas = imp.nMeses > 0;
+  const [fonte, setFonte] = useState('imp');   // 'imp' | 'manual'
+  const usandoImp = fonte === 'imp' && temImportadas;
+  const qtdMap = usandoImp ? imp.qtdPorFid : undefined;
+
+  const { rows, vend, fat, vendComFicha, cmvT, fatComFicha, cmvPct, semFicha } = calcVendasResumo(state, qtdMap);
 
   // Engenharia de cardápio (popularidade × margem)
   const totalQ = vendComFicha.reduce((s, x) => s + x.q, 0);
@@ -1947,9 +2023,11 @@ function GestaoTab({ state, updateGestao, onImport }) {
     '🍍 Abacaxi': 'Nem vende nem dá margem — reformule ou tire do cardápio.',
   };
 
-  // CMV real
+  // CMV real — faturamento real vem do PDV quando em modo importado, senão do campo manual
   const compras = parsePreco(g.compras);
-  const fatReal = parsePreco(g.fatReal);
+  const fatRealManual = parsePreco(g.fatReal);
+  const fatReal = usandoImp && imp.fatRealTotal > 0 ? imp.fatRealTotal : fatRealManual;
+  const fatRealImportado = usandoImp && imp.fatRealTotal > 0;
   const cmvRealPct = fatReal > 0 ? compras / fatReal : 0;
 
   // Rateio de custos indiretos (fixos), proporcional ao cardápio (fixo diário)
@@ -1967,8 +2045,8 @@ function GestaoTab({ state, updateGestao, onImport }) {
   const pontoEquilibrio = mcPct > 0 ? custosFixos / mcPct : 0;
   const lucroLiquidoPeriodo = comRateio.reduce((s, x) => s + x.lucroTotal, 0);
 
-  const card = { background:'var(--card)', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px var(--shadow)', marginBottom:14 };
-  const h = { fontWeight:700, fontSize:13, letterSpacing:.5, marginBottom:10, color:'var(--tx)' };
+  const card = { background:'var(--card)', borderRadius:'var(--r-md)', padding:'var(--sp-4)', boxShadow:'var(--sh-1)', border:'1px solid var(--line)', marginBottom:'var(--sp-4)' };
+  const h = { fontWeight:700, fontSize:'var(--fs-base)', marginBottom:'var(--sp-3)', color:'var(--tx)' };
   const inpStyle = { border:'1px solid var(--inp-line)', borderRadius:6, padding:'7px 10px', fontSize:16, background:'var(--inp-bg)', width:'100%', color:'var(--tx)' };
   const lbl = { fontSize:11, color:'var(--tx3)', marginBottom:3 };
   const numInput = (field, placeholder) => (
@@ -2001,10 +2079,22 @@ function GestaoTab({ state, updateGestao, onImport }) {
     reader.readAsText(file);
   };
 
-  const rowsFiltradas = rows.filter(x => !searchV || x.d.n.toLowerCase().includes(searchV.toLowerCase()));
+  // No modo importado, a lista mostra só os produtos efetivamente vendidos (qtd>0),
+  // ordenados pela quantidade; no manual, todos os produtos para digitação.
+  const rowsFiltradas = rows
+    .filter(x => !searchV || x.d.n.toLowerCase().includes(searchV.toLowerCase()))
+    .filter(x => !usandoImp || x.q > 0)
+    .sort((a, b) => usandoImp ? b.q - a.q : 0);
 
   return (
-    <div className="tab-content" style={{ padding:'12px 16px' }}>
+    <div className="tab-content" style={{ padding:'var(--sp-3) var(--sp-4)' }}>
+      <div style={{ marginBottom:'var(--sp-4)' }}>
+        <SubNav items={[{ id:'resumo', label:'📊 Resumo' }, { id:'custos', label:'💵 Custos' }]} value={sub} onChange={setSub} />
+      </div>
+
+      {sub === 'resumo' && <ResumoView state={state} />}
+
+      {sub === 'custos' && (<React.Fragment>
       <div className="gestao-grid">
       {/* Custos variáveis */}
       <div style={card}>
@@ -2098,7 +2188,9 @@ function GestaoTab({ state, updateGestao, onImport }) {
           )}
           {vendComFicha.length === 0 && (
             <div style={{ fontSize:11, color:'var(--gold)', marginBottom:10 }}>
-              Nenhuma venda lançada ainda — o rateio por unidade já está calculado, mas o total do período e o ponto de equilíbrio ficam mais precisos lançando as vendas abaixo.
+              {usandoImp
+                ? 'Nenhuma venda importada vinculada a fichas neste período — o rateio por unidade já está calculado, mas o total do período depende de vincular as vendas às fichas (aba 💰 Vendas).'
+                : 'Nenhuma venda lançada ainda — o rateio por unidade já está calculado, mas o total do período e o ponto de equilíbrio ficam mais precisos lançando as vendas abaixo.'}
             </div>
           )}
           <div style={{ maxHeight:280, overflowY:'auto', border:'1px solid var(--soft)', borderRadius:8 }}>
@@ -2106,7 +2198,7 @@ function GestaoTab({ state, updateGestao, onImport }) {
               <div key={x.fid} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 10px', borderBottom:'1px solid var(--line-soft)' }}>
                 <div style={{ flex:1, minWidth:0 }}>
                   <div style={{ fontSize:12, fontWeight:500, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{x.d.n}</div>
-                  <div style={{ fontSize:10, color:'var(--tx4)' }}>rateio: {fmt2(x.rateioUn)} · {x.q > 0 ? x.q + '× vendido' : 'sem venda lançada'}</div>
+                  <div style={{ fontSize:10, color:'var(--tx4)' }}>rateio: {fmt2(x.rateioUn)} · {x.q > 0 ? x.q + '× vendido' : (usandoImp ? 'sem venda no período' : 'sem venda lançada')}</div>
                 </div>
                 <div style={{ textAlign:'right', flexShrink:0 }}>
                   <div style={{ fontSize:13, fontWeight:700, color: x.lucroUn >= 0 ? 'var(--green)' : 'var(--red)' }}>{fmt2(x.lucroUn)}/un</div>
@@ -2123,13 +2215,39 @@ function GestaoTab({ state, updateGestao, onImport }) {
 
       {/* Vendas do período */}
       <div style={card}>
-        <div style={h}>📈 VENDAS DO PERÍODO</div>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr', gap:8, marginBottom:10 }}>
-          <input type="text" placeholder="Período (ex: 07/2026)" value={g.periodo || ''}
-            onChange={e => updateGestao('periodo', e.target.value)} style={inpStyle} />
-          <input type="search" placeholder="Buscar produto para lançar venda..." value={searchV}
-            onChange={e => setSearchV(e.target.value)} style={inpStyle} />
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:8 }}>
+          <div style={{ ...h, marginBottom:0 }}>📈 VENDAS DO PERÍODO</div>
+          {temImportadas && (
+            <div style={{ display:'inline-flex', background:'var(--soft)', borderRadius:8, padding:2 }}>
+              {[['imp','💰 Importadas'],['manual','✍️ Manuais']].map(([v, lab]) => (
+                <button key={v} onClick={() => setFonte(v)} style={{
+                  padding:'5px 12px', borderRadius:6, fontSize:12, fontWeight:700, border:'none',
+                  background: fonte === v ? 'var(--card)' : 'transparent',
+                  color: fonte === v ? 'var(--gold)' : 'var(--tx2)',
+                  boxShadow: fonte === v ? '0 1px 3px var(--shadow)' : 'none',
+                }}>{lab}</button>
+              ))}
+            </div>
+          )}
         </div>
+
+        {usandoImp ? (
+          <div style={{ margin:'10px 0' }}>
+            {setFiltro && <div style={{ marginBottom:10 }}><FiltroMeses vendas={vendasImp} filtro={filtro} setFiltro={setFiltro} /></div>}
+            <div style={{ fontSize:12, color:'var(--tx2)', padding:'8px 12px', background:'var(--box)', borderRadius:8 }}>
+              Usando as vendas reais importadas do PDV — {imp.nMeses} mês(es) · faturamento real {fmt2(imp.fatRealTotal)}.
+              {imp.nSemVinculo > 0 && <span style={{ color:'var(--gold)' }}> {imp.nSemVinculo} produto(s) sem vínculo com ficha ({fmt2(imp.fatSemVinculo)}) — vincule na aba 💰 Vendas.</span>}
+            </div>
+          </div>
+        ) : (
+          <div style={{ display:'grid', gridTemplateColumns:'1fr', gap:8, margin:'10px 0' }}>
+            <input type="text" placeholder="Período (ex: 07/2026)" value={g.periodo || ''}
+              onChange={e => updateGestao('periodo', e.target.value)} style={inpStyle} />
+          </div>
+        )}
+        <input type="search" placeholder="Buscar produto..." value={searchV}
+          onChange={e => setSearchV(e.target.value)} style={{ ...inpStyle, marginBottom:10 }} />
+
         <div style={{ maxHeight:300, overflowY:'auto', border:'1px solid var(--soft)', borderRadius:8 }}>
           {rowsFiltradas.map(x => (
             <div key={x.fid} style={{ display:'flex', alignItems:'center', gap:8, padding:'6px 10px', borderBottom:'1px solid var(--line-soft)' }}>
@@ -2137,16 +2255,34 @@ function GestaoTab({ state, updateGestao, onImport }) {
                 <div style={{ fontSize:12, fontWeight:500, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{x.d.n}</div>
                 <div style={{ fontSize:10, color:'var(--tx4)' }}>{fmt2(x.calc.p)}{x.calc.calculado ? ' · custo ' + fmt2(x.calc.total) : ' · sem ficha'}</div>
               </div>
-              <input type="text" inputMode="numeric" placeholder="qtd" value={vendas[x.fid] || ''}
-                onChange={e => { const v = e.target.value; if (v === '' || /^\d{0,5}$/.test(v)) updateGestao('vendas', { ...vendas, [x.fid]: v }); }}
-                style={{ ...inpStyle, width:64, textAlign:'center', padding:'6px 4px' }} />
+              {usandoImp ? (
+                <div style={{ minWidth:64, textAlign:'right' }}>
+                  <div style={{ fontSize:14, fontWeight:700, color:'var(--tx)', fontVariantNumeric:'tabular-nums' }}>{x.q.toLocaleString('pt-BR')}</div>
+                  <div style={{ fontSize:10, color:'var(--tx4)' }}>un</div>
+                </div>
+              ) : (
+                <input type="text" inputMode="numeric" placeholder="qtd" value={vendas[x.fid] || ''}
+                  onChange={e => { const v = e.target.value; if (v === '' || /^\d{0,5}$/.test(v)) updateGestao('vendas', { ...vendas, [x.fid]: v }); }}
+                  style={{ ...inpStyle, width:64, textAlign:'center', padding:'6px 4px' }} />
+              )}
             </div>
           ))}
+          {rowsFiltradas.length === 0 && (
+            <div style={{ padding:'20px', textAlign:'center', fontSize:12, color:'var(--tx4)' }}>
+              {usandoImp ? 'Nenhuma venda importada vinculada a fichas neste período.' : 'Nenhum produto encontrado.'}
+            </div>
+          )}
         </div>
         {vend.length > 0 && (
           <div style={{ marginTop:10, display:'grid', gridTemplateColumns:'1fr 1fr', gap:6 }}>
+            {fatRealImportado && (
+              <div style={{ background:'var(--box)', borderRadius:6, padding:'8px 10px', textAlign:'center', gridColumn:'1 / -1' }}>
+                <div style={{ fontSize:10, color:'var(--tx3)' }}>Faturamento real (PDV)</div>
+                <div style={{ fontSize:15, fontWeight:700, color:'var(--green)' }}>{fmt2(imp.fatRealTotal)}</div>
+              </div>
+            )}
             <div style={{ background:'var(--box)', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
-              <div style={{ fontSize:10, color:'var(--tx3)' }}>Faturamento teórico</div>
+              <div style={{ fontSize:10, color:'var(--tx3)' }}>Faturamento {fatRealImportado ? 'teórico (fichas)' : 'teórico'}</div>
               <div style={{ fontSize:15, fontWeight:700 }}>{fmt2(fat)}</div>
             </div>
             <div style={{ background:'var(--box)', borderRadius:6, padding:'8px 10px', textAlign:'center' }}>
@@ -2196,9 +2332,19 @@ function GestaoTab({ state, updateGestao, onImport }) {
           </div>
           <div>
             <div style={lbl}>Faturamento real do período (R$)</div>
-            {numInput('fatReal', '0,00')}
+            {fatRealImportado ? (
+              <div style={{ ...inpStyle, display:'flex', alignItems:'center', justifyContent:'space-between', background:'var(--box)' }}>
+                <span style={{ fontWeight:700 }}>{fmt2(imp.fatRealTotal)}</span>
+                <span style={{ fontSize:10, color:'var(--gold)', fontWeight:700 }}>PDV</span>
+              </div>
+            ) : numInput('fatReal', '0,00')}
           </div>
         </div>
+        {fatRealImportado && (
+          <div style={{ fontSize:11, color:'var(--tx3)', marginTop:6 }}>
+            Faturamento real vindo das vendas importadas do PDV. Para digitar manualmente, troque a fonte para ✍️ Manuais em "Vendas do período".
+          </div>
+        )}
         {fatReal > 0 && compras > 0 && (
           <div style={{ marginTop:10, fontSize:13, lineHeight:1.7 }}>
             <div>CMV real: <strong style={{ color: cmvRealPct > 0.38 ? 'var(--red)' : 'var(--green)' }}>{fmtPct(cmvRealPct)}</strong>
@@ -2232,6 +2378,7 @@ function GestaoTab({ state, updateGestao, onImport }) {
         </div>
       </div>
       </div>
+      </React.Fragment>)}
       <div style={{ height:16 }} />
       {confirmImport && (
         <ConfirmModal
@@ -2274,8 +2421,8 @@ function FiltroMeses({ vendas, filtro, setFiltro }) {
   );
 }
 
-// ─── COMPONENTE: VENDAS TAB ───────────────────────────────────────────────────
-function VendasTab({ vendas, vendasStatus, state, filtro, setFiltro, onImportMes, onDeleteMes, onSetVinculo }) {
+// ─── COMPONENTE: VENDAS TAB (Lista + Gráficos) ────────────────────────────────
+function VendasTab({ vendas, vendasStatus, state, filtro, setFiltro, onImportMes, onDeleteMes, onSetVinculo, theme }) {
   const fileRef = useRef(null);
   const [erro, setErro] = useState('');
   const [confirmSubst, setConfirmSubst] = useState(null);  // parsed aguardando confirmação
@@ -2283,6 +2430,7 @@ function VendasTab({ vendas, vendasStatus, state, filtro, setFiltro, onImportMes
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState({ k:'fat', asc:false });
   const [editCod, setEditCod] = useState(null);            // linha com select de vínculo aberto
+  const [sub, setSub] = useState('lista');                 // 'lista' | 'graficos'
 
   const agg = agregarVendas(vendas, filtro.de, filtro.ate);
   const map = vendas.map || {};
@@ -2338,13 +2486,13 @@ function VendasTab({ vendas, vendasStatus, state, filtro, setFiltro, onImportMes
     reader.readAsText(file, 'utf-8');
   };
 
-  const card = { background:'var(--card)', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px var(--shadow)', marginBottom:14 };
-  const h = { fontWeight:700, fontSize:13, letterSpacing:.5, marginBottom:10, color:'var(--tx)' };
+  const card = { background:'var(--card)', borderRadius:'var(--r-md)', padding:'var(--sp-4)', boxShadow:'var(--sh-1)', border:'1px solid var(--line)', marginBottom:'var(--sp-4)' };
+  const h = { fontWeight:700, fontSize:'var(--fs-base)', marginBottom:'var(--sp-3)', color:'var(--tx)' };
   const kpi = (label, value, sub) => (
-    <div style={{ background:'var(--card)', borderRadius:10, padding:'12px 14px', boxShadow:'0 1px 4px var(--shadow)' }}>
-      <div style={{ fontSize:11, color:'var(--tx3)', marginBottom:4 }}>{label}</div>
-      <div style={{ fontSize:22, fontWeight:800, color:'var(--tx)' }}>{value}</div>
-      {sub && <div style={{ fontSize:11, color:'var(--tx3)', marginTop:2 }}>{sub}</div>}
+    <div style={{ background:'var(--box)', borderRadius:'var(--r-sm)', padding:'var(--sp-3)', border:'1px solid var(--line)' }}>
+      <div style={{ fontSize:'var(--fs-xs)', color:'var(--tx3)', marginBottom:'var(--sp-1)', textTransform:'uppercase', letterSpacing:0.4 }}>{label}</div>
+      <div style={{ fontSize:'var(--fs-xl)', fontWeight:800, color:'var(--tx)', fontVariantNumeric:'tabular-nums' }}>{value}</div>
+      {sub && <div style={{ fontSize:'var(--fs-xs)', color:'var(--tx3)', marginTop:2 }}>{sub}</div>}
     </div>
   );
   const th = (label, k, right) => (
@@ -2364,7 +2512,18 @@ function VendasTab({ vendas, vendasStatus, state, filtro, setFiltro, onImportMes
   }[vendasStatus] || { t:'', b:'transparent', c:'var(--tx3)' };
 
   return (
-    <div className="tab-content" style={{ padding:'12px 16px' }}>
+    <div className="tab-content" style={{ padding:'var(--sp-3) var(--sp-4)' }}>
+      {temMeses && (
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:'var(--sp-3)', marginBottom:'var(--sp-4)' }}>
+          <SubNav items={[{ id:'lista', label:'📋 Lista' }, { id:'graficos', label:'📉 Gráficos' }]} value={sub} onChange={setSub} />
+          <div style={{ display:'flex', alignItems:'center', gap:'var(--sp-3)', flexWrap:'wrap' }}>
+            <FiltroMeses vendas={vendas} filtro={filtro} setFiltro={setFiltro} />
+            <span style={{ fontSize:'var(--fs-sm)', color:'var(--tx3)' }}>{agg.meses.length} mês(es) · {fmt2(agg.fatTotal)}</span>
+          </div>
+        </div>
+      )}
+
+      {sub === 'lista' && (<React.Fragment>
       {/* Importação */}
       <div style={card}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:8 }}>
@@ -2421,12 +2580,7 @@ function VendasTab({ vendas, vendasStatus, state, filtro, setFiltro, onImportMes
 
       {temMeses && (
         <div>
-          {/* Filtro + KPIs */}
-          <div style={{ ...card, display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:10 }}>
-            <FiltroMeses vendas={vendas} filtro={filtro} setFiltro={setFiltro} />
-            <span style={{ fontSize:12, color:'var(--tx3)' }}>{agg.meses.length} mês(es) no período</span>
-          </div>
-          <div className="kpi-row" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:14 }}>
+          <div className="kpi-row" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'var(--sp-3)', marginBottom:'var(--sp-4)' }}>
             {kpi('FATURAMENTO', fmt2(agg.fatTotal))}
             {kpi('ITENS VENDIDOS', agg.qtdTotal.toLocaleString('pt-BR'))}
             {kpi('PRODUTOS DISTINTOS', agg.porProduto.length)}
@@ -2510,6 +2664,11 @@ function VendasTab({ vendas, vendasStatus, state, filtro, setFiltro, onImportMes
           </div>
         </div>
       )}
+      </React.Fragment>)}
+
+      {sub === 'graficos' && temMeses && (
+        <GraficosView vendas={vendas} state={state} filtro={filtro} theme={theme} />
+      )}
 
       {confirmSubst && (
         <ConfirmModal
@@ -2547,34 +2706,22 @@ function ChartCard({ title, subtitle, build, deps, height }) {
     return () => chart.destroy();
   }, deps);
   return (
-    <div style={{ background:'var(--card)', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px var(--shadow)', marginBottom:14 }}>
-      <div style={{ fontWeight:700, fontSize:13, letterSpacing:.5, color:'var(--tx)' }}>{title}</div>
-      {subtitle && <div style={{ fontSize:11, color:'var(--tx3)', marginTop:2 }}>{subtitle}</div>}
-      <div style={{ height: height || 280, position:'relative', marginTop:10 }}>
+    <div style={{ background:'var(--card)', borderRadius:'var(--r-md)', padding:'var(--sp-4)', boxShadow:'var(--sh-1)', border:'1px solid var(--line)', marginBottom:'var(--sp-4)' }}>
+      <div style={{ fontWeight:700, fontSize:'var(--fs-base)', color:'var(--tx)' }}>{title}</div>
+      {subtitle && <div style={{ fontSize:'var(--fs-xs)', color:'var(--tx3)', marginTop:2 }}>{subtitle}</div>}
+      <div style={{ height: height || 280, position:'relative', marginTop:'var(--sp-3)' }}>
         <canvas ref={ref} />
       </div>
     </div>
   );
 }
 
-function GraficosTab({ vendas, state, filtro, setFiltro, theme }) {
-  const temMeses = mesesOrdenados(vendas).length > 0;
+// Bloco de gráficos — usado embutido dentro da aba 💰 Vendas (sub-visão "Gráficos").
+// O filtro de período e o estado vazio são controlados pela VendasTab.
+function GraficosView({ vendas, state, filtro, theme }) {
   const agg = agregarVendas(vendas, filtro.de, filtro.ate);
   const map = vendas.map || {};
   const aggKey = JSON.stringify([filtro.de, filtro.ate, (vendas.updatedAt || ''), theme]);
-
-  const card = { background:'var(--card)', borderRadius:10, padding:'14px 16px', boxShadow:'0 1px 4px var(--shadow)', marginBottom:14 };
-
-  if (!temMeses) {
-    return (
-      <div className="tab-content" style={{ padding:'12px 16px' }}>
-        <div style={{ textAlign:'center', padding:'50px 20px', color:'var(--tx4)' }}>
-          <div style={{ fontSize:40, marginBottom:8 }}>📉</div>
-          <div>Sem dados para os gráficos. Importe os relatórios mensais na aba 💰 Vendas.</div>
-        </div>
-      </div>
-    );
-  }
 
   // Base comum dos gráficos (cores lidas das variáveis do tema no momento do build)
   const base = () => {
@@ -2677,23 +2824,15 @@ function GraficosTab({ vendas, state, filtro, setFiltro, theme }) {
   };
 
   return (
-    <div className="tab-content" style={{ padding:'12px 16px' }}>
-      <div style={{ ...card, display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:10 }}>
-        <FiltroMeses vendas={vendas} filtro={filtro} setFiltro={setFiltro} />
-        <span style={{ fontSize:12, color:'var(--tx3)' }}>
-          {agg.meses.length} mês(es) · {fmt2(agg.fatTotal)} faturados
-        </span>
-      </div>
-      <div className="charts-grid">
-        <ChartCard title="📆 FATURAMENTO POR MÊS" subtitle="Total faturado em cada mês importado"
-          build={buildMensal} deps={[aggKey]} height={260} />
-        <ChartCard title="🏆 TOP 10 PRODUTOS" subtitle="Maiores faturamentos do período"
-          build={buildTop10} deps={[aggKey]} height={300} />
-        <ChartCard title="📊 CURVA ABC" subtitle="Participação no faturamento — barras individuais, linha acumulada"
-          build={buildABC} deps={[aggKey]} height={300} />
-        <ChartCard title="🍽️ FATURAMENTO POR CATEGORIA" subtitle="Categorias das fichas vinculadas às vendas"
-          build={buildCats} deps={[aggKey]} height={300} />
-      </div>
+    <div className="charts-grid">
+      <ChartCard title="📆 FATURAMENTO POR MÊS" subtitle="Total faturado em cada mês importado"
+        build={buildMensal} deps={[aggKey]} height={260} />
+      <ChartCard title="🏆 TOP 10 PRODUTOS" subtitle="Maiores faturamentos do período"
+        build={buildTop10} deps={[aggKey]} height={300} />
+      <ChartCard title="📊 CURVA ABC" subtitle="Participação no faturamento — barras individuais, linha acumulada"
+        build={buildABC} deps={[aggKey]} height={300} />
+      <ChartCard title="🍽️ FATURAMENTO POR CATEGORIA" subtitle="Categorias das fichas vinculadas às vendas"
+        build={buildCats} deps={[aggKey]} height={300} />
     </div>
   );
 }
@@ -2705,7 +2844,7 @@ function ConfirmModal({ message, onConfirm, onCancel, okLabel }) {
       position:'fixed', inset:0, zIndex:999, background:'var(--overlay)',
       display:'flex', alignItems:'center', justifyContent:'center', padding:24,
     }}>
-      <div style={{ background:'var(--card)', borderRadius:12, padding:24, maxWidth:320, width:'100%', boxShadow:'0 8px 32px rgba(0,0,0,0.2)' }}>
+      <div style={{ background:'var(--card)', borderRadius:'var(--r-lg)', padding:24, maxWidth:320, width:'100%', boxShadow:'var(--sh-3)', border:'1px solid var(--line)' }}>
         <div style={{ fontSize:15, color:'var(--tx)', marginBottom:20, lineHeight:1.5 }}>{message}</div>
         <div style={{ display:'flex', gap:10 }}>
           <button onClick={onCancel} style={{
@@ -3088,21 +3227,20 @@ function App() {
             saveCustomFicha={saveCustomFicha} deleteCustomFicha={deleteCustomFicha}
           />
         )}
-        {tab === 'resumo' && <ResumoTab state={state} />}
         {tab === 'vendas' && (
           <VendasTab
             vendas={vendasData} vendasStatus={vendasStatus} state={state}
             filtro={filtroVendas} setFiltro={setFiltroVendas}
             onImportMes={importarMesVendas} onDeleteMes={excluirMesVendas} onSetVinculo={setVinculoVenda}
+            theme={theme}
           />
         )}
-        {tab === 'graficos' && (
-          <GraficosTab
-            vendas={vendasData} state={state}
-            filtro={filtroVendas} setFiltro={setFiltroVendas} theme={theme}
+        {tab === 'gestao' && (
+          <GestaoTab
+            state={state} updateGestao={updateGestao} onImport={handleImport}
+            vendasImp={vendasData} filtro={filtroVendas} setFiltro={setFiltroVendas}
           />
         )}
-        {tab === 'gestao' && <GestaoTab state={state} updateGestao={updateGestao} onImport={handleImport} />}
       </main>
       <Footer
         onSave={handleSave} onCancel={handleCancel} onExport={handleExport}
